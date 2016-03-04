@@ -12,7 +12,7 @@
 * SUPPORTS:   Visual Studio 2015, 2013, 2012, 2010, 2008
 * UPDATED:    2/13/2016
 * VERSION:    1.0.6
-* TAGS:       tasks, TAP, task scheduler, functional tests, ORM, .NET, C#, asynchronous, orm extensions
+* TAGS:       tasks, TAP, TPL, task scheduler, functional tests, ORM, .NET, C#, asynchronous, parametric polymorphism
 
 ### Screenshot <img src="https://github.com/Latency/ORM-Monitor/blob/master/ORM-Monitor.png?raw=true">
 
@@ -238,7 +238,7 @@ private void OlvTasksOnItemsAdding(object sender, ItemsAddingEventArgs itemsAddi
   In addition to being able to use the API library as standalone, the project consists of two user-interfaces I developed using Telerik's RAD tools and the other with ordinary stock controls.
 
 <a name="references"><h2>References</h2></a>
- TPL, .NET 4.x, ORM, Dependency Injection, Generics, Delegates, EventHandlers
+ TPL, .NET 4.x, ORM, Dependency Injection, Generics, Delegates, EventHandlers, Parametric Polymorphism
 
 <a name="license"><h2>License</h2></a>
 [GNU LESSER GENERAL PUBLIC LICENSE] - Version 3, 29 June 2007
