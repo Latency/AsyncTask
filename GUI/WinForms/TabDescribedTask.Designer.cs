@@ -28,7 +28,6 @@ namespace GUI.WinForms {
     private void InitializeComponent() {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TabDescribedTask));
-      this.olvColumnAction = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.groupBox9 = new System.Windows.Forms.GroupBox();
       this.StartButton = new Telerik.WinControls.UI.RadButton();
       this.StopButton = new Telerik.WinControls.UI.RadButton();
@@ -42,6 +41,7 @@ namespace GUI.WinForms {
       this.olvColumnPriority = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.olvColumnProgress = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.olvColumnStatus = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+      this.olvColumnAction = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.olvColumnDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.imageListSmall = new System.Windows.Forms.ImageList(this.components);
       this.radCollapsiblePanel1 = new Telerik.WinControls.UI.RadCollapsiblePanel();
@@ -55,20 +55,6 @@ namespace GUI.WinForms {
       this.radCollapsiblePanel1.PanelContainer.SuspendLayout();
       this.radCollapsiblePanel1.SuspendLayout();
       this.SuspendLayout();
-      // 
-      // olvColumnAction
-      // 
-      this.olvColumnAction.AspectName = "NextAction";
-      this.olvColumnAction.ButtonSize = new System.Drawing.Size(80, 26);
-      this.olvColumnAction.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.FixedBounds;
-      this.olvColumnAction.EnableButtonWhenItemIsDisabled = true;
-      this.olvColumnAction.HeaderFont = new System.Drawing.Font("MilleniGem", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.olvColumnAction.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-      this.olvColumnAction.ImageAspectName = "NextAction";
-      this.olvColumnAction.IsButton = true;
-      this.olvColumnAction.Text = "Action";
-      this.olvColumnAction.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-      this.olvColumnAction.Width = 90;
       // 
       // groupBox9
       // 
@@ -100,7 +86,7 @@ namespace GUI.WinForms {
       this.StartButton.RootElement.MinSize = new System.Drawing.Size(110, 24);
       this.StartButton.Size = new System.Drawing.Size(110, 24);
       this.StartButton.TabIndex = 4;
-      this.StartButton.Text = "Start New Task";
+      this.StartButton.Text = "Start New TaskName";
       this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
       // 
       // StopButton
@@ -239,20 +225,20 @@ namespace GUI.WinForms {
       // 
       // olvColumnTask
       // 
-      this.olvColumnTask.AspectName = "Task";
+      this.olvColumnTask.AspectName = "TaskName";
       this.olvColumnTask.CellPadding = new System.Drawing.Rectangle(4, 2, 4, 2);
-      this.olvColumnTask.HeaderFont = new System.Drawing.Font("MilleniGem", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.olvColumnTask.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnTask.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
       this.olvColumnTask.ImageAspectName = "ImageName";
       this.olvColumnTask.MinimumWidth = 40;
-      this.olvColumnTask.Text = "Task";
+      this.olvColumnTask.Text = "TaskName";
       this.olvColumnTask.ToolTipText = "";
       this.olvColumnTask.Width = 400;
       // 
       // olvColumnPriority
       // 
       this.olvColumnPriority.AspectName = "Priority";
-      this.olvColumnPriority.HeaderFont = new System.Drawing.Font("MilleniGem", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.olvColumnPriority.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnPriority.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
       this.olvColumnPriority.Text = "Priority";
       this.olvColumnPriority.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -261,7 +247,7 @@ namespace GUI.WinForms {
       // olvColumnProgress
       // 
       this.olvColumnProgress.AspectName = "Progress";
-      this.olvColumnProgress.HeaderFont = new System.Drawing.Font("MilleniGem", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.olvColumnProgress.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnProgress.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
       this.olvColumnProgress.Text = "Progress";
       this.olvColumnProgress.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -270,7 +256,7 @@ namespace GUI.WinForms {
       // olvColumnStatus
       // 
       this.olvColumnStatus.AspectName = "Status";
-      this.olvColumnStatus.HeaderFont = new System.Drawing.Font("MilleniGem", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.olvColumnStatus.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnStatus.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
       this.olvColumnStatus.IsTileViewColumn = true;
       this.olvColumnStatus.MinimumWidth = 30;
@@ -279,10 +265,25 @@ namespace GUI.WinForms {
       this.olvColumnStatus.ToolTipText = "";
       this.olvColumnStatus.Width = 140;
       // 
+      // olvColumnAction
+      // 
+      this.olvColumnAction.AspectName = "Action";
+      this.olvColumnAction.ButtonSize = new System.Drawing.Size(80, 26);
+      this.olvColumnAction.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.FixedBounds;
+      this.olvColumnAction.CellEditUseWholeCell = true;
+      this.olvColumnAction.EnableButtonWhenItemIsDisabled = true;
+      this.olvColumnAction.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.olvColumnAction.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+      this.olvColumnAction.ImageAspectName = "";
+      this.olvColumnAction.IsButton = true;
+      this.olvColumnAction.Text = "Action";
+      this.olvColumnAction.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+      this.olvColumnAction.Width = 90;
+      // 
       // olvColumnDate
       // 
       this.olvColumnDate.AspectName = "Date";
-      this.olvColumnDate.HeaderFont = new System.Drawing.Font("MilleniGem", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.olvColumnDate.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnDate.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
       this.olvColumnDate.ImageAspectName = "Date";
       this.olvColumnDate.Text = "Date";

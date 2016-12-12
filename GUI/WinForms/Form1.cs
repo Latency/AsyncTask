@@ -10,11 +10,14 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
-using ORM_Monitor.Controllers;
-using ORM_Monitor.Models;
+using GUI.Properties;
+using ORM_Monitor;
+using ReflectSoftware.Insight;
 
 namespace GUI.WinForms {
   public partial class Form1 : Form {
+    private readonly ReflectInsight _log = RILogManager.Default;
+
     /// <summary>
     ///   Constructor
     /// </summary>
@@ -29,35 +32,46 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void button1_Click(object sender, EventArgs e) {
-      Action<Control, MethodInvoker> action = (ctl, a) => {
+      Action<Control, string> action = (ctl, a) => {
         if (ctl.InvokeRequired)
-          ctl.Invoke(a);
+          ctl.Invoke((MethodInvoker) delegate { ctl.Text += a + Environment.NewLine; });
         else
-          a();
+          ctl.Text += a + Environment.NewLine;
       };
 
-      richTextBox1.Text += "***Starting Test***\n"; // Cross-Threaded call to UI thread will throw exception.
+      TaskEventArgs.Expression expression = args => {
+        var obj = args[0];
+        var str = args[1] as string;
+        var testNo = obj != null ? $"{((TaskEvent<dynamic>)obj).Name}: " : string.Empty;
+        _log.SendInformation(testNo + str);
+      };
 
-      var t = new TaskEvent<Action<Control, MethodInvoker>>(5000);
-      t.RunningAction.OnRunning += (th, tea) => { SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 20)); };
-      t.CompletedAction.OnCompleted += (th, tea) => {
-        if (tea.Expression != null)
-          tea.Expression(richTextBox1, delegate { richTextBox1.Text += "Completed\n"; });
-        else
-          richTextBox1.Text += "Completed\n"; // Cross-Threaded call to UI thread will throw exception.
+
+      richTextBox1.Text += "***Starting Test***\n";
+
+      var t = new TaskEvent<Action<Control, MethodInvoker>>(expression, TimeSpan.FromSeconds(Settings.Default.TTL)) {
+        Name = "task"
       };
-      t.CanceledAction.OnCanceled += (th, tea) => {
-        // Is the same as above without the else clause using null propagation matching signature from Action<T1, T2>.Invoke Method in namespace System (System.Runtime.dll)
-        tea.Expression?.Invoke(richTextBox1, delegate { richTextBox1.Text += "Canceled\n"; });
-      };
-      t.TimeoutAction.OnTimeout +=
-        (th, tea) => { tea.Expression?.Invoke(richTextBox1, delegate { richTextBox1.Text += "Timed out\n"; }); };
+
+      t.OnRunning((th, tea) => { SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 20)); });
+      t.OnCompleted(
+        (th, tea) => {
+          action.Invoke(richTextBox1, "Completed");
+        }
+      );
+      t.OnCanceled(
+        (th, tea) => {
+          action.Invoke(richTextBox1, "Canceled");
+        }
+      );
+      t.OnTimeout(
+        (th, tea) => {
+          action.Invoke(richTextBox1, "Timed out");
+        }
+      );
 
       // Invoke extension method.
-      //Async_IO.AsyncMonitor(null, t);   /* Explicit use Will cause cross-threaded operations on 'richTextbox.Text' due to null exception. */
-#pragma warning disable 4014
-      action.AsyncMonitor(t);
-#pragma warning restore 4014
+      t.AsyncMonitor();
     }
 
 

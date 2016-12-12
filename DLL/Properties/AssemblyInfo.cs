@@ -1,10 +1,10 @@
 ﻿//  *****************************************************************************
-//  File:      AssemblyInfo.cs
-//  Solution:  ORM-Monitor
-//  Project:   DLL
-//  Date:      01/03/2016
-//  Author:    Latency McLaughlin
-//  Copywrite: Bio-Hazard Industries - 1998-2016
+//  File:       AssemblyInfo.cs
+//  Solution:   ORM-Monitor
+//  Project:    DLL
+//  Date:       11/04/2016
+//  Author:     Latency McLaughlin
+//  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
 using System.Reflection;
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bio-Hazard Industries")]
 [assembly: AssemblyProduct("ORM-Monitor")]
-[assembly: AssemblyCopyright("Copyright ©  1998-2016")]
+[assembly: AssemblyCopyright("Copyright ©  1998-2017")]
 [assembly: AssemblyTrademark("Latency McLaughlin")]
 [assembly: AssemblyCulture("")]
 
@@ -41,5 +41,4 @@ using System.Runtime.InteropServices;
 //      Revision
 //
 
-[assembly: AssemblyVersion("1.0.*")]
-//[assembly: AssemblyFileVersion("1.0.8")]
+[assembly: AssemblyVersion("2.0")]

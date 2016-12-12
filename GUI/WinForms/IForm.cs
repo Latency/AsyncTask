@@ -14,6 +14,5 @@ namespace GUI.WinForms {
   internal interface IForm {
     RadLabelElement StatusBar { get; set; }
     RadLabelElement StatusControl { get; set; }
-    Scheduler Scheduler { get; set; }
   }
 }

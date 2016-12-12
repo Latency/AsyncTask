@@ -74,17 +74,13 @@ namespace GUI {
       for (var e = exception; e != null; e = e.InnerException) {
         if (e.Data.Count <= 0)
           continue;
-        var collection =
-          e.Data.Cast<DictionaryEntry>()
-            .ToDictionary<DictionaryEntry, object, object>(kvp => "AdvancedInformation." + kvp.Key,
-              kvp => kvp.Value ?? string.Empty);
+        var collection = e.Data.Cast<DictionaryEntry>().ToDictionary<DictionaryEntry, object, object>(kvp => "AdvancedInformation." + kvp.Key, kvp => kvp.Value ?? string.Empty);
         e.Data.Clear();
         foreach (var item in collection)
           e.Data.Add(item.Key, item.Value);
       }
 
-      var exceptionMessageBox = new ExceptionMessageBox(exception, ExceptionMessageBoxButtons.AbortRetryIgnore,
-        ExceptionMessageBoxSymbol.Error);
+      var exceptionMessageBox = new ExceptionMessageBox(exception, ExceptionMessageBoxButtons.AbortRetryIgnore, ExceptionMessageBoxSymbol.Error);
       switch (exceptionMessageBox.Show(sender as Form)) {
         case DialogResult.Abort:
           Application.Exit();
@@ -95,8 +91,7 @@ namespace GUI {
 
         case DialogResult.Retry:
           var currentProcess = Process.GetCurrentProcess();
-          RILogManager.Default.SendInformation(
-            $"Restarting application `{currentProcess.ProcessName}' after exception `{exception.GetType().Name}' on pid #{currentProcess.Id}");
+          RILogManager.Default.SendInformation($"Restarting application `{currentProcess.ProcessName}' after exception `{exception.GetType().Name}' on pid #{currentProcess.Id}");
           Application.Restart();
           break;
       }
@@ -111,8 +106,7 @@ namespace GUI {
     /// <param name="e"></param>
     protected static void UnhandledException(object sender, UnhandledExceptionEventArgs e) {
       var ex = ExceptionSinkTrigger((Exception) e.ExceptionObject);
-      var exceptionMessageBox = new ExceptionMessageBox(ex, ExceptionMessageBoxButtons.OK,
-        ExceptionMessageBoxSymbol.Error);
+      var exceptionMessageBox = new ExceptionMessageBox(ex, ExceptionMessageBoxButtons.OK, ExceptionMessageBoxSymbol.Error);
       exceptionMessageBox.Show(null);
     }
   }

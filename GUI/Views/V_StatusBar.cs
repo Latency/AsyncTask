@@ -8,24 +8,29 @@
 //  *****************************************************************************
 
 using System;
-using System.ComponentModel;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using BrightIdeasSoftware;
+using GUI.Properties;
+using GUI.WinForms;
 using ORM_Monitor;
-using ORM_Monitor.Models;
+using ORM_Monitor.Events;
+using ORM_Monitor.Interfaces;
+using ReflectSoftware.Insight;
 using ReflectSoftware.Insight.Common;
 
 namespace GUI.Views {
   // ReSharper disable once InconsistentNaming
-  internal sealed class V_StatusBar : BackgroundWorker, ITaskScheduler {
+  internal sealed partial class V_StatusBar : ITaskView {
     /// <summary>
     ///   Default constructor
     /// </summary>
+    /// <param name="ctx"></param>
     /// <param name="olv"></param>
     /// <param name="tag"></param>
-    public V_StatusBar(ObjectListView olv, object tag = null) {
+    public V_StatusBar(RadForm1 ctx, ObjectListView olv, object tag = null) {
+      Context = ctx;
       Controller = olv;
       Tag = tag;
     }
@@ -35,124 +40,155 @@ namespace GUI.Views {
     // -----------------------------------------------------------------------
 
     /// <summary>
-    ///   OnDoWork
-    /// </summary>
-    void ITaskScheduler.DoWork(object sender, DoWorkEventArgs e) {
-      //var task = sender as T_StatusBar;
-      //var st = task?.Tag as ServiceTask;
-      //if (st == null)
-      //  throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("st"));
-
-      // TODO
-    }
-
-
-    /// <summary>
-    ///   OnRunWorkerCompleted
-    /// </summary>
-    void ITaskScheduler.RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-      //var task = sender as T_StatusBar;
-      //var st = task?.Tag as ServiceTask;
-      //if (st == null)
-      //  throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("st"));
-
-      // TODO
-    }
-
-
-    /// <summary>
     ///   FetchElement
     /// </summary>
     /// <param name="serviceTask"></param>
     /// <returns></returns>
-    private static dynamic FetchElement(ServiceTask serviceTask) {
+    private ListViewItem FetchElement(TaskService serviceTask) {
       var task = serviceTask.View as V_StatusBar;
       if (task == null)
         throw new NullReferenceException(MethodBase.GetCurrentMethod().Name);
       var olv = task.Controller;
-      return olv.Items != null && olv.Items.Count > 0 && serviceTask.Index < olv.Items.Count
-        ? olv.Items[serviceTask.Index]
-        : null;
+      if (olv.InvokeRequired) {
+        Func<ObjectListView, TaskService, dynamic> action = (o, s) => o.Items != null && o.Items.Count > 0 && s.Index < olv.Items.Count ? o.Items[s.Index] : null;
+        return Context.Invoke(action, olv, serviceTask) as ListViewItem;
+      } 
+
+      return olv.Items != null && olv.Items.Count > 0 && serviceTask.Index < olv.Items.Count ? olv.Items[serviceTask.Index] : null;
     }
 
 
     /// <summary>
-    ///   OnProgressChanged
+    ///  Runs the task, returning true for success, false for failure.
     /// </summary>
-    void ITaskScheduler.ProgressChanged(object sender, ProgressChangedEventArgs e) {
-      var task = sender as V_StatusBar;
-      var st = task?.Tag as ServiceTask;
-      if (st == null)
-        throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("item"));
+    /// <param name="arguments"></param>
+    /// <param name="expression"></param>
+    /// <returns>true or false.</returns>
+    public TaskEvent<T> Run<T>(TaskEventArgs.Expression expression, params dynamic[] arguments) {
+      var @t = new TaskEvent<T>(expression, TimeSpan.FromSeconds(Settings.Default.TTL)) {
+        Name = GetType().Name.Substring(2)
+      };
 
-      st.Progress = e.ProgressPercentage;
+      Action<ListViewItem, TaskService> action = (viewItem, service) => {
+        viewItem.SubItems[2].Text = $"{service.Progress}%";
+        viewItem.SubItems[3].Text = service.Task.Status.ToString();
+      };
 
-      var item = FetchElement(st);
-      if (item != null) {
-        item.SubItems[2].Text = $"{st.Progress}%";
-        // item.SubItems[3].Text = st.Status.ToString();
-      }
+      // ---------------------------------
+      @t.OnRunning(
+        (obj, tea) => {
+          var th = obj as RunningEvent<T>;
+          if (th == null)
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(th)));
 
-      // TODO
-    }
+          var ts = Tag as TaskService;
+          if (ts == null)
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(ts)));
 
+          double current;
+          var targetTime = DateTime.Now.AddSeconds(3);
+          var currentTime = DateTime.Now;
+          var diffTime = targetTime.Subtract(currentTime).TotalMilliseconds;
+          var item = FetchElement(ts);
 
-    /// <summary>
-    ///   OnDoWork
-    /// </summary>
-    /// <param name="e"></param>
-    protected override void OnDoWork(DoWorkEventArgs e) {
-      base.OnDoWork(e);
+          while ((current = targetTime.Subtract(currentTime).TotalMilliseconds) > 0) {
+            if (tea.Token != null && tea.Token.Value.IsCancellationRequested) {
+              th.Result = false;
+              return;
+            }
+            
+            var val = 1 - current / diffTime;
+            ts.Progress = (int)(val * 100);
 
-      var task = e.Argument as V_StatusBar;
-      var st = task?.Tag as ServiceTask;
-      var targetTime = DateTime.Now.AddSeconds(3);
-      var currentTime = DateTime.Now;
-      var diffTime = targetTime.Subtract(currentTime).TotalMilliseconds;
-      double current;
-      while ((current = targetTime.Subtract(currentTime).TotalMilliseconds) > 0) {
-        if (CancellationPending) {
-          e.Cancel = true;
-          if (st != null)
-            st.Status = TaskStatus.Canceled;
-          return;
+            if (item != null && Controller.InvokeRequired)
+              Controller.Invoke(action, item, ts);
+
+            // Pulse 10x per second.
+            Task.Delay(100).Wait();
+
+            currentTime = DateTime.Now;
+          }
+
+          ts.Progress = 100;
+          Controller.Invoke(action, item, ts);
+
+          th.Result = true;
         }
+      );
 
-        Thread.Sleep(250);
-        var val = 1 - current/diffTime;
-        if (WorkerReportsProgress)
-          ReportProgress((int) (val*100), TaskStatus.Running);
-        currentTime = DateTime.Now;
-      }
+      // ---------------------------------
+      @t.OnCompleted(
+        (obj, tea) => {
+          var ts = Tag as TaskService;
+          if (ts == null)
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(ts)));
+          var item = FetchElement(ts);
 
-      if (st != null)
-        st.Status = TaskStatus.RanToCompletion;
-      if (WorkerReportsProgress)
-        ReportProgress(100, TaskStatus.RanToCompletion);
+          ts.Progress = 100;
+
+          if (item != null && Controller.InvokeRequired)
+            Controller.Invoke(action, item, ts);
+        }
+      );
+
+      // ---------------------------------
+      @t.OnTimeout(
+        (obj, tea) => {
+          var ts = Tag as TaskService;
+          if (ts == null)
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(ts)));
+          var item = FetchElement(ts);
+
+          if (item != null && Controller.InvokeRequired)
+            Controller.Invoke(action, item, ts);
+        }
+      );
+
+      // ---------------------------------
+      @t.OnProgressChanged(
+        (obj, tea) => {
+          // TODO
+        }
+      );
+
+      // ---------------------------------
+      @t.OnExit(
+        (obj, tea) => {
+          RILogManager.Default.SendInformation($"Disposing {GetType().Name} token source.");
+          var ts = Tag as TaskService;
+          if (ts == null)
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(@t.OnExit)));
+
+          var item = FetchElement(ts);
+          if (item != null && Controller.InvokeRequired)
+            Controller.Invoke(action, item, ts);
+
+          Context.RunningTasks.Remove(ts.TaskName);
+          
+          t.TokenSource.Dispose();
+        }
+      );
+
+      // ---------------------------------
+      @t.OnCanceled(
+        (obj, tea) => {
+          var ts = Tag as TaskService;
+          if (ts == null)
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(ts)));
+
+          var item = FetchElement(ts);
+          if (item != null && Controller.InvokeRequired) {
+            Controller.Invoke(action, item, ts);
+          }
+        }
+      );
+
+      return @t;
     }
 
-
-    /// <summary>
-    ///   Dispose
-    /// </summary>
-    public new void Dispose() {
-      base.Dispose();
-      Tag = null;
-    }
 
     // -----------------------------------------------------------------------
 
     #endregion Override Methods
-
-    #region Properties
-
-    // -----------------------------------------------------------------------
-
-    public ObjectListView Controller { get; }
-    public object Tag { get; set; }
-
-    // -----------------------------------------------------------------------
-
-    #endregion Properties
   }
 }

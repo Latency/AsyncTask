@@ -13,19 +13,19 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using GUI.Views;
 using ORM_Monitor;
-using ORM_Monitor.Models;
+using ORM_Monitor.Interfaces;
 using ReflectSoftware.Insight.Common;
 
 namespace GUI.WinForms {
   internal sealed partial class TabDescribedTask {
     // ReSharper disable once InconsistentNaming
-    private readonly IForm _GUIContext;
+    private readonly RadForm1 _GUIContext;
     private string _prefixForNextSelectionMessage;
 
 
@@ -33,26 +33,17 @@ namespace GUI.WinForms {
     ///   Constructor
     /// </summary>
     /// <param name="ctx"></param>
-    public TabDescribedTask(IForm ctx) {
+    public TabDescribedTask(RadForm1 ctx) {
       InitializeComponent();
-
       _GUIContext = ctx;
 
       SetupColumns();
 
       olvTasks.ButtonClick += RemoveButton_Click;
-      olvTasks.SelectionChanged += delegate { HandleSelectionChanged(olvTasks); };
       olvTasks.HotItemChanged += HandleHotItemChanged;
-      olvTasks.GroupTaskClicked +=
-        delegate(object sender, GroupTaskClickedEventArgs args) {
-          ShowMessage("Clicked on group task: " + args.Group.Name);
-        };
-      olvTasks.GroupStateChanged +=
-        delegate(object sender, GroupStateChangedEventArgs e) {
-          Debug.WriteLine("Group '{0}' was {1}{2}{3}{4}{5}{6}", e.Group.Header, e.Selected ? "Selected" : "",
-            e.Focused ? "Focused" : "", e.Collapsed ? "Collapsed" : "", e.Unselected ? "Unselected" : "",
-            e.Unfocused ? "Unfocused" : "", e.Uncollapsed ? "Uncollapsed" : "");
-        };
+      olvTasks.SelectionChanged += (sender, e) => HandleSelectionChanged(olvTasks);
+      olvTasks.GroupTaskClicked += (sender, e) => ShowMessage("Clicked on group task: " + e.Group.Name);
+      olvTasks.GroupStateChanged += (sender, e) => Debug.WriteLine("Group '{0}' was {1}{2}{3}{4}{5}{6}", e.Group.Header, e.Selected ? "Selected" : "", e.Focused ? "Focused" : "", e.Collapsed ? "Collapsed" : "", e.Unselected ? "Unselected" : "", e.Unfocused ? "Unfocused" : "", e.Uncollapsed ? "Uncollapsed" : "");
     }
 
 
@@ -61,10 +52,10 @@ namespace GUI.WinForms {
     /// </summary>
     /// <param name="listView"></param>
     private void HandleSelectionChanged(ObjectListView listView) {
-      var p = listView.SelectedObject as IServiceTask;
-      var msg = p == null ? listView.SelectedIndices.Count.ToString(CultureInfo.CurrentCulture) : $"'{p.Task}'";
-      var focused = listView.FocusedObject as IServiceTask;
-      var focusedMsg = focused == null ? "" : $". Focused on '{focused.Task}'";
+      var p = listView.SelectedObject as ITaskService;
+      var msg = p == null ? listView.SelectedIndices.Count.ToString(CultureInfo.CurrentCulture) : $"'{p.TaskName}'";
+      var focused = listView.FocusedObject as ITaskService;
+      var focusedMsg = focused == null ? "" : $". Focused on '{focused.TaskName}'";
       _GUIContext.StatusBar.Text = string.IsNullOrEmpty(_prefixForNextSelectionMessage)
         ? $"Selected {msg} of {listView.GetItemCount()} items{focusedMsg}"
         : $"{_prefixForNextSelectionMessage}. Selected {msg} of {listView.GetItemCount()} items{focusedMsg}";
@@ -135,8 +126,18 @@ namespace GUI.WinForms {
         Spacing = -12
       };
 
-      olvColumnStatus.AspectToStringConverter = delegate(object model) {
-        var status = (TaskStatus) model;
+      olvColumnStatus.AspectGetter = olvColumnAction.AspectGetter = model => {
+        var ts = model as TaskService;
+        if (ts == null)
+          throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(olvColumnStatus.AspectGetter)));
+        return ts.Task.Status;
+      };
+
+      olvColumnStatus.AspectToStringConverter = model => {
+        var status = TaskStatus.Created;
+        if (model != null)
+          status = (TaskStatus) model;
+
         switch (status) {
           case TaskStatus.WaitingForChildrenToComplete:
             return "Canceling";
@@ -149,9 +150,12 @@ namespace GUI.WinForms {
         }
       };
 
-      olvColumnStatus.ImageGetter = delegate(object model) {
-        var task = (ServiceTask) model;
-        switch (task.Status) {
+      olvColumnStatus.ImageGetter = model => {
+        var ts = model as TaskService;
+        if (ts == null)
+          throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(olvColumnStatus.AspectGetter)));
+
+        switch (ts.Task.Status) {
           case TaskStatus.Running:
             return "Heart";
           case TaskStatus.WaitingToRun:
@@ -168,6 +172,22 @@ namespace GUI.WinForms {
             return "";
         }
       };
+
+      olvColumnAction.AspectToStringConverter = status => {
+        switch ((TaskStatus) status) {
+          case TaskStatus.Running:
+          case TaskStatus.WaitingToRun:
+            return "Stop";
+          case TaskStatus.RanToCompletion:
+          case TaskStatus.Canceled:
+          case TaskStatus.Faulted:
+            return "Remove";
+          case TaskStatus.WaitingForChildrenToComplete:
+            return "Canceling";
+          default:
+            return "";
+        }
+      };
     }
 
 
@@ -179,10 +199,10 @@ namespace GUI.WinForms {
       var filters = new List<IModelFilter>();
 
       if (checkBoxHighPriority.Checked)
-        filters.Add(new ModelFilter(model => ((ServiceTask) model).Priority > 3));
+        filters.Add(new ModelFilter(model => ((TaskService) model).Priority > 3));
 
       if (checkBoxIncomplete.Checked)
-        filters.Add(new ModelFilter(model => ((ServiceTask) model).Status != TaskStatus.RanToCompletion));
+        filters.Add(new ModelFilter(model => ((TaskService) model).Task.Status != TaskStatus.RanToCompletion));
 
       if (!string.IsNullOrEmpty(textBoxFilter.Text))
         filters.Add(new TextMatchFilter(olvTasks, textBoxFilter.Text));
@@ -235,10 +255,10 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void StopButton_Click(object sender, EventArgs e) {
-      if (_GUIContext.Scheduler.Cancel())
-        _GUIContext.StatusBar.Text += @"Canceling tasks" + Environment.NewLine;
-      else
-        _GUIContext.StatusBar.Text += @"No tasks are running to be canceled" + Environment.NewLine;
+      _GUIContext.StatusBar.Text = _GUIContext.RunningTasks.Count > 0 ? @"Canceling tasks" : @"No tasks are running to be canceled";
+      foreach (var task in _GUIContext.RunningTasks.Select(st => st.Value as TaskEvent<dynamic>)) {
+        task?.TokenSource.Cancel();
+      }
     }
 
 
@@ -248,29 +268,20 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void RemoveButton_Click(object sender, CellClickEventArgs e) {
-      var st = e.Model as ServiceTask;
+      var st = e.Model as TaskService;
       if (st == null)
         throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("st"));
 
       _GUIContext.StatusBar.Text = $"Button clicked: ({e.RowIndex}, {e.SubItem}, {e.Model})";
 
-      if (!olvTasks.IsDisabled(e.Model) && st.Status != TaskStatus.RanToCompletion && st.Status != TaskStatus.Canceled) {
+      if (!olvTasks.IsDisabled(e.Model) && !st.Task.IsCompleted && !st.Task.IsCanceled && !st.Task.IsFaulted) {
         olvTasks.DisableObject(e.Model);
 
-        var task = st.View as V_StatusBar;
-        if (task == null || !task.IsBusy || task.CancellationPending)
-          return;
-
-        st.Status = TaskStatus.WaitingForChildrenToComplete;
-
-        if (task.WorkerSupportsCancellation) {
-          // Cancel the asynchronous operation.
-          task.CancelAsync();
-        }
+        st.Event.TokenSource.Cancel();
+        st.Task.Wait();
 
         olvTasks.RefreshObject(e.Model);
-      }
-      else
+      } else
         olvTasks.RemoveObject(st);
     }
 
@@ -281,9 +292,8 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void StartButton_Click(object sender, EventArgs e) {
-      olvTasks.AddObject(new ServiceTask(olvTasks, new Random().Next().ToString(),
-        "Politely and informatively respond to all tech questions the employees may have", "faq", TaskStatus.Running,
-        new Random().Next(0, 5)));
+      _GUIContext.StatusBar.Text = $"Starting task{(_GUIContext.RunningTasks.Count > 1 ? "s" : string.Empty)}";
+      olvTasks?.AddObject(new TaskService(olvTasks, new Random().Next().ToString(), "Politely and informatively respond to all tech questions the employees may have", "faq", new Random().Next(0, 5)));
     }
 
 

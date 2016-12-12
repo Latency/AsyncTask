@@ -1,10 +1,9 @@
 ﻿using System.Windows.Forms;
-using ORM_Monitor;
 using Telerik.WinControls.UI;
 
 
 namespace GUI.WinForms {
-  sealed partial class RadForm1 : RadForm, IForm {
+  sealed partial class RadForm1 : RadForm {
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -103,6 +102,7 @@ namespace GUI.WinForms {
       this.radStatusStrip1.SetSpring(this.statusControl, false);
       this.statusControl.Text = "";
       this.statusControl.TextWrap = true;
+
       // 
       // RadForm1
       // 
@@ -119,7 +119,8 @@ namespace GUI.WinForms {
       this.RootElement.ApplyShapeToControl = true;
       this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-      this.Text = "RadForm1";
+      this.Text = "ORM-Monitor";
+      this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.RadForm1_FormClosed);
       this.Resize += new System.EventHandler(this.RadForm1_Resize);
       ((System.ComponentModel.ISupportInitialize)(this.radPanel_Bottom)).EndInit();
       this.radPanel_Bottom.ResumeLayout(false);
@@ -137,10 +138,8 @@ namespace GUI.WinForms {
     private RadLabelElement statusBar;
     private RadLabelElement statusControl;
 
-    RadLabelElement IForm.StatusBar { get { return statusBar; } set { statusBar = value; } }
+    internal RadLabelElement StatusBar { get { return statusBar; } set { statusBar = value; } }
 
-    RadLabelElement IForm.StatusControl { get { return statusControl; } set { statusControl = value; } }
-
-    Scheduler IForm.Scheduler { get { return _scheduler; } set { _scheduler = value; } }
+    internal RadLabelElement StatusControl { get { return statusControl; } set { statusControl = value; } }
   }
 }

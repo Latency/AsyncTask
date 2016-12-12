@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{8DE92AB3-35DE-4DA0-B9A0-C1DFC7EF413A}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{BA33716C-FAC1-4DA8-B668-5731342A0266}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DLL", "DLL\DLL.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORM-Monitor", "DLL\ORM-Monitor.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

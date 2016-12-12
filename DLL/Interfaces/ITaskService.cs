@@ -1,28 +1,23 @@
 ﻿//  *****************************************************************************
-//  File:      IServiceTask.cs
-//  Solution:  ORM-Monitor
-//  Project:   DLL
-//  Date:      01/03/2016
-//  Author:    Latency McLaughlin
-//  Copywrite: Bio-Hazard Industries - 1998-2016
+//  File:       ITaskService.cs
+//  Solution:   ORM-Monitor
+//  Project:    DLL
+//  Date:       11/04/2016
+//  Author:     Latency McLaughlin
+//  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
 using System;
 using System.Threading.Tasks;
 
-namespace ORM_Monitor {
+namespace ORM_Monitor.Interfaces {
   /// <summary>
   ///   IServiceTask
   /// </summary>
-  public interface IServiceTask {
+  public interface ITaskService {
     #region Properties
 
     // ------------------------------------------------------------------------
-
-    /// <summary>
-    ///   Status
-    /// </summary>
-    TaskStatus Status { get; set; }
 
     /// <summary>
     ///   Date
@@ -35,9 +30,19 @@ namespace ORM_Monitor {
     string ImageName { get; set; }
 
     /// <summary>
+    ///   TaskName
+    /// </summary>
+    string TaskName { get; set; }
+
+    /// <summary>
     ///   Task
     /// </summary>
-    string Task { get; set; }
+    Task Task { get; set; }
+
+    /// <summary>
+    ///   Event
+    /// </summary>
+    TaskEvent<dynamic> Event { get; set; }
 
     /// <summary>
     ///   Description

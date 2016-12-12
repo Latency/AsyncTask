@@ -9,19 +9,21 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ORM_Monitor</RootNamespace>
     <AssemblyName>ORM-Monitor</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>snKey.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,45 +35,35 @@
     <DocumentationFile>bin\$(Configuration)\ORM-Monitor.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="RabbitMQ.Client, Version=3.6.0.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
-      <HintPath>..\packages\RabbitMQ.Client.3.6.0\lib\net45\RabbitMQ.Client.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ReflectSoftware.Insight, Version=5.5.2.1510, Culture=neutral, PublicKeyToken=c78ddbdaf1f32b08, processorArchitecture=MSIL">
-      <HintPath>..\packages\ReflectSoftware.Insight.5.5.2\lib\net45\ReflectSoftware.Insight.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IServiceTask.cs" />
+    <Compile Include="Events\ProgressChangedEvent.cs" />
+    <Compile Include="Interfaces\IProgressChangedEvent.cs" />
+    <Compile Include="Interfaces\ITaskView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ITaskScheduler.cs" />
-    <Compile Include="Models\ServiceTask.cs" />
-    <Compile Include="Models\TaskEvent.cs" />
-    <Compile Include="Models\TaskEventArgs.cs" />
-    <Compile Include="Models\TaskHandler.cs" />
-    <Compile Include="Controllers\_CanceledEvent.cs" />
-    <Compile Include="Controllers\_CompletedEvent.cs" />
-    <Compile Include="Controllers\_RuningEvent.cs" />
-    <Compile Include="Controllers\_TimeoutEvent.cs" />
-    <Compile Include="Controllers\Async-IO.cs" />
-    <Compile Include="Scheduler.cs" />
+    <Compile Include="Events\CanceledEvent.cs" />
+    <Compile Include="Events\CompletedEvent.cs" />
+    <Compile Include="Events\ExitEvent.cs" />
+    <Compile Include="Events\RuningEvent.cs" />
+    <Compile Include="Events\TimeoutEvent.cs" />
+    <Compile Include="Interfaces\ICanceledEvent.cs" />
+    <Compile Include="Interfaces\ICompletedEvent.cs" />
+    <Compile Include="Interfaces\IExitEvent.cs" />
+    <Compile Include="Interfaces\IRunningEvent.cs" />
+    <Compile Include="Interfaces\ITaskService.cs" />
+    <Compile Include="Interfaces\ITaskHandler.cs" />
+    <Compile Include="Interfaces\ITimeoutEvent.cs" />
+    <Compile Include="TaskEvent.cs" />
+    <Compile Include="TaskEventArgs.cs" />
+    <Compile Include="TaskHandler.cs" />
+    <Compile Include="TaskService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config">
+    <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="snKey.snk" />

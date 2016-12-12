@@ -10,6 +10,7 @@
 using System;
 using System.Windows.Forms;
 using Microsoft.SqlServer.MessageBox;
+using Telerik.WinControls.UI;
 
 namespace GUI {
   internal abstract partial class Program {
@@ -17,7 +18,7 @@ namespace GUI {
     ///   The main entry point for the application.
     /// </summary>
     /// <param name="form"></param>
-    protected static void MainWrapper(Form form) {
+    protected static void MainWrapper(RadForm form) {
       #region Exception Sink Handlers
 
       // ---------------------------------------------------------------------
@@ -36,11 +37,9 @@ namespace GUI {
       //====================================================================
       try {
         Application.Run(form);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         var ex = ExceptionSinkTrigger(e);
-        var exceptionMessageBox = new ExceptionMessageBox(ex, ExceptionMessageBoxButtons.OK,
-          ExceptionMessageBoxSymbol.Error);
+        var exceptionMessageBox = new ExceptionMessageBox(ex, ExceptionMessageBoxButtons.OK, ExceptionMessageBoxSymbol.Error);
         exceptionMessageBox.Show(null);
       }
     }

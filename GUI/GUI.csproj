@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GUI</RootNamespace>
     <AssemblyName>TaskScheduler</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectGuid>{8DE92AB3-35DE-4DA0-B9A0-C1DFC7EF413A}</ProjectGuid>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -69,6 +69,7 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -85,12 +86,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="ObjectListView, Version=2.9.0.25611, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
-      <HintPath>..\packages\ObjectListView.Official.2.9.0\lib\net20\ObjectListView.dll</HintPath>
+    <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ORM-Monitor, Version=1.0.5906.30601, Culture=neutral, PublicKeyToken=a5fc845a139c4594, processorArchitecture=MSIL">
-      <HintPath>..\packages\ORM-Monitor.1.0.5906.30601\lib\net461\ORM-Monitor.dll</HintPath>
+    <Reference Include="ReflectSoftware.Insight, Version=5.6.1.1604, Culture=neutral, PublicKeyToken=c78ddbdaf1f32b08, processorArchitecture=MSIL">
+      <HintPath>..\packages\ReflectSoftware.Insight.5.6.1.2\lib\net45\ReflectSoftware.Insight.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -111,12 +112,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Loader2.cs" />
-    <Compile Include="Loader1.cs" />
-    <Compile Include="WinForms\Form1.cs">
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Views\V_StatusBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Program.Console.cs" />
+    <Compile Include="Program.Sinks.cs" />
+    <Compile Include="Views\V_StatusBar.Designer.cs">
+      <DependentUpon>V_StatusBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinForms\RadForm1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WinForms\Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="WinForms\RadForm1.Designer.cs">
+      <DependentUpon>RadForm1.cs</DependentUpon>
     </Compile>
     <Compile Include="WinForms\TabDescribedTask.cs">
       <SubType>UserControl</SubType>
@@ -124,31 +137,22 @@
     <Compile Include="WinForms\TabDescribedTask.Designer.cs">
       <DependentUpon>TabDescribedTask.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\V_StatusBar.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Program.Console.cs" />
-    <Compile Include="Program.Sinks.cs" />
-    <Compile Include="WinForms\IForm.cs" />
-    <Compile Include="WinForms\RadForm1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="WinForms\RadForm1.Designer.cs">
-      <DependentUpon>RadForm1.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="WinForms\Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WinForms\TabDescribedTask.resx">
-      <DependentUpon>TabDescribedTask.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="WinForms\RadForm1.resx">
       <DependentUpon>RadForm1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\TabDescribedTask.resx">
+      <DependentUpon>TabDescribedTask.cs</DependentUpon>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TabDescribedTask1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="ReflectInsight.config" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +160,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DLL\ORM-Monitor.csproj">
+      <Project>{6ed688cd-50c6-45b2-8ae0-759d28e468ae}</Project>
+      <Name>ORM-Monitor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
