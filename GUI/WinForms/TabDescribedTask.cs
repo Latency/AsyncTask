@@ -173,8 +173,40 @@ namespace GUI.WinForms {
         }
       };
 
+      olvColumnAction.Renderer = new DescribedTaskRenderer {
+        ImageList = imageListButton,
+        DescriptionAspectName = "Description",
+        TitleFont = new Font("Tahoma", 11, FontStyle.Bold),
+        DescriptionFont = new Font("Tahoma", 9),
+        ImageTextSpace = 8,
+        TitleDescriptionSpace = 1,
+        UseGdiTextRendering = true,
+        TitleColor = Color.DarkBlue,
+        DescriptionColor = Color.CornflowerBlue
+      };
+
+      olvColumnStatus.ImageGetter = model => {
+        var ts = model as TaskService;
+        if (ts == null)
+          throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(olvColumnStatus.AspectGetter)));
+
+        switch (ts.Task.Status) {
+          case TaskStatus.Running:
+          case TaskStatus.WaitingToRun:
+            return "Hover";
+          case TaskStatus.RanToCompletion:
+          case TaskStatus.Canceled:
+          case TaskStatus.Faulted:
+            return "Normal";
+          case TaskStatus.WaitingForChildrenToComplete:
+            return "Pressed";
+          default:
+            return "";
+        }
+      };
+
       olvColumnAction.AspectToStringConverter = status => {
-        switch ((TaskStatus) status) {
+        switch ((TaskStatus)status) {
           case TaskStatus.Running:
           case TaskStatus.WaitingToRun:
             return "Stop";

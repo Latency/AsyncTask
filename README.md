@@ -40,7 +40,9 @@ Some nice things about the C# language is that it can detect within a certain to
 Also, that the language has Reflection built-in so we can drill down to many layers and pull out information used for dynamic / RT calling conventions.
 
 <a name="introduction"><h2>Introduction</h2></a>
-This article provides an application programming interface (API) which allows you to wrap delegates for asynchronous invocation supporting TTL/timeout, callbacks for OnCompleted, OnTimeout, & OnCancellation requisitions.
+This article provides an application programming interface (API) which allows one to wrap processes for asynchronous invocation supporting deadlock protection, timeout, cancellation, TTL, and parametric polymorphic MVC design by convention.
+
+Callback support for OnCompleted, OnTimeout, OnExit, OnProgressChanged, OnRunning, & OnCancellation delegates.
 
 It was compiled with C# v6.0 as an extension library and supplying an application driver and test suite for viewing and testing the build.
 
@@ -111,11 +113,10 @@ There are plug-ins that this project uses as dependency from NuGet that are buil
   <tr>
     <td>External References</td>
     <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.2100.60</td>
-    <td><i>Microsoft.VisualStudio.Validation</i> - v14.1.111</td>
   </tr>
   <tr>
     <td>3rd Party Wrapper for .NET ListView</td>
-    <td colspan="2"><i>ObjectListView.Official</i> - ObjectListView v2.9.0</td>
+    <td colspan="2"><i>ObjectListView.Official</i> - ObjectListView v2.9.1</td>
   </tr>
 </table>
 
@@ -126,10 +127,8 @@ There are plug-ins that this project uses as dependency from NuGet that are buil
   </tr>
   <tr>
     <td>Exception logging &amp; UI application hooks</td>
-    <td><i>ReflectSoftware.Insight</i> - v5.5.2.1510</td>
-    <td><i>Newtonsoft.Json</i> - JSON.NET v8.0.2</td>
-    <td><i>RabbitMQ.Client</i> - v3.6.0 (Provides RI remote hooks to Live Viewer)</td>
-    <td><i>Log4Net</i> - v2.0.5</td>
+    <td><i>ReflectSoftware.Insight</i> - v5.6.1.2</td>
+    <td><i>Newtonsoft.Json</i> - JSON.NET v9.0.1</td>
   </tr>
 </table>
 
@@ -144,7 +143,7 @@ There are plug-ins that this project uses as dependency from NuGet that are buil
   </tr>
   <tr>
     <td>Unit Testing</td>
-    <td><i>NUnit</i> - v2.6.4 (v3 not integrated into Resharper)</td>
+    <td><i>NUnit</i> - v3.5.0</td>
   </tr>
 </table>
 

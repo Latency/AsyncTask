@@ -268,17 +268,11 @@ namespace GUI.WinForms {
       // olvColumnAction
       // 
       this.olvColumnAction.AspectName = "Action";
-      this.olvColumnAction.ButtonSize = new System.Drawing.Size(80, 26);
-      this.olvColumnAction.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.FixedBounds;
-      this.olvColumnAction.CellEditUseWholeCell = true;
-      this.olvColumnAction.EnableButtonWhenItemIsDisabled = true;
       this.olvColumnAction.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnAction.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-      this.olvColumnAction.ImageAspectName = "";
-      this.olvColumnAction.IsButton = true;
+      this.olvColumnAction.ImageAspectName = "ImageName";
       this.olvColumnAction.Text = "Action";
-      this.olvColumnAction.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-      this.olvColumnAction.Width = 90;
+      this.olvColumnAction.Width = 100;
       // 
       // olvColumnDate
       // 
