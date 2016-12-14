@@ -1,17 +1,18 @@
 ﻿//  *****************************************************************************
 //  File:       TaskService.cs
 //  Solution:   ORM-Monitor
-//  Project:    DLL
-//  Date:       11/04/2016
+//  Project:    GUI
+//  Date:       12/13/2016
 //  Author:     Latency McLaughlin
 //  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
 using System;
 using System.Threading.Tasks;
-using ORM_Monitor.Interfaces;
+using GUI.Views;
+using ORM_Monitor;
 
-namespace ORM_Monitor {
+namespace GUI.Models {
   /// <summary>
   ///   ServiceTask
   /// </summary>
@@ -22,14 +23,14 @@ namespace ORM_Monitor {
     /// <param name="view"></param>
     /// <param name="taskName"></param>
     /// <param name="description"></param>
-    /// <param name="imageName"></param>
+    /// <param name="taskImageName"></param>
     /// <param name="priority"></param>
     /// <param name="date"></param>
     /// <param name="progress"></param>
-    public TaskService(dynamic view, string taskName, string description, string imageName, int priority, DateTime? date = null, ushort progress = 0) {
+    public TaskService(ITaskView view, string taskName, string description, string taskImageName, int priority, DateTime? date = null, ushort progress = 0) {
       View = view;
       TaskName = taskName;
-      ImageName = imageName;
+      TaskImageName = taskImageName;
       Date = date ?? DateTime.Now;
       Description = description;
       Priority = priority;
@@ -43,7 +44,7 @@ namespace ORM_Monitor {
     /// <summary>
     ///   View
     /// </summary>
-    public dynamic View { get; set; }
+    public ITaskView View { get; set; }
 
     /// <summary>
     ///   Index
@@ -71,9 +72,14 @@ namespace ORM_Monitor {
     public DateTime? Date { get; set; }
 
     /// <summary>
-    ///   ImageName
+    ///   TaskImageName
     /// </summary>
-    public string ImageName { get; set; }
+    public string TaskImageName { get; set; }
+
+    /// <summary>
+    ///   ButtonImageName
+    /// </summary>
+    public string ButtonImageName { get; set; }
 
     /// <summary>
     ///   Description

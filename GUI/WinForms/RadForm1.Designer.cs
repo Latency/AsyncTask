@@ -45,6 +45,7 @@ namespace GUI.WinForms {
     /// the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent() {
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RadForm1));
       this.radPanel_Bottom = new Telerik.WinControls.UI.RadPanel();
       this.radStatusStrip1 = new Telerik.WinControls.UI.RadStatusStrip();
       this.statusBar = new Telerik.WinControls.UI.RadLabelElement();
@@ -102,7 +103,6 @@ namespace GUI.WinForms {
       this.radStatusStrip1.SetSpring(this.statusControl, false);
       this.statusControl.Text = "";
       this.statusControl.TextWrap = true;
-
       // 
       // RadForm1
       // 
@@ -111,6 +111,7 @@ namespace GUI.WinForms {
       this.AutoScroll = true;
       this.ClientSize = new System.Drawing.Size(1249, 659);
       this.Controls.Add(this.radPanel_Bottom);
+      this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MinimumSize = new System.Drawing.Size(600, 480);
       this.Name = "RadForm1";
       // 

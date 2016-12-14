@@ -1,16 +1,18 @@
 ﻿//  *****************************************************************************
 //  File:       ITaskService.cs
 //  Solution:   ORM-Monitor
-//  Project:    DLL
-//  Date:       11/04/2016
+//  Project:    GUI
+//  Date:       12/13/2016
 //  Author:     Latency McLaughlin
 //  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
 using System;
 using System.Threading.Tasks;
+using GUI.Views;
+using ORM_Monitor;
 
-namespace ORM_Monitor.Interfaces {
+namespace GUI.Models {
   /// <summary>
   ///   IServiceTask
   /// </summary>
@@ -20,14 +22,29 @@ namespace ORM_Monitor.Interfaces {
     // ------------------------------------------------------------------------
 
     /// <summary>
+    ///   View
+    /// </summary>
+    ITaskView View { get; set; }
+
+    /// <summary>
+    ///   Index
+    /// </summary>
+    int Index { get; set; }
+
+    /// <summary>
     ///   Date
     /// </summary>
     DateTime? Date { get; set; }
 
     /// <summary>
-    ///   ImageName
+    ///   TaskImageName
     /// </summary>
-    string ImageName { get; set; }
+    string TaskImageName { get; set; }
+
+    /// <summary>
+    ///   TaskImageName
+    /// </summary>
+    string ButtonImageName { get; set; }
 
     /// <summary>
     ///   TaskName

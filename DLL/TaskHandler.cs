@@ -1,14 +1,13 @@
 ﻿//  *****************************************************************************
 //  File:       TaskHandler.cs
 //  Solution:   ORM-Monitor
-//  Project:    DLL
+//  Project:    ORM-Monitor
 //  Date:       11/04/2016
 //  Author:     Latency McLaughlin
 //  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
 using System;
-using System.Threading;
 using ORM_Monitor.Interfaces;
 
 namespace ORM_Monitor {
@@ -16,15 +15,17 @@ namespace ORM_Monitor {
   ///   TaskHandler
   /// </summary>
   /// <typeparam name="T"></typeparam>
-  public abstract class TaskHandler<T> : ITaskHandler<T> {
+  public abstract class TaskHandler<T> : ITaskHandler {
     /// <summary>
     ///   Constructor
     /// </summary>
-    /// <param name="cts"></param>
+    /// <param name="taskEvent"></param>
     /// <param name="expression"></param>
-    protected TaskHandler(CancellationTokenSource cts, TaskEventArgs.Expression expression) {
-      Cts = cts;
-      Expression = expression;
+    /// <param name="service"></param>
+    protected TaskHandler(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, object service) {
+      _taskEvent = taskEvent;
+      _expression = expression;
+      _service = service;
     }
 
 
@@ -34,18 +35,32 @@ namespace ORM_Monitor {
     /// <summary>
     ///   IsSubscribed
     /// </summary>
-    public abstract bool IsSubscribed { get; }
+    public bool IsSubscribed => Handler?.GetInvocationList().Length > 0;
 
     // -----------------------------------------------------------------------
     #endregion Properties
 
+    #region Methods
+
+    // -----------------------------------------------------------------------
+    /// <summary>
+    ///   Invoke
+    /// </summary>
+    public void Invoke() {
+      Handler?.Invoke(this, new TaskEventArgs<T>(_taskEvent, _expression, _service));
+    }
+
+    // -----------------------------------------------------------------------
+    #endregion Methods
+
     #region Fields
     // -----------------------------------------------------------------------
 
-    protected readonly CancellationTokenSource Cts;
-    public readonly TaskEventArgs.Expression Expression;
+    private readonly TaskEvent<T> _taskEvent;
+    private readonly TaskEventArgs<T>.Expression _expression;
+    private readonly object _service; 
 
-    protected abstract event EventHandler<TaskEventArgs> Handler;
+    protected event EventHandler<TaskEventArgs<T>> Handler;
     protected readonly object Mutex = new object();
 
     // -----------------------------------------------------------------------

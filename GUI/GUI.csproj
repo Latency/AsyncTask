@@ -112,18 +112,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Loader2.cs" />
+    <Compile Include="Models\ITaskService.cs" />
+    <Compile Include="Models\TaskService.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Views\V_StatusBar.cs">
+    <Compile Include="Views\ITaskView.cs" />
+    <Compile Include="Views\TaskListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Views\V_TaskList.cs" />
     <Compile Include="Program.Console.cs" />
     <Compile Include="Program.Sinks.cs" />
-    <Compile Include="Views\V_StatusBar.Designer.cs">
-      <DependentUpon>V_StatusBar.cs</DependentUpon>
+    <Compile Include="Views\V_TaskList.Designer.cs">
+      <DependentUpon>V_TaskList.cs</DependentUpon>
     </Compile>
     <Compile Include="WinForms\RadForm1.cs">
       <SubType>Form</SubType>
@@ -131,11 +135,11 @@
     <Compile Include="WinForms\RadForm1.Designer.cs">
       <DependentUpon>RadForm1.cs</DependentUpon>
     </Compile>
-    <Compile Include="WinForms\TabDescribedTask.cs">
+    <Compile Include="Controller\C_TaskList.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="WinForms\TabDescribedTask.Designer.cs">
-      <DependentUpon>TabDescribedTask.cs</DependentUpon>
+    <Compile Include="Controller\C_TaskList.Designer.cs">
+      <DependentUpon>C_TaskList.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <Compile Include="Program.cs" />
@@ -143,10 +147,10 @@
     <EmbeddedResource Include="WinForms\RadForm1.resx">
       <DependentUpon>RadForm1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="WinForms\TabDescribedTask.resx">
-      <DependentUpon>TabDescribedTask.cs</DependentUpon>
+    <EmbeddedResource Include="Controller\C_TaskList.resx">
+      <DependentUpon>C_TaskList.cs</DependentUpon>
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>TabDescribedTask1.Designer.cs</LastGenOutput>
+      <LastGenOutput>C_TaskList1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

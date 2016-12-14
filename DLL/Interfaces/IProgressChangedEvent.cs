@@ -10,8 +10,7 @@
 using System;
 
 namespace ORM_Monitor.Interfaces {
-  public interface IProgressChangedEvent<out T> : ITaskHandler<T> {
-    event EventHandler<TaskEventArgs> OnProgressChanged;
-    void Invoke();
+  public interface IProgressChangedEvent<T> : ITaskHandler {
+    event EventHandler<TaskEventArgs<T>> OnProgressChanged;
   }
 }

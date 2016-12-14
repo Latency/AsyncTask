@@ -1,5 +1,5 @@
 ﻿//  *****************************************************************************
-//  File:      TabDescribedTask.cs
+//  File:      C_TaskList.cs
 //  Solution:  ORM-Monitor
 //  Project:   GUI
 //  Date:      01/03/2016
@@ -18,14 +18,16 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
+using GUI.Models;
+using GUI.WinForms;
 using ORM_Monitor;
-using ORM_Monitor.Interfaces;
 using ReflectSoftware.Insight.Common;
 
-namespace GUI.WinForms {
-  internal sealed partial class TabDescribedTask {
+namespace GUI.Controller {
+  // ReSharper disable once InconsistentNaming
+  internal sealed partial class C_TaskList {
     // ReSharper disable once InconsistentNaming
-    private readonly RadForm1 _GUIContext;
+    private readonly RadForm1 _guiContext;
     private string _prefixForNextSelectionMessage;
 
 
@@ -33,9 +35,9 @@ namespace GUI.WinForms {
     ///   Constructor
     /// </summary>
     /// <param name="ctx"></param>
-    public TabDescribedTask(RadForm1 ctx) {
+    public C_TaskList(RadForm1 ctx) {
       InitializeComponent();
-      _GUIContext = ctx;
+      _guiContext = ctx;
 
       SetupColumns();
 
@@ -56,7 +58,7 @@ namespace GUI.WinForms {
       var msg = p == null ? listView.SelectedIndices.Count.ToString(CultureInfo.CurrentCulture) : $"'{p.TaskName}'";
       var focused = listView.FocusedObject as ITaskService;
       var focusedMsg = focused == null ? "" : $". Focused on '{focused.TaskName}'";
-      _GUIContext.StatusBar.Text = string.IsNullOrEmpty(_prefixForNextSelectionMessage)
+      _guiContext.StatusBar.Text = string.IsNullOrEmpty(_prefixForNextSelectionMessage)
         ? $"Selected {msg} of {listView.GetItemCount()} items{focusedMsg}"
         : $"{_prefixForNextSelectionMessage}. Selected {msg} of {listView.GetItemCount()} items{focusedMsg}";
       _prefixForNextSelectionMessage = null;
@@ -79,27 +81,27 @@ namespace GUI.WinForms {
     /// <param name="e"></param>
     private void HandleHotItemChanged(object sender, HotItemChangedEventArgs e) {
       if (sender == null) {
-        _GUIContext.StatusControl.Text = "";
+        _guiContext.StatusControl.Text = "";
         return;
       }
 
       switch (e.HotCellHitLocation) {
         case HitTestLocation.Nothing:
-          _GUIContext.StatusControl.Text = @"Over nothing";
+          _guiContext.StatusControl.Text = @"Over nothing";
           break;
         case HitTestLocation.Header:
         case HitTestLocation.HeaderCheckBox:
         case HitTestLocation.HeaderDivider:
-          _GUIContext.StatusControl.Text = $"Over {e.HotCellHitLocation} of column #{e.HotColumnIndex}";
+          _guiContext.StatusControl.Text = $"Over {e.HotCellHitLocation} of column #{e.HotColumnIndex}";
           break;
         case HitTestLocation.Group:
-          _GUIContext.StatusControl.Text = $"Over group '{e.HotGroup.Header}', {e.HotCellHitLocationEx}";
+          _guiContext.StatusControl.Text = $"Over group '{e.HotGroup.Header}', {e.HotCellHitLocationEx}";
           break;
         case HitTestLocation.GroupExpander:
-          _GUIContext.StatusControl.Text = $"Over group expander of '{e.HotGroup.Header}'";
+          _guiContext.StatusControl.Text = $"Over group expander of '{e.HotGroup.Header}'";
           break;
         default:
-          _GUIContext.StatusControl.Text = $"Over {e.HotCellHitLocation} of ({e.HotRowIndex}, {e.HotColumnIndex})";
+          _guiContext.StatusControl.Text = $"Over {e.HotCellHitLocation} of ({e.HotRowIndex}, {e.HotColumnIndex})";
           break;
       }
     }
@@ -175,14 +177,8 @@ namespace GUI.WinForms {
 
       olvColumnAction.Renderer = new DescribedTaskRenderer {
         ImageList = imageListButton,
-        DescriptionAspectName = "Description",
-        TitleFont = new Font("Tahoma", 11, FontStyle.Bold),
-        DescriptionFont = new Font("Tahoma", 9),
-        ImageTextSpace = 8,
-        TitleDescriptionSpace = 1,
         UseGdiTextRendering = true,
-        TitleColor = Color.DarkBlue,
-        DescriptionColor = Color.CornflowerBlue
+        TextBrush = new SolidBrush(Color.Black)
       };
 
       olvColumnStatus.ImageGetter = model => {
@@ -193,15 +189,15 @@ namespace GUI.WinForms {
         switch (ts.Task.Status) {
           case TaskStatus.Running:
           case TaskStatus.WaitingToRun:
-            return "Hover";
+            return ts.ButtonImageName = "Hover";
           case TaskStatus.RanToCompletion:
           case TaskStatus.Canceled:
           case TaskStatus.Faulted:
-            return "Normal";
+            return ts.ButtonImageName = "Normal";
           case TaskStatus.WaitingForChildrenToComplete:
-            return "Pressed";
+            return ts.ButtonImageName = "Pressed";
           default:
-            return "";
+            return ts.ButtonImageName = "";
         }
       };
 
@@ -287,8 +283,8 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void StopButton_Click(object sender, EventArgs e) {
-      _GUIContext.StatusBar.Text = _GUIContext.RunningTasks.Count > 0 ? @"Canceling tasks" : @"No tasks are running to be canceled";
-      foreach (var task in _GUIContext.RunningTasks.Select(st => st.Value as TaskEvent<dynamic>)) {
+      _guiContext.StatusBar.Text = _guiContext.RunningTasks.Count > 0 ? @"Canceling tasks" : @"No tasks are running to be canceled";
+      foreach (var task in _guiContext.RunningTasks.Select(st => st.Value as TaskEvent<dynamic>)) {
         task?.TokenSource.Cancel();
       }
     }
@@ -304,7 +300,7 @@ namespace GUI.WinForms {
       if (st == null)
         throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("st"));
 
-      _GUIContext.StatusBar.Text = $"Button clicked: ({e.RowIndex}, {e.SubItem}, {e.Model})";
+      _guiContext.StatusBar.Text = $"Button clicked: ({e.RowIndex}, {e.SubItem}, {e.Model})";
 
       if (!olvTasks.IsDisabled(e.Model) && !st.Task.IsCompleted && !st.Task.IsCanceled && !st.Task.IsFaulted) {
         olvTasks.DisableObject(e.Model);
@@ -324,7 +320,7 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void StartButton_Click(object sender, EventArgs e) {
-      _GUIContext.StatusBar.Text = $"Starting task{(_GUIContext.RunningTasks.Count > 1 ? "s" : string.Empty)}";
+      _guiContext.StatusBar.Text = $"Starting task{(_guiContext.RunningTasks.Count > 1 ? "s" : string.Empty)}";
       olvTasks?.AddObject(new TaskService(olvTasks, new Random().Next().ToString(), "Politely and informatively respond to all tech questions the employees may have", "faq", new Random().Next(0, 5)));
     }
 
@@ -335,7 +331,11 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void ClearButton_Click(object sender, EventArgs e) {
-      olvTasks.ClearObjects();
+      if (olvTasks.GetItemCount() > 0) {
+        _guiContext.StatusBar.Text = @"Clearing task list";
+        olvTasks.ClearObjects();
+      } else
+        _guiContext.StatusBar.Text = @"Task list has already been cleared";
     }
   }
 }

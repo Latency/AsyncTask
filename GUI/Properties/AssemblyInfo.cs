@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bio-Hazard Industries")]
 [assembly: AssemblyProduct("TaskName Scheduler")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright ©  1998-2017")]
 [assembly: AssemblyTrademark("Latency McLaughlin")]
 [assembly: AssemblyCulture("")]
 

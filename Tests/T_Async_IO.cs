@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ORM_Monitor;
-using ORM_Monitor.Events;
 using ReflectSoftware.Insight;
 using Tests.Properties;
 using MyType = System.Action<object, string>;
@@ -60,11 +59,12 @@ namespace Tests {
     /// </summary>
     [Test]
     public void Monitor_Test() {
-      TaskEventArgs.Expression expression = args => {
+      TaskEventArgs<MyType>.Expression expression = args => {
         var obj = args[0];
         var str = args[1] as string;
         var testNo = obj != null ? $"{((TaskEvent<dynamic>) obj).Name}: " : string.Empty;
         _log.SendInformation(testNo + str);
+        return default(MyType);
       };
 
       // Construct started r
@@ -83,32 +83,25 @@ namespace Tests {
         @t0.OnRunning(
           (obj, tea) => {
             SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
-
-            var th = obj as RunningEvent<dynamic>;
-            if (th != null)
-              th.Result = true;
           }
         );
 
         @t0.OnCompleted(
           (th, tea) => {
-            var obj = th as CompletedEvent<dynamic>;
-            obj?.Expression.Invoke(@t0, Messages.Completed);
+            tea?.Invoke(@t0, Messages.Completed);
           }
         );
 
         @t0.OnTimeout(
           (th, tea) => {
-            var obj = th as TimeoutEvent<dynamic>;
-            obj?.Expression.Invoke(@t0, Messages.Timeout);
+            tea?.Invoke(@t0, Messages.Timeout);
             Assert.Fail("timeout @t0");
           }
         );
 
         @t0.OnCanceled(
           (th, tea) => {
-            var obj = th as CanceledEvent<dynamic>;
-            obj?.Expression.Invoke(@t0, canceled(Task.CurrentId));
+            tea?.Invoke(@t0, canceled(Task.CurrentId));
             Assert.Fail("canceled @t0");
           }
         );
@@ -127,33 +120,26 @@ namespace Tests {
           (obj, tea) => {
             // Poll longer than Timeout threshold
             SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 10));
-            
-            var th = obj as RunningEvent<dynamic>;
-            if (th != null)
-              th.Result = true;
           }
         );
 
         @t1.OnCompleted(
           (th, tea) => {
-            var obj = th as CompletedEvent<dynamic>;
-            obj?.Expression.Invoke(@t1, Messages.Completed);
+            tea?.Invoke(@t1, Messages.Completed);
             Assert.Fail("completed @t1");
           }
         );
 
         @t1.OnTimeout(
           (th, tea) => {
-            var obj = th as TimeoutEvent<dynamic>;
-            obj?.Expression.Invoke(@t1, Messages.Timeout);
+            tea?.Invoke(@t1, Messages.Timeout);
             Assert.Fail("timeout @t1");
           }
         );
 
         @t1.OnCanceled(
           (th, tea) => {
-            var obj = th as CanceledEvent<dynamic>;
-            obj?.Expression.Invoke(@t1, canceled(Task.CurrentId));
+           tea?.Invoke(@t1, canceled(Task.CurrentId));
           }
         );
 
@@ -187,23 +173,20 @@ namespace Tests {
 
         @t2.OnCompleted(
           (th, tea) => {
-            var obj = th as CompletedEvent<dynamic>;
-            obj?.Expression.Invoke(@t2, Messages.Completed);
+            tea?.Invoke(@t2, Messages.Completed);
             Assert.Fail("completed @t2");
           }
         );
 
         @t2.OnTimeout(
           (th, tea) => {
-            var obj = th as TimeoutEvent<dynamic>;
-            obj?.Expression.Invoke(@t2, Messages.Timeout);
+            tea?.Invoke(@t2, Messages.Timeout);
           }
         );
 
         @t2.OnCanceled(
           (th, tea) => {
-            var obj = th as CanceledEvent<dynamic>;
-            obj?.Expression.Invoke(@t2, canceled(Task.CurrentId));
+            tea?.Invoke(@t2, canceled(Task.CurrentId));
             Assert.Fail("canceled @t2");
           }
         );

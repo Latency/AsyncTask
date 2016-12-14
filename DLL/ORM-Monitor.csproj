@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="Events\ProgressChangedEvent.cs" />
     <Compile Include="Interfaces\IProgressChangedEvent.cs" />
-    <Compile Include="Interfaces\ITaskView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Events\CanceledEvent.cs" />
     <Compile Include="Events\CompletedEvent.cs" />
@@ -54,13 +53,11 @@
     <Compile Include="Interfaces\ICompletedEvent.cs" />
     <Compile Include="Interfaces\IExitEvent.cs" />
     <Compile Include="Interfaces\IRunningEvent.cs" />
-    <Compile Include="Interfaces\ITaskService.cs" />
     <Compile Include="Interfaces\ITaskHandler.cs" />
     <Compile Include="Interfaces\ITimeoutEvent.cs" />
     <Compile Include="TaskEvent.cs" />
     <Compile Include="TaskEventArgs.cs" />
     <Compile Include="TaskHandler.cs" />
-    <Compile Include="TaskService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

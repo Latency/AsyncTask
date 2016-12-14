@@ -1,14 +1,13 @@
 ﻿//  *****************************************************************************
 //  File:       TimeoutEvent.cs
 //  Solution:   ORM-Monitor
-//  Project:    DLL
+//  Project:    ORM-Monitor
 //  Date:       11/04/2016
 //  Author:     Latency McLaughlin
 //  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
 using System;
-using System.Threading;
 using ORM_Monitor.Interfaces;
 
 namespace ORM_Monitor.Events {
@@ -19,19 +18,19 @@ namespace ORM_Monitor.Events {
     /// <summary>
     ///   Constructor
     /// </summary>
-    /// <param name="ctx"></param>
+    /// <param name="taskEvent"></param>
     /// <param name="expression"></param>
-    public TimeoutEvent(CancellationTokenSource ctx, TaskEventArgs.Expression expression) : base(ctx, expression) {
+    /// <param name="service"></param>
+    public TimeoutEvent(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, object service) : base(taskEvent, expression, service) {
     }
 
     #region Event Invocator
-
     // -----------------------------------------------------------------------
 
     /// <summary>
     ///   OnTimeout
     /// </summary>
-    public event EventHandler<TaskEventArgs> OnTimeout {
+    public event EventHandler<TaskEventArgs<T>> OnTimeout {
       add {
         lock (Mutex) {
           Handler += value;
@@ -45,47 +44,6 @@ namespace ORM_Monitor.Events {
     }
 
     // -----------------------------------------------------------------------
-
     #endregion Event Invocator
-
-    #region Methods
-
-    // -----------------------------------------------------------------------
-    /// <summary>
-    ///   Invoke
-    /// </summary>
-    public void Invoke() {
-      Handler?.Invoke(this, new TaskEventArgs(Cts, Expression));
-    }
-
-    // -----------------------------------------------------------------------
-
-    #endregion Methods
-
-    #region Properties
-
-    // -----------------------------------------------------------------------
-
-    /// <summary>
-    ///   IsSubscribed
-    /// </summary>
-    public override bool IsSubscribed => Handler?.GetInvocationList().Length > 0;
-
-    // -----------------------------------------------------------------------
-
-    #endregion Properties
-
-    #region Fields
-
-    // -----------------------------------------------------------------------
-
-    /// <summary>
-    ///   Handler
-    /// </summary>
-    protected override event EventHandler<TaskEventArgs> Handler;
-
-    // -----------------------------------------------------------------------
-
-    #endregion Fields
   }
 }

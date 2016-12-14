@@ -12,8 +12,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
+using GUI.Controller;
+using GUI.Models;
 using GUI.Views;
 using ORM_Monitor;
 using ReflectSoftware.Insight;
@@ -28,12 +31,12 @@ namespace GUI.WinForms {
     /// <summary>
     ///  Concurrent llist container.
     /// </summary>
-    internal volatile Dictionary<string, dynamic> RunningTasks = new Dictionary<string, dynamic>();
+    internal volatile Dictionary<string, TaskEvent<dynamic>> RunningTasks = new Dictionary<string, TaskEvent<dynamic>>();
 
     /// <summary>
     ///  Panel
     /// </summary>
-    private readonly TabDescribedTask _taskObj;
+    private readonly C_TaskList _taskObj;
 
     // -----------------------------------------------------------------------
     #endregion Private Fields
@@ -73,7 +76,7 @@ namespace GUI.WinForms {
       InitializeComponent();
 
       // Embed panel.
-      _taskObj = new TabDescribedTask(this) {
+      _taskObj = new C_TaskList(this) {
         Dock = DockStyle.Fill
       };
       _taskObj.olvTasks.ItemsAdding += OlvTasksOnItemsAdding;
@@ -89,21 +92,22 @@ namespace GUI.WinForms {
     ///   OnListViewAdding
     /// </summary>
     private void OlvTasksOnItemsAdding(object sender, ItemsAddingEventArgs itemsAddingEventArgs) {
-      var olv = sender as ObjectListView;
+      var olv = sender as TaskListView;
       if (olv == null)
         throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(olv)));
 
-      TaskEventArgs.Expression action = args => {
+      TaskEventArgs<dynamic>.Expression action = args => {
         var obj = args[0];
         var str = args[1] as string;
         var testNo = obj != null ? $"{((TaskEvent<dynamic>)obj).Name}: " : string.Empty;
         RILogManager.Default.SendInformation(testNo + str);
+        return null;
       };
 
       foreach (TaskService st in itemsAddingEventArgs.ObjectsToAdd) {
         st.Index = olv.GetItemCount();
-        st.View = new V_StatusBar(this, olv, st);
-        st.Event = st.View.Run<dynamic>(action, this);
+        st.View = new V_TaskList(this, olv, st);
+        st.Event = ((V_TaskList) st.View).Run(action);
         try {
           RunningTasks.Add(st.TaskName, st.Event);
           st.Task = st.Event.AsyncMonitor();
@@ -132,12 +136,15 @@ namespace GUI.WinForms {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void RadForm1_FormClosed(object sender, FormClosedEventArgs e) {
+      var list = new List<Task>();
+
       // Cancel Applife online updating.
-      foreach (var t in RunningTasks.Where(t => !t.Value.IsDisposed))
+      foreach (var t in RunningTasks.Where(t => !t.Value.IsDisposed)) {
+        list.Add(t.Value.Task);
         t.Value.TokenSource.Cancel();
+      }
     }
-
-
+    
     //------------------------------------------------------------------------
     #endregion Event Handlers
   }

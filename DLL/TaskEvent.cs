@@ -22,8 +22,8 @@ namespace ORM_Monitor {
   /// <typeparam name="T"></typeparam>
   public class TaskEvent<T> : IDisposable {
     public void Dispose() {
-      _runningTask.Dispose();
-      _runningTask = null;
+      Task.Dispose();
+      Task = null;
       GC.Collect();
     }
 
@@ -38,7 +38,7 @@ namespace ORM_Monitor {
     public Task AsyncMonitor() {
       var name = MethodBase.GetCurrentMethod().Name;
 
-      _runningTask = Task.Run(() => {
+      Task = Task.Run(() => {
         Thread.CurrentThread.Name = name;
 
         // Awaits for blocking main actions.
@@ -47,9 +47,14 @@ namespace ORM_Monitor {
             try {
               // ReSharper disable once InvertIf
               if (_onRunning != null && _onRunning.IsSubscribed) {
-                var result = _onRunning.Invoke();
-                if (_onCompleted != null && _onCompleted.IsSubscribed)
-                  _onCompleted.Invoke(result);
+                _onRunning.Invoke();
+                if (TokenSource.IsCancellationRequested) {
+                  if (_onCanceled != null && _onCanceled.IsSubscribed)
+                    _onCanceled.Invoke();
+                } else {
+                  if (_onCompleted != null && _onCompleted.IsSubscribed)
+                    _onCompleted.Invoke();
+                }
               }
             } catch (ThreadAbortException) {
               Debug.WriteLine("Thread abort!");
@@ -63,16 +68,15 @@ namespace ORM_Monitor {
           var endTime = DateTime.Now.Add(Duration);
 
           // Poll for cancellation request or timeout.
-          while (thread.IsAlive) {
-            if (TokenSource.IsCancellationRequested) {
-              thread.Abort(TaskStatus.Canceled);
-              if (_onCanceled != null && _onCanceled.IsSubscribed)
-                _onCanceled.Invoke();
-              break;
-            }
-
+          while (thread.IsAlive && !TokenSource.IsCancellationRequested) {
             if (Duration >= TimeSpan.Zero && DateTime.Now >= endTime) {
-              thread.Abort(TaskStatus.Faulted);
+              try {
+                thread.Abort(TaskStatus.Faulted);
+              } catch (ThreadAbortException) {
+                Debug.WriteLine("Thread abort!");
+              } catch (Exception ex) {
+                throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
+              }
               if (_onTimeout != null && _onTimeout.IsSubscribed)
                 _onTimeout.Invoke();
               break;
@@ -85,6 +89,8 @@ namespace ORM_Monitor {
           }
 
           thread.Join();
+        } catch (ThreadInterruptedException ex) {
+          Debug.WriteLine(ex.Message);
         } catch (OperationCanceledException ex) {
           Debug.WriteLine(ex.Message);
         } catch (Exception ex) {
@@ -92,9 +98,9 @@ namespace ORM_Monitor {
         }
       }, TokenSource.Token);
 
-      _runningTask.ContinueWith(t => _onExit.Invoke());
+      Task.ContinueWith(t => _onExit.Invoke());
 
-      return _runningTask;
+      return Task;
     }
 
     // -----------------------------------------------------------------------
@@ -110,8 +116,6 @@ namespace ORM_Monitor {
     /// </summary>
     public bool IsDisposed => (bool) TokenSource.GetType().GetProperty("IsDisposed", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty).GetValue(TokenSource);
 
-    private Task _runningTask;
-
     // -----------------------------------------------------------------------
 
     #endregion Expression Bodies
@@ -123,20 +127,21 @@ namespace ORM_Monitor {
     /// <summary>
     ///   Constructor
     /// </summary>
+    /// <param name="service"></param>
     /// <param name="timeSpan"></param>
     /// <param name="expression"></param>
-    public TaskEvent(TaskEventArgs.Expression expression, TimeSpan timeSpan) {
+    public TaskEvent(TaskEventArgs<T>.Expression expression, object service, TimeSpan timeSpan) {
       Name = string.Empty;
       Status = TaskStatus.Created;
       Duration = timeSpan;
       TokenSource = new CancellationTokenSource();
 
-      _onCanceled = new CanceledEvent<T>(TokenSource, expression);
-      _onCompleted = new CompletedEvent<T>(TokenSource, expression);
-      _onProgressChanged = new ProgressChangedEvent<T>(TokenSource, expression);
-      _onRunning = new RunningEvent<T>(TokenSource, expression);
-      _onTimeout = new TimeoutEvent<T>(TokenSource, expression);
-      _onExit = new ExitEvent<T>(TokenSource, expression);
+      _onCanceled = new CanceledEvent<T>(this, expression, service);
+      _onCompleted = new CompletedEvent<T>(this, expression, service);
+      _onProgressChanged = new ProgressChangedEvent<T>(this, expression, service);
+      _onRunning = new RunningEvent<T>(this, expression, service);
+      _onTimeout = new TimeoutEvent<T>(this, expression, service);
+      _onExit = new ExitEvent<T>(this, expression, service);
 
       TokenSource.Token.Register(() => _onCanceled.Invoke());
     }
@@ -145,7 +150,7 @@ namespace ORM_Monitor {
     /// <summary>
     ///   Constructor
     /// </summary>
-    public TaskEvent(TaskEventArgs.Expression expression, double timeout = -1) : this(expression, TimeSpan.FromMilliseconds(timeout)) {
+    public TaskEvent(TaskEventArgs<T>.Expression expression, object service, double timeout = -1) : this(expression, service, TimeSpan.FromMilliseconds(timeout)) {
     }
 
     // -----------------------------------------------------------------------
@@ -159,42 +164,42 @@ namespace ORM_Monitor {
     /// <summary>
     ///   CanceledAction - Event Handler for CanceledEvent<c>T</c>
     /// </summary>
-    public void OnCanceled(EventHandler<TaskEventArgs> action) {
+    public void OnCanceled(EventHandler<TaskEventArgs<T>> action) {
       _onCanceled.OnCanceled += action;
     }
 
     /// <summary>
     ///   CompletedAction - Event Handler for CompletedEvent<c>T</c>
     /// </summary>
-    public void OnCompleted(EventHandler<TaskEventArgs> action) {
+    public void OnCompleted(EventHandler<TaskEventArgs<T>> action) {
       _onCompleted.OnCompleted += action;
     }
     
     /// <summary>
     ///   ProgressChangedAction - Event Handler for ProgressChangedEvent<c>T</c>
     /// </summary>
-    public void OnProgressChanged(EventHandler<TaskEventArgs> action) {
+    public void OnProgressChanged(EventHandler<TaskEventArgs<T>> action) {
       _onProgressChanged.OnProgressChanged += action;
     }
     
     /// <summary>
     ///   RunningAction - Event Handler for RunningEvent<c>T</c>
     /// </summary>
-    public void OnRunning(EventHandler<TaskEventArgs> action) {
+    public void OnRunning(EventHandler<TaskEventArgs<T>> action) {
       _onRunning.OnRunning += action;
     }
 
     /// <summary>
     ///   TimeoutAction - Event Handler for TimeoutEvent<c>T</c>
     /// </summary>
-    public void OnTimeout(EventHandler<TaskEventArgs> action) {
+    public void OnTimeout(EventHandler<TaskEventArgs<T>> action) {
       _onTimeout.OnTimeout += action;
     }
 
     /// <summary>
     ///   TimeoutAction - Event Handler for TimeoutEvent<c>T</c>
     /// </summary>
-    public void OnExit(EventHandler<TaskEventArgs> action) {
+    public void OnExit(EventHandler<TaskEventArgs<T>> action) {
       _onExit.OnExit += action;
     }
 
@@ -245,6 +250,11 @@ namespace ORM_Monitor {
     #region Properties
 
     // -----------------------------------------------------------------------
+
+    /// <summary>
+    ///   Task
+    /// </summary>
+    public Task Task { get; private set; }
 
     /// <summary>
     ///   TokenSource

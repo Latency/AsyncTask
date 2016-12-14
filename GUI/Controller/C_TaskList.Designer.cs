@@ -1,8 +1,17 @@
-﻿using System.Windows.Forms;
+﻿//  *****************************************************************************
+//  File:      C_TaskList.Designer.cs
+//  Solution:  ORM-Monitor
+//  Project:   GUI
+//  Date:      01/03/2016
+//  Author:    Latency McLaughlin
+//  Copywrite: Bio-Hazard Industries - 1998-2016
+//  *****************************************************************************
 
+using System.Windows.Forms;
+using GUI.Views;
 
-namespace GUI.WinForms {
-  sealed partial class TabDescribedTask : UserControl {
+namespace GUI.Controller {
+  sealed partial class C_TaskList : UserControl {
     /// <summary> 
     /// Required designer variable.
     /// </summary>
@@ -27,7 +36,7 @@ namespace GUI.WinForms {
     /// </summary>
     private void InitializeComponent() {
       this.components = new System.ComponentModel.Container();
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TabDescribedTask));
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(C_TaskList));
       this.groupBox9 = new System.Windows.Forms.GroupBox();
       this.StartButton = new Telerik.WinControls.UI.RadButton();
       this.StopButton = new Telerik.WinControls.UI.RadButton();
@@ -36,7 +45,7 @@ namespace GUI.WinForms {
       this.checkBoxHighPriority = new System.Windows.Forms.CheckBox();
       this.textBoxFilter = new System.Windows.Forms.TextBox();
       this.imageListTasks = new System.Windows.Forms.ImageList(this.components);
-      this.olvTasks = new BrightIdeasSoftware.ObjectListView();
+      this.olvTasks = new GUI.Views.TaskListView();
       this.olvColumnTask = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.olvColumnPriority = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
       this.olvColumnProgress = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -86,7 +95,7 @@ namespace GUI.WinForms {
       this.StartButton.RootElement.MinSize = new System.Drawing.Size(110, 24);
       this.StartButton.Size = new System.Drawing.Size(110, 24);
       this.StartButton.TabIndex = 4;
-      this.StartButton.Text = "Start New TaskName";
+      this.StartButton.Text = "Start New Task";
       this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
       // 
       // StopButton
@@ -229,7 +238,7 @@ namespace GUI.WinForms {
       this.olvColumnTask.CellPadding = new System.Drawing.Rectangle(4, 2, 4, 2);
       this.olvColumnTask.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnTask.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-      this.olvColumnTask.ImageAspectName = "ImageName";
+      this.olvColumnTask.ImageAspectName = "TaskImageName";
       this.olvColumnTask.MinimumWidth = 40;
       this.olvColumnTask.Text = "TaskName";
       this.olvColumnTask.ToolTipText = "";
@@ -267,10 +276,10 @@ namespace GUI.WinForms {
       // 
       // olvColumnAction
       // 
-      this.olvColumnAction.AspectName = "Action";
+      this.olvColumnAction.AspectName = "ActionName";
       this.olvColumnAction.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.olvColumnAction.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-      this.olvColumnAction.ImageAspectName = "ImageName";
+      this.olvColumnAction.ImageAspectName = "ButtonImageName";
       this.olvColumnAction.Text = "Action";
       this.olvColumnAction.Width = 100;
       // 
@@ -327,7 +336,7 @@ namespace GUI.WinForms {
       this.imageListButton.Images.SetKeyName(1, "Normal");
       this.imageListButton.Images.SetKeyName(2, "Pressed");
       // 
-      // TabDescribedTask
+      // C_TaskList
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -335,7 +344,7 @@ namespace GUI.WinForms {
       this.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
       this.Controls.Add(this.radCollapsiblePanel1);
       this.Controls.Add(this.olvTasks);
-      this.Name = "TabDescribedTask";
+      this.Name = "C_TaskList";
       this.Size = new System.Drawing.Size(1244, 581);
       this.groupBox9.ResumeLayout(false);
       this.groupBox9.PerformLayout();
@@ -355,7 +364,7 @@ namespace GUI.WinForms {
 
     private GroupBox                                   groupBox9;
     private TextBox                                    textBoxFilter;
-    public  BrightIdeasSoftware.ObjectListView         olvTasks;
+    public  TaskListView                               olvTasks;
     private ImageList                                  imageListTasks,
                                                        imageListButton,
                                                        imageListSmall;
