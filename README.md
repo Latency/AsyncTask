@@ -209,22 +209,6 @@ var @t = new TaskEvent<MyType>(TTL) {
 action.AsyncMonitor(@t);   // The extension method to use.
 ```
 
-### Example #2
-```csharp
-private Scheduler _scheduler = new Scheduler();
-    
-private void OlvTasksOnItemsAdding(object sender, ItemsAddingEventArgs itemsAddingEventArgs) {
-  var olv = sender as ObjectListView;
-  if (olv == null)
-    throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(olv)));
-
-  foreach (ServiceTask st in itemsAddingEventArgs.ObjectsToAdd) {
-    st.Index = olv.GetItemCount();
-    _scheduler.RunTask(st.View = new V_StatusBar(olv, st));
-  }
-}
-```
-
 1. Run \`<i>Task Scheduler.exe</i>\`.
 2. Click the `Start New Task` button in the window pane to spawn a new event.
 3. Click the `Cancel` button to stop the event.

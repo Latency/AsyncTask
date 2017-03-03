@@ -61,11 +61,20 @@ namespace Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Completed successfully..
+        ///   Looks up a localized string similar to Completed successfully!.
         /// </summary>
         internal static string Completed {
             get {
                 return ResourceManager.GetString("Completed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminating task!.
+        /// </summary>
+        internal static string Exited {
+            get {
+                return ResourceManager.GetString("Exited", resourceCulture);
             }
         }
         

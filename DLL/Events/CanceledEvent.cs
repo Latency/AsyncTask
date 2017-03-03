@@ -20,8 +20,8 @@ namespace ORM_Monitor.Events {
     /// </summary>
     /// <param name="taskEvent"></param>
     /// <param name="expression"></param>
-    /// <param name="service"></param>
-    public CanceledEvent(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, object service) : base(taskEvent, expression, service) {
+    /// <param name="source"></param>
+    public CanceledEvent(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, T source) : base(taskEvent, expression, source) {
     }
 
     #region Event Invocator

@@ -44,41 +44,40 @@ namespace ORM_Monitor {
         // Awaits for blocking main actions.
         try {
           var thread = new Thread(() => {
-            try {
-              // ReSharper disable once InvertIf
-              if (_onRunning != null && _onRunning.IsSubscribed) {
+            // ReSharper disable once InvertIf
+            if (_onRunning != null && _onRunning.IsSubscribed) {
+              try {
                 _onRunning.Invoke();
-                if (TokenSource.IsCancellationRequested) {
-                  if (_onCanceled != null && _onCanceled.IsSubscribed)
-                    _onCanceled.Invoke();
-                } else {
-                  if (_onCompleted != null && _onCompleted.IsSubscribed)
-                    _onCompleted.Invoke();
-                }
+                if (_onCompleted != null && _onCompleted.IsSubscribed)
+                  _onCompleted.Invoke();
+              } catch (ThreadAbortException) {
+                Thread.ResetAbort();
+              } catch (Exception ex) {
+                throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
               }
-            } catch (ThreadAbortException) {
-              Debug.WriteLine("Thread abort!");
             }
-          });
+          }) {
+            Name = $"{name}->Worker",
+            IsBackground = true
+          };
 
           thread.SetApartmentState(ApartmentState.STA);
-          thread.Name = $"{name}->Worker";
           thread.Start();
 
           var endTime = DateTime.Now.Add(Duration);
 
           // Poll for cancellation request or timeout.
-          while (thread.IsAlive && !TokenSource.IsCancellationRequested) {
+          while (thread.IsAlive) {
+            if (TokenSource.IsCancellationRequested) {
+              if (_onCanceled != null && _onCanceled.IsSubscribed)
+                _onCanceled.Invoke();
+              thread.Abort(TaskStatus.Canceled);
+              break;
+            }
             if (Duration >= TimeSpan.Zero && DateTime.Now >= endTime) {
-              try {
-                thread.Abort(TaskStatus.Faulted);
-              } catch (ThreadAbortException) {
-                Debug.WriteLine("Thread abort!");
-              } catch (Exception ex) {
-                throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
-              }
               if (_onTimeout != null && _onTimeout.IsSubscribed)
                 _onTimeout.Invoke();
+              thread.Abort(TaskStatus.Faulted);
               break;
             }
 
@@ -127,30 +126,28 @@ namespace ORM_Monitor {
     /// <summary>
     ///   Constructor
     /// </summary>
-    /// <param name="service"></param>
+    /// <param name="source"></param>
     /// <param name="timeSpan"></param>
     /// <param name="expression"></param>
-    public TaskEvent(TaskEventArgs<T>.Expression expression, object service, TimeSpan timeSpan) {
+    public TaskEvent(TaskEventArgs<T>.Expression expression, T source, TimeSpan timeSpan) {
       Name = string.Empty;
       Status = TaskStatus.Created;
       Duration = timeSpan;
       TokenSource = new CancellationTokenSource();
 
-      _onCanceled = new CanceledEvent<T>(this, expression, service);
-      _onCompleted = new CompletedEvent<T>(this, expression, service);
-      _onProgressChanged = new ProgressChangedEvent<T>(this, expression, service);
-      _onRunning = new RunningEvent<T>(this, expression, service);
-      _onTimeout = new TimeoutEvent<T>(this, expression, service);
-      _onExit = new ExitEvent<T>(this, expression, service);
-
-      TokenSource.Token.Register(() => _onCanceled.Invoke());
+      _onCanceled = new CanceledEvent<T>(this, expression, source);
+      _onCompleted = new CompletedEvent<T>(this, expression, source);
+      _onProgressChanged = new ProgressChangedEvent<T>(this, expression, source);
+      _onRunning = new RunningEvent<T>(this, expression, source);
+      _onTimeout = new TimeoutEvent<T>(this, expression, source);
+      _onExit = new ExitEvent<T>(this, expression, source);
     }
 
 
     /// <summary>
     ///   Constructor
     /// </summary>
-    public TaskEvent(TaskEventArgs<T>.Expression expression, object service, double timeout = -1) : this(expression, service, TimeSpan.FromMilliseconds(timeout)) {
+    public TaskEvent(TaskEventArgs<T>.Expression expression, T source, double timeout = -1) : this(expression, source, TimeSpan.FromMilliseconds(timeout)) {
     }
 
     // -----------------------------------------------------------------------

@@ -35,11 +35,11 @@ namespace ORM_Monitor {
     /// </summary>
     /// <param name="taskEvent"></param>
     /// <param name="expression"></param>
-    /// <param name="service"></param>
-    public TaskEventArgs(TaskEvent<T> taskEvent, Expression expression, object service) {
+    /// <param name="source"></param>
+    public TaskEventArgs(TaskEvent<T> taskEvent, Expression expression, T source) {
       Event = taskEvent;
       _expression = expression;
-      Service = service;
+      Source = source;
     }
     
     // -----------------------------------------------------------------------
@@ -67,9 +67,9 @@ namespace ORM_Monitor {
     public TaskEvent<T> Event { get; }
 
     /// <summary>
-    ///   Service
+    ///   Source
     /// </summary>
-    public object Service { get; }
+    public T Source { get; }
 
     // -----------------------------------------------------------------------
 

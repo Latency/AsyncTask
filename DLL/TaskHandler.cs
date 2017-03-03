@@ -21,11 +21,11 @@ namespace ORM_Monitor {
     /// </summary>
     /// <param name="taskEvent"></param>
     /// <param name="expression"></param>
-    /// <param name="service"></param>
-    protected TaskHandler(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, object service) {
+    /// <param name="source"></param>
+    protected TaskHandler(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, T source) {
       _taskEvent = taskEvent;
       _expression = expression;
-      _service = service;
+      _source = source;
     }
 
 
@@ -47,7 +47,7 @@ namespace ORM_Monitor {
     ///   Invoke
     /// </summary>
     public void Invoke() {
-      Handler?.Invoke(this, new TaskEventArgs<T>(_taskEvent, _expression, _service));
+      Handler?.Invoke(this, new TaskEventArgs<T>(_taskEvent, _expression, _source));
     }
 
     // -----------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace ORM_Monitor {
 
     private readonly TaskEvent<T> _taskEvent;
     private readonly TaskEventArgs<T>.Expression _expression;
-    private readonly object _service; 
+    private readonly T _source; 
 
     protected event EventHandler<TaskEventArgs<T>> Handler;
     protected readonly object Mutex = new object();
