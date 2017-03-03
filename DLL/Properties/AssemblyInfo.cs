@@ -1,4 +1,5 @@
-﻿//  *****************************************************************************
+﻿using System.Resources;
+//  *****************************************************************************
 //  File:       AssemblyInfo.cs
 //  Solution:   ORM-Monitor
 //  Project:    DLL
@@ -42,3 +43,5 @@ using System.Runtime.InteropServices;
 //
 
 [assembly: AssemblyVersion("2.1.0")]
+[assembly: NeutralResourcesLanguage("en-US")]
+

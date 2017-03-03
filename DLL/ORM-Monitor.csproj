@@ -25,6 +25,9 @@
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -33,6 +36,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\ORM-Monitor.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>8C6163BF5E6DF4DB8F97E20DFE424749519CE944</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>kryterion_code_signing.p12</ManifestKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -64,6 +79,13 @@
     <None Include="snKey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- This section is used for code-signing the application. This should not be confused with manifest signing or with strong-name assembly signing, which can both be done from the Visual Studio interface. -->
+  <Target Name="SignOutput" AfterTargets="CoreCompile">
+    <ItemGroup>
+      <SignableFiles Include="$(ProjectDir)obj\$(ConfigurationName)\$(TargetName)" />
+    </ItemGroup>
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe&quot; sign /a /fd sha256 /sha1 $(ManifestCertificateThumbprint) /t &quot;$(ManifestTimestampUrl)&quot; &quot;%(SignableFiles.Identity)$(TargetExt)&quot;" />
+  </Target>
   <!-- Code to merge the assemblies into one:setup.exe -->
   <PropertyGroup>
     <ILMergeTarget>..\NuGet\ILMerge.targets</ILMergeTarget>
@@ -72,7 +94,12 @@
   <Import Project="$(ILMergeTarget)" Condition="Exists('$(ILMergeTarget)')" />
   <Target Name="AfterBuild" DependsOnTargets="ILMerge" />
   <Target Name="Clean">
-    <RemoveDir Directories="bin;obj" />
     <RemoveDir Directories="..\NuGet\lib\;..\NuGet\bin\;..\NuGet\obj\" Condition="Exists('$(ILMergeTarget)')" />
+  </Target>
+  <Target Name="SpicNSpan" AfterTargets="Clean">
+    <!-- Remove obj folder -->
+    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
+    <!-- Remove bin folder -->
+    <RemoveDir Directories="$(BaseOutputPath)" />
   </Target>
 </Project>

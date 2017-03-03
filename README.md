@@ -8,11 +8,11 @@
 
 * CREATED BY: Latency McLaughlin
 * REVIEWS:    (2)
-* FRAMEWORK:  .NET 4.6.1
-* SUPPORTS:   Visual Studio 2015, 2013, 2012, 2010, 2008
-* UPDATED:    2/13/2016
-* VERSION:    1.0.6
-* TAGS:       tasks, TAP, TPL, task scheduler, functional tests, ORM, .NET, C#, asynchronous, parametric polymorphism
+* FRAMEWORK:  .NET 4.6.2
+* SUPPORTS:   Visual Studio 2017, 2015, 2013, 2012, 2010, 2008
+* UPDATED:    3/2/2017
+* VERSION:    2.1.0
+* TAGS:       Tasks, TAP, TPL, ORM, .NET, C#, Asynchronous, Parametric Polymorphism
 
 ### Screenshot <img src="https://github.com/Latency/ORM-Monitor/blob/master/ORM-Monitor.png?raw=true">
 
@@ -107,16 +107,13 @@ There are plug-ins that this project uses as dependency from NuGet that are buil
     <th width="587" style="min-width:531px;" colspan="2">Assembly - GUI</th>
   </tr>
   <tr>
-    <td>Telerik UI for WinForms SDK</td>
-    <td colspan="2">DevCraft 2015</td>
-  </tr>
-  <tr>
     <td>External References</td>
     <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.2100.60</td>
   </tr>
   <tr>
-    <td>3rd Party Wrapper for .NET ListView</td>
-    <td colspan="2"><i>ObjectListView.Official</i> - ObjectListView v2.9.1</td>
+    <td>Exception logging & UI application hooks</td>
+    <td><i>ReflectSoftware.Insight</i> - v5.6.1.2</td>
+    <td><i>Newtonsoft.Json - JSON.NET</i> - v9.0.1</td>
   </tr>
 </table>
 
@@ -124,11 +121,6 @@ There are plug-ins that this project uses as dependency from NuGet that are buil
   <tr>
     <th width="300" style="min-width:300px; max-width: 300px">Description</th>
     <th width="587" style="min-width:531px;" colspan="4">Assembly - DLL</th>
-  </tr>
-  <tr>
-    <td>Exception logging &amp; UI application hooks</td>
-    <td><i>ReflectSoftware.Insight</i> - v5.6.1.2</td>
-    <td><i>Newtonsoft.Json</i> - JSON.NET v9.0.1</td>
   </tr>
 </table>
 
@@ -139,11 +131,11 @@ There are plug-ins that this project uses as dependency from NuGet that are buil
   </tr>
   <tr>
     <td>External References</td>
-    <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.2100.60</td>
+    <td><i>ORM-Monitor</i> - v2.1.0</td>
   </tr>
   <tr>
     <td>Unit Testing</td>
-    <td><i>NUnit</i> - v3.5.0</td>
+    <td><i>NUnit</i> - v3.6.1</td>
   </tr>
 </table>
 
@@ -165,63 +157,81 @@ There are four essential steps to using this:
 
 &nbsp;2. Create a \`<i>TaskEvent</i>\` with type parameter matching the type from #1. (if specified)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using <i>object initialization</i>, specify the timeout for 5 seconds which is shorter than the default.<br>
-&nbsp;3. Specify the `OnRunning` event handler delegate.  (Required)<br>
+&nbsp;3. Specify the `OnRunning` event handler delegate.  (<b>Required</b>)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;There is an exception handler for this in the \`<i>AsyncMonitor</i>\` method if omitted.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Optional</i>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnCompleted` and `OnTimeout` event handler delegates similarly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnExit`, `OnProgressChanged`, `OnCanceled`, `OnCompleted`, and `OnTimeout` event handler delegates similarly.<br>
 &nbsp;4. Invoke the extension method.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>[Controllers/Async-IO.cs](DLL/Controllers/Async-IO.cs)</i>:   Extension methods for asynchronous routines.
 ```csharp
-   public static async void AsyncMonitor<T>(this T expression, TaskEvent<T> t) where T : class { ... }
+
+
 ```
    Usage:
 ```csharp
-   action.AsyncMonitor(t)
+   //<Task> = <TaskEvent>.AsyncMonitor();
+   Task task = @t0.AsyncMonitor();
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Or since it is an extension method, it can be called explicitly since static:
 ```csharp
-   Async_IO.AsyncMonitor(null, t)
+   Async_IO.AsyncMonitor(@t0);
 ```
 
 ### Example #1
 ```csharp
-const int TTL = 5000;
-var @t = new TaskEvent<MyType>(TTL) {
-  Name = "t0"
-};
-// ---------------------------------
-@t.MainAction.OnRunning += (th, tea) => {
-  // Poll for 1 second
-  if (tea.Token.HasValue && !tea.Token.Value.IsCancellationRequested)
-    SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 1));
-};
-@t.PostAction.OnCompleted += (th, tea) => {
-  if (tea.Expression != null)
-    tea.Expression(richTextBox1, delegate { richTextBox1.Text += "Completed\n"; });
-  else
-    richTextBox1.Text += "Completed\n";     // Cross-Threaded call to UI thread will throw exception.
-};
-@t.TimeoutAction.OnTimeout += (th, tea) => {
-  // Is the same as above without the else clause using null propagation matching signature from Action<T1, T2>.Invoke Method in namespace System (System.Runtime.dll)
-  tea.Expression?.Invoke(richTextBox1, delegate { richTextBox1.Text += "Timed out\n"; });
-};
-// ---------------------------------
-action.AsyncMonitor(@t);   // The extension method to use.
+    TaskEventArgs<MyType>.Expression expression = args => {
+      var obj = args[0];
+      var str = args[1] as string;
+      var testNo = obj != null ? $"{((TaskEvent<MyType>) obj).Name}: " : string.Empty;
+      Debug.WriteLine(testNo + str);
+      return default(MyType);
+    };
+    
+    MyType canceled = id => $"Task ID({id}) has canceled.";
+      
+    var @t0 = new TaskEvent<MyType>(expression, source: canceled, timeout: TimeSpan.FromSeconds(5)) {
+      Name = "t0"
+    };
+
+    @t0.OnRunning((obj, tea) => {
+      SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
+    });
+
+    @t0.OnCompleted((th, tea) => {
+      tea?.Invoke(@t0, Messages.Completed);
+    });
+
+    @t0.OnTimeout((th, tea) => {
+      tea?.Invoke(@t0, Messages.Timeout);
+      Assert.Fail("timeout @t0");
+    });
+
+    @t0.OnCanceled((th, tea) => {
+      tea?.Invoke(@t0, tea.Source.Invoke(tea.Event.Task.Id));
+      Assert.Fail("canceled @t0");
+    });
+
+    @t0.OnExit((th, tea) => {
+      tea?.Invoke(@t0, Messages.Exited);
+    });
+
+    // The extension method to use.
+    Task task = @t0.AsyncMonitor();
 ```
 
-1. Run \`<i>Task Scheduler.exe</i>\`.
+1. Run \`<i>TaskScheduler.exe</i>\`.
 2. Click the `Start New Task` button in the window pane to spawn a new event.
 3. Click the `Cancel` button to stop the event.
-4. Click the `Remove` button to remove the event's line from the list view.
+4. Click the `Remove` button to remove the row from the list.
 
 <a name="other"><h2>Other features</h2></a>
 - Unit Tests:<br>
   The unit test uses NUnit to help qualify the underlying API.   Included is a sample that can be ran and tested againsted a variety of mock senario conditions.
 - UI Application:<br>
-  In addition to being able to use the API library as standalone, the project consists of two user-interfaces I developed using Telerik's RAD tools and the other with ordinary stock controls.
+  In addition to being able to use the API library as standalone, the project consists of a user-interface I developed using WPF.
 
 <a name="references"><h2>References</h2></a>
- TPL, .NET 4.x, ORM, Dependency Injection, Generics, Delegates, EventHandlers, Parametric Polymorphism
+ TPL, .NET 4.x, ORM, Inversion of Control, Dependency Injection, Generics, Delegates, EventHandlers, Parametric Polymorphism
 
 <a name="license"><h2>License</h2></a>
 [GNU LESSER GENERAL PUBLIC LICENSE] - Version 3, 29 June 2007

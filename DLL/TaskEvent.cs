@@ -21,6 +21,9 @@ namespace ORM_Monitor {
   /// </summary>
   /// <typeparam name="T"></typeparam>
   public class TaskEvent<T> : IDisposable {
+    /// <summary>
+    ///   Dispose
+    /// </summary>
     public void Dispose() {
       Task.Dispose();
       Task = null;
@@ -34,7 +37,7 @@ namespace ORM_Monitor {
     /// <summary>
     ///   Asyncronous delegate monitor.
     /// </summary>
-    /// <returns>TaskName</returns>
+    /// <returns>Task</returns>
     public Task AsyncMonitor() {
       var name = MethodBase.GetCurrentMethod().Name;
 
