@@ -86,8 +86,8 @@ namespace ORM_Monitor {
 
             _onProgressChanged.Invoke();
 
-            // Pulse 1/2 sec.
-            Thread.Sleep(500);
+            // Pulse 1/2 sec with a logical delay without blocking the current thread.
+            Task.Delay(500, TokenSource.Token);
           }
 
           thread.Join();
