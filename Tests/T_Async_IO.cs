@@ -8,6 +8,7 @@
 //  *****************************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,8 +33,7 @@ namespace Tests {
       };
 
       _aTimer.Elapsed += (sender, args) => {
-        _tick++;
-        Debug.WriteLine("Tick #{0}", _tick);
+        Debug.WriteLine("Tick #{0}", ++_tick);
       };
     }
 
@@ -63,13 +63,12 @@ namespace Tests {
       };
 
       // Construct started r
-      var tasks = new Task[3];
+      var tasks = new List<Task>();
       MyType canceled = id => $"Task ID({id}) has canceled.";
 
       try {
         // #############################################################
         Debug.WriteLine("Processing **** NORMAL    **** test");
-        //
 
         var @t0 = new TaskEvent<MyType>(expression, canceled, TimeSpan.FromSeconds(Settings.Default.TTL)) {
           Name = "t0"
@@ -95,9 +94,10 @@ namespace Tests {
 
         @t0.OnExit((th, tea) => {
           tea?.Invoke(@t0, Messages.Exited);
+          tasks.Remove(@t0.Task);
         });
 
-        tasks[0] = @t0.AsyncMonitor();
+        tasks.Add(@t0.AsyncMonitor());
 
         // #############################################################
         Debug.WriteLine("Processing **** CANCELED  **** test");
@@ -128,20 +128,19 @@ namespace Tests {
 
         @t1.OnExit((th, tea) => {
           tea?.Invoke(@t1, Messages.Exited);
+          tasks.Remove(@t1.Task);
         });
 
         #region Triger
-
         // ------------------------------------
         Task.Run(() => {
           Task.Delay(TimeSpan.FromSeconds(3)).Wait();
           @t1.TokenSource.Cancel();
         });
         // ------------------------------------
-
         #endregion Trigger
 
-        tasks[1] = @t1.AsyncMonitor();
+        tasks.Add(@t1.AsyncMonitor());
 
         // #############################################################
         Debug.WriteLine("Processing **** TIMED OUT **** test");
@@ -172,14 +171,13 @@ namespace Tests {
 
         @t2.OnExit((th, tea) => {
           tea?.Invoke(@t2, Messages.Exited);
+          tasks.Remove(@t2.Task);
         });
 
-        tasks[2] = @t2.AsyncMonitor();
+        tasks.Add(@t2.AsyncMonitor());
 
         // Wait for all the tasks to finish.
-        Task.WaitAll(tasks);
-
-        Thread.Sleep(1000);
+        Task.WaitAll(tasks.ToArray());
 
         Debug.WriteLine("All Tasks Completed");
       } catch (OperationCanceledException) {

@@ -41,7 +41,7 @@ Some nice things about the C# language is that it can detect within a certain to
 Also, that the language has Reflection built-in so we can drill down to many layers and pull out information used for dynamic / RT calling conventions.
 
 <h2><a name="introduction">Introduction</a></h2>
-This article provides an [API] which allows for wrapping processes asynchronously; supporting deadlock protection, timeout, cancellation, TTL, and parametric polymorphic [MVC] design by convention.
+This article introduces an [API] which wraps processes asynchronously; supporting deadlock protection, timeout, cancellation requests, checkpointing, and a parametric polymorphic [MVC] design by convention.
 
 Callback support for the following delegates:
 * OnCompleted

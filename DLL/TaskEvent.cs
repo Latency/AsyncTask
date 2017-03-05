@@ -98,9 +98,9 @@ namespace ORM_Monitor {
         } catch (Exception ex) {
           throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
         }
-      }, TokenSource.Token);
 
-      Task.ContinueWith(t => _onExit.Invoke());
+        _onExit.Invoke();
+      }, TokenSource.Token);
 
       return Task;
     }
