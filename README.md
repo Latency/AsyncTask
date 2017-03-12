@@ -15,8 +15,12 @@
 * VERSION:      [2.1.1](https://www.nuget.org/packages/ORM-Monitor/2.1.1/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
-### Screenshot <img src="https://github.com/Latency/ORM-Monitor/blob/master/ORM-Monitor.png?raw=true">
+### Screenshot
+ <img src="https://github.com/Latency/ORM-Monitor/blob/master/ORM-Monitor.png?raw=true">
 
+<hr>
+
+## Navigation
 * <a href="#background">Background</a>
 * <a href="#introduction">Introduction</a>
 * <a href="#overview">Overview</a>

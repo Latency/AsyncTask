@@ -7,97 +7,63 @@
 //  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
-using System;
-using System.Threading.Tasks;
-using GUI.Views;
-using ORM_Monitor;
+using System.Windows;
+using System.Windows.Controls;
 
-namespace GUI.Models {
+namespace ORM_Monitor.Models {
   /// <summary>
   ///   ServiceTask
   /// </summary>
-  public class TaskService : ITaskService {
+  public class TaskService {
+    #region Constructor
+    // -----------------------------------------------------------------------
+
     /// <summary>
-    ///   Copy Constructor
+    ///   Constructor
     /// </summary>
-    /// <param name="view"></param>
-    /// <param name="taskName"></param>
-    /// <param name="description"></param>
-    /// <param name="taskImageName"></param>
-    /// <param name="priority"></param>
-    /// <param name="date"></param>
-    /// <param name="progress"></param>
-    public TaskService(ITaskView view, string taskName, string description, string taskImageName, int priority, DateTime? date = null, ushort progress = 0) {
-      View = view;
-      TaskName = taskName;
-      TaskImageName = taskImageName;
-      Date = date ?? DateTime.Now;
-      Description = description;
-      Priority = priority;
-      Progress = progress;
+    /// <param name="owner"></param>
+    /// <param name="parent"></param>
+    /// <param name="ctrlr"></param>
+    /// <param name="dgRow"></param>
+    public TaskService(Window owner, ITaskRecordSet parent, ITaskController ctrlr, DataGridRow dgRow) {
+      Owner = owner;
+      Parent = parent;
+      Controller = ctrlr;
+      GridRow = dgRow;
     }
 
-    #region Properties
-
     // -----------------------------------------------------------------------
+    #endregion Constructor
+
+
+    #region Properties
+    // -----------------------------------------------------------------------
+    /// <summary>
+    ///   Owner
+    /// </summary>
+    public Window Owner { get; private set; }
+
+    /// <summary>
+    ///   Controller
+    /// </summary>
+    public ITaskController Controller { get; private set; }
+
+    /// <summary>
+    ///   RecordSet
+    /// </summary>
+    public ITaskRecordSet Parent { get; private set; }
 
     /// <summary>
     ///   View
     /// </summary>
-    public ITaskView View { get; set; }
-
-    /// <summary>
-    ///   Index
-    /// </summary>
-    public int Index { get; set; }
-
-    /// <summary>
-    ///   TaskName
-    /// </summary>
-    public string TaskName { get; set; }
-
-    /// <summary>
-    ///   Task
-    /// </summary>
-    public Task Task { get; set; }
+    public DataGridRow GridRow { get; private set; }
 
     /// <summary>
     ///   Event
     /// </summary>
     public TaskEvent<dynamic> Event { get; set; }
 
-    /// <summary>
-    ///   Date
-    /// </summary>
-    public DateTime? Date { get; set; }
-
-    /// <summary>
-    ///   TaskImageName
-    /// </summary>
-    public string TaskImageName { get; set; }
-
-    /// <summary>
-    ///   ButtonImageName
-    /// </summary>
-    public string ButtonImageName { get; set; }
-
-    /// <summary>
-    ///   Description
-    /// </summary>
-    public string Description { get; set; }
-
-    /// <summary>
-    ///   Priority
-    /// </summary>
-    public int Priority { get; set; }
-
-    /// <summary>
-    ///   Progress
-    /// </summary>
-    public int Progress { get; set; }
-
     // -----------------------------------------------------------------------
-
     #endregion Properties
   }
 }

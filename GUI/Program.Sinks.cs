@@ -10,17 +10,27 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using Microsoft.SqlServer.MessageBox;
 using ReflectSoftware.Insight;
 using ReflectSoftware.Insight.Common;
+using Application = System.Windows.Application;
 
-namespace GUI {
-  internal abstract partial class Program {
-    protected static event EventHandler OnError;
+namespace ORM_Monitor {
+  internal static class Sinks {
+    internal static event EventHandler OnError;
+
+
+    /// <summary>
+    ///  Static Constructor
+    /// </summary>
+    static Sinks() {
+      OnError += LogException;
+    }
 
 
     /// <summary>
@@ -28,7 +38,7 @@ namespace GUI {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    protected static void LogException(object sender, EventArgs e) {
+    internal static void LogException(object sender, EventArgs e) {
       var methodBase = MethodBase.GetCurrentMethod();
       if (methodBase == null)
         return;
@@ -67,7 +77,7 @@ namespace GUI {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="t"></param>
-    protected static void ThreadException(object sender, ThreadExceptionEventArgs t) {
+    internal static void ReportUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs t) {
       var exception = ExceptionSinkTrigger(t.Exception);
 
       // Unwind the call stack and attribute the 'data' tags for the ExceptionMessageBox.
@@ -81,9 +91,10 @@ namespace GUI {
       }
 
       var exceptionMessageBox = new ExceptionMessageBox(exception, ExceptionMessageBoxButtons.AbortRetryIgnore, ExceptionMessageBoxSymbol.Error);
+      // ReSharper disable once SwitchStatementMissingSomeCases
       switch (exceptionMessageBox.Show(sender as Form)) {
         case DialogResult.Abort:
-          Application.Exit();
+          Application.Current.Shutdown();
           break;
 
         case DialogResult.Cancel:
@@ -92,7 +103,11 @@ namespace GUI {
         case DialogResult.Retry:
           var currentProcess = Process.GetCurrentProcess();
           RILogManager.Default.SendInformation($"Restarting application `{currentProcess.ProcessName}' after exception `{exception.GetType().Name}' on pid #{currentProcess.Id}");
-          Application.Restart();
+          if (Application.ResourceAssembly.Location != null)
+            Process.Start(Application.ResourceAssembly.Location);
+          else
+            throw new FileNotFoundException(MethodBase.GetCurrentMethod().Name + ":  Application resource assembly does not exist.");
+          Application.Current.Shutdown();
           break;
       }
     }
@@ -104,7 +119,7 @@ namespace GUI {
     /// <remarks>Exception sink if all else fails and was never trapped.</remarks>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    protected static void UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+    internal static void UnhandledException(object sender, UnhandledExceptionEventArgs e) {
       var ex = ExceptionSinkTrigger((Exception) e.ExceptionObject);
       var exceptionMessageBox = new ExceptionMessageBox(ex, ExceptionMessageBoxButtons.OK, ExceptionMessageBoxSymbol.Error);
       exceptionMessageBox.Show(null);

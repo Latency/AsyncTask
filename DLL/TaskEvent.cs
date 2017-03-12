@@ -72,15 +72,15 @@ namespace ORM_Monitor {
           // Poll for cancellation request or timeout.
           while (thread.IsAlive) {
             if (TokenSource.IsCancellationRequested) {
+              thread.Abort(TaskStatus.Canceled);
               if (_onCanceled != null && _onCanceled.IsSubscribed)
                 _onCanceled.Invoke();
-              thread.Abort(TaskStatus.Canceled);
               break;
             }
             if (Duration >= TimeSpan.Zero && DateTime.Now >= endTime) {
+              thread.Abort(TaskStatus.Faulted);
               if (_onTimeout != null && _onTimeout.IsSubscribed)
                 _onTimeout.Invoke();
-              thread.Abort(TaskStatus.Faulted);
               break;
             }
 

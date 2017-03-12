@@ -16,11 +16,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("TaskName Scheduler")]
-[assembly: AssemblyDescription("Asynchronous TaskName Scheduler (TDD)")]
+[assembly: AssemblyTitle("ORM-Monitor")]
+[assembly: AssemblyDescription("Asynchronous Task Scheduler Library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bio-Hazard Industries")]
-[assembly: AssemblyProduct("TaskName Scheduler")]
+[assembly: AssemblyProduct("ORM-Monitor")]
 [assembly: AssemblyCopyright("Copyright ©  1998-2017")]
 [assembly: AssemblyTrademark("Latency McLaughlin")]
 [assembly: AssemblyCulture("")]
@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("2.0.*")]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: InternalsVisibleTo("TaskName Scheduler.Tests")]
 [assembly: InternalsVisibleTo("TaskScheduler.Explorables")]
