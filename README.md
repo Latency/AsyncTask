@@ -12,7 +12,7 @@
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2017, 2015, 2013, 2012, 2010, 2008
 * UPDATED:      3/2/2017
-* VERSION:      [2.1.1](https://www.nuget.org/packages/ORM-Monitor/2.1.1/)
+* VERSION:      [2.1.3](https://www.nuget.org/packages/ORM-Monitor/2.1.3/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -33,18 +33,24 @@
 <hr>
 
 <h2><a name="background">Background</a></h2>
-There have been many instances throughout my career where incompetent developers try to release code to the company and its stakeholders which deadlock underlying dependency OSI layers which hinder project performance and scheduling.  Those tasked to sustain code as dependency will be frustrated debugging these efforts when trying to qualify responsibility of failure.
 
-The goal was to develop an API that would be universal and simple to use in helping eliminate any concerns by wrapping amateur developers efforts with ease.
+There have been many instances throughout my career where incompetent developers try to release code to the company and its stakeholders which deadlock underlying dependency OSI layers which hinder project performance and scheduling.
+Those tasked to sustain code as dependency will be frustrated debugging these efforts when trying to qualify responsibility of failure.
+
+The goal was to develop an [API] that would be universal and simple to use in helping eliminate any '<i>concerns</i>' a.k.a cohesive areas of functionality, by wrapping amateur developers efforts with ease and addressing cross-cutting/horizontal concerns as well.
 The goal was to reduce time & development costs in validating efforts for risk mitigation serving as a universal multi-functional paradigm.
 Any developer can therefore use it to construct new code with the same underlying mechanics and reduce boilerplate code.
 
 When we reference an <i>Object Relational Mapped</i> sub-system it means it is polymorphic and is generic by convention that doesn't depend on specific references to types.  Think of it as a universal template which can inject the types in question as its specified type parameter and let any of the mapping be done under the hood in a <i>dynamic</i> manor.
 
-Some nice things about the C# language is that it can detect within a certain tolerance what the type might be so that the type parameter can be omitted from its calling convention.
-Also, that the language has Reflection built-in so we can drill down to many layers and pull out information used for dynamic / RT calling conventions.
+Some nice things about the C# language is that it is far superior to Java and can detect within a certain tolerance what the type might be so that the type parameter can be omitted from its calling convention.
+Also, that both languages have Reflection built-in so it is possible to be able to drill down many OSI layers and pull out information used for dynamic / RT calling conventions.
+
+Java has limitations and has nothing to offer of greater value which is described here for [Comparison].
+In fact, our methodology for this article is to use '<i>generic programming</i>'; a feature set of Java not properly support since reflection cannot be used to construct new generic realizations nor allows generics directly for primitive types.
 
 <h2><a name="introduction">Introduction</a></h2>
+
 This article introduces an [API] which wraps processes asynchronously; supporting deadlock protection, timeout, cancellation requests, checkpointing, and a parametric polymorphic [MVC] design by convention.
 
 Callback support for the following delegates:
@@ -63,11 +69,22 @@ Model-View-Controller ([MVC]) is an architectural pattern that separates applica
  <img src="http://www.ii.uni.wroc.pl/~wzychla/images/mvc.png" alt="A wiki image of MVC">
 </p>
 
-The data model is a set of data structures that lay the base for the businnes logic of an application. In typical object-oriented application, the data model is built of client-side classes and collections. The data model typically is somehow stored into a Database Management System, however how the data is exactly stored is not a concern of [MVC].
-
 The view is a user interface element (typically a window) that presents the data to the user and allows the user to change the data. It is a typical situation to have several views active at the same time (for example in the Multiple-Document Interface).
 
 The controller is a connection point between the model and views: views register in the controller and reports changes in the model to them.
+
+The data model is a set of data structures that lay the base for the businnes logic of an application. In typical object-oriented application, the data model is built of client-side classes and collections. The data model typically is somehow stored into a Database Management System, however how the data is exactly stored is not a concern of [MVC].  In fact, other than speed in it's performance, models stored within the DBMS is not as efficient as an ORM based one.
+There are many references for this and it only makes sense.   Injection efforts and security risks are not of a concern as old myths die hard dictate.   Dynamic and parametric polymorphic efforts show that RT constructs perform with much better flexibility and tightly coupled integration within a projects design.
+Future efforts for extension and modification can be reduced and even eliminated when used in conjunction with a reflective based programming language.
+
+So you have to ask yourself, why would we use deprecated features such as stored procedures to construct a data model integrating in all the business logic which is much more difficult to do and maintain when we have options to construct efforts much more dynamic, flexible, easier to maintain, and understand?
+There are alternatives to this which are far superior and used within an ORM sub-system.  If your next question to this is, "Do I need to use stored procedures to achieve the same result?", the answer is NO and I can guarantee a better overall design in the process.
+
+Forget about the data model and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
+The model–view–adapter solves this rather differently from the model–view–controller by arranging model, adapter or mediating controller and view linearly without any connections whatsoever directly between model and view.
+What do you call something that has connections directly related?   Dependancies!  If a dependancy breaks down, so does the rest of the system.  Think about it!  In an alternative scenario, you can use [DI] to replace additional constraints that may be binded as well.   This is where aspect oriented programming ([AOP]) will reduce the amount of boilerplate code which in effect also reduces the maintence efforts and cost along with the project size and complexity.
+
+This is what many companies fail to understand and I have been passed over several times by hiring managers because they don't even have a clue or simpily don't want to look bad knowing that you could take their job and would never admit to feeling intimidated.  Companies want what they want, use what they have currently in place to sustain their development efforts, and not have to re-train their staff to use more efficient designs.  Do you really want to work for a company who is complacent in their way of doing things anyway?    Is it cost effective for the company to use efforts that are behind the curve?  Eventually there comes a time where continous integration and patching dictate a rewrite or redesign.   Why prolong efforts when eventually it will need to be done?   Get with the times ... for real!!!  Their support staff may be using efforts that work but are not as efficient as alternative methodologies being proposed here.
 
 ---
 
@@ -94,6 +111,7 @@ This API has several benefits, such as:
   Independant type parameters act as a placeholder for a specific type that a client specifies when they instantiate a variable of the generic type.
 
 <h2><a name="overview">Overview</a></h2>
+
 * <b>Graphical user interface samples.</b><br>
  A clever user-interface is included which offers a view to spawn and cancel tasks.
 
@@ -104,9 +122,10 @@ This API has several benefits, such as:
  When running your tests, it might be that you want to create a sample of functional or regressive tasks.  Interchanging the delegates make it easy.  For example, switching contexts from an administrator area in your [CMS] / web-application.
 
 * <b>Multiple O/R mapper framework concurrent scheduling.</b><br>
- [ORM-Monitor] Extension uses a wrapping factory for the delegates supplied as its generic type. It doesn't matter whether your application uses multiple event handlers with specific listeners for each.  This [API] will consolidate those into a universal system regardless of type.   It will reduce the boilerplate code and overhead which will ultimately reduce the overall risk of failure since everything will funnel through the same sub-system.
+ [ORM-Monitor] uses a wrapping factory for the delegates supplied as its generic type. It doesn't matter whether your application uses multiple event handlers with specific listeners for each.  This [API] will consolidate those into a universal system regardless of type.   It will reduce the boilerplate code and overhead which will ultimately reduce the overall risk of failure since everything will funnel through the same sub-system.
 
 <h2><a name="installation">Installation</a></h2>
+
 This library can be installed from [NuGet]:
 
 There are plug-ins that this project uses as dependency from [NuGet] that are built-in and merged into the [API].
@@ -119,7 +138,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
     <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.1.1</td>
+    <td><i>ORM-Monitor</i> - v2.1.3</td>
     <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.2100.60</td>
   </tr>
   <tr>
@@ -134,8 +153,8 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
     <th width="300" style="min-width:300px; max-width: 300px">Description</th>
     <th width="587" style="min-width:531px;" colspan="2">Assembly - DLL</th>
   </tr>
-  <td>N/A</td>
-  <td/>
+  <td>API</td>
+  <td><i>ORM-Monitor</i> - v2.1.3</td>
 </table>
 
 <table>
@@ -145,7 +164,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
   <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.1.1</td>
+    <td><i>ORM-Monitor</i> - v2.1.3</td>
   </tr>
   <tr>
     <td>Unit Testing</td>
@@ -155,6 +174,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
 
 
 <h2><a name="using">Using The Code</a></h2>
+
 There are four essential steps to using this:
 
 &nbsp;1. Optional:<br>
@@ -243,21 +263,25 @@ There are four essential steps to using this:
 4. Click the `Remove` button to remove the row from the list.
 
 <h2><a name="other">Other Features</a></h2>
+
 - Unit Tests:<br>
   The unit test uses [NUnit] to help qualify the underlying [API].   Included is a sample that can be ran and tested againsted a variety of mock senario conditions.
 - UI Application:<br>
   In addition to being able to use the [API] library as standalone, the project consists of a user-interface I developed using [WPF].
 
 <h2><a name="references">References</a></h2>
+
  [TPL], [.NET], [ORM], [IoC], [DI], [Generics], [Delegates], [EventHandlers], [Parametric Polymorphism]
 
 <h2><a name="license">License</a></h2>
+
 [GNU LESSER GENERAL PUBLIC LICENSE] - Version 3, 29 June 2007
 
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job.)
 
    [GNU LESSER GENERAL PUBLIC LICENSE]: <http://www.gnu.org/licenses/lgpl-3.0.en.html>
+   [Comparison]: <https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java>
    [TaskEvent.cs]: <https://github.com/Latency/ORM-Monitor/blob/master/DLL/TaskEvent.cs>
    [NuGet]: <https://www.nuget.org/packages/ORM-Monitor/>
    [.NET]: <https://en.wikipedia.org/wiki/.NET_Framework/>
@@ -265,6 +289,7 @@ There are four essential steps to using this:
    [Visual Studio]: <https://en.wikipedia.org/wiki/Microsoft_Visual_Studio/>
    [Latency McLaughlin]: <https://www.linkedin.com/in/Latency/>
    [API]: <https://en.wikipedia.org/wiki/Application_programming_interface>
+   [AOP]: <https://en.wikipedia.org/wiki/Aspect-oriented_programming>
    [Parametric Polymorphism]: <https://en.wikipedia.org/wiki/Parametric_polymorphism>
    [ORM-Monitor]: <https://github.com/Latency/ORM-Monitor/>
    [TAP]: <https://msdn.microsoft.com/en-us/library/hh873175(v=vs.110).aspx>
@@ -274,6 +299,7 @@ There are four essential steps to using this:
    [C#]: <https://en.wikipedia.org/wiki/C_Sharp_(programming_language)>
    [DLL]: <https://en.wikipedia.org/wiki/Dynamic-link_library>
    [MVC]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>
+   [MVA]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
    [CMS]: <https://en.wikipedia.org/wiki/Content_management_system>
    [IoC]: <https://msdn.microsoft.com/en-us/library/ff921087.aspx>
    [DI]: <https://en.wikipedia.org/wiki/Dependency_injection>
