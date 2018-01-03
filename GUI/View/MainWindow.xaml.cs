@@ -8,6 +8,7 @@
 //  *****************************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -48,7 +49,7 @@ namespace ORM_Monitor.View {
 
     }
 
-    #region Event Handlers
+    #region Handler Handlers
 
     //------------------------------------------------------------------------
 
@@ -58,8 +59,7 @@ namespace ORM_Monitor.View {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void Window_Closed(object sender, EventArgs e) {
-      var dc = DataContext as TaskController;
-      if (dc == null)
+      if (!(DataContext is TaskController dc))
         return;
       dc.Dispose();
       DataContext = null;
@@ -72,8 +72,7 @@ namespace ORM_Monitor.View {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void RemoveButton_Click(object sender, RoutedEventArgs e) {
-      var btn = sender as Button;
-      if (btn == null)
+      if (!(sender is Button btn))
         throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(btn)));
 
       // Traverse up the VisualTree and find the DataGridRow.
@@ -85,8 +84,7 @@ namespace ORM_Monitor.View {
 
       var rst = ListView1.Items[index] as TaskRecordSet;
 
-      var st = rst?.Tag as TaskService;
-      if (st == null)
+      if (!(rst?.Tag is TaskService st))
         return;
 
       lblStatusBar.Text = $"Button clicked: (Row: {index + 1}, Action: {btn.Content})";
@@ -107,22 +105,26 @@ namespace ORM_Monitor.View {
 
 
     /// <summary>
+    ///   ActionCollection
+    /// </summary>
+    /// <returns></returns>
+    private static List<Delegate> ActionCollection() {
+      return new List<Delegate>(
+        new Delegate[] {
+          (Action<string,string>)  ((name, status) => RILogManager.Default.SendInformation($"@{name}: {status}")),
+        }
+      );
+    }
+
+
+    /// <summary>
     ///   StartButton_MouseDown
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void StartButton_Click(object sender, RoutedEventArgs e) {
-      var dc = DataContext as TaskController;
-      if (dc == null)
+      if (!(DataContext is TaskController dc))
         return;
-
-      TaskEventArgs<dynamic>.Expression action = args => {
-        var obj = args[0];
-        var str = args[1] as string;
-        var testNo = obj != null ? $"{((TaskEvent<dynamic>) obj).Name}: " : string.Empty;
-        RILogManager.Default.SendInformation(testNo + str);
-        return null;
-      };
 
       try {
         var rst = new TaskRecordSet(taskName: new Random().Next().ToString(), description: "Politely and informatively respond to all tech questions the employees may have.", priority: new Random().Next(0, 5));
@@ -133,20 +135,23 @@ namespace ORM_Monitor.View {
           var idx = ListView1.Items.Add(rst);
           ListView1.UpdateLayout();
 
-          DataGridRow dgr = (DataGridRow) ListView1.ItemContainerGenerator.ContainerFromIndex(idx);
+          var dgr = ListView1.ItemContainerGenerator.ContainerFromIndex(idx) as DataGridRow;
           var st = new TaskService(this, rst, dc, dgr);
           rst.Tag = st;
 
           var a = Extensions.FindFirstChild<DataGridCellsPanel>(dgr);
           foreach (DataGridCell b in a.Children) {
             b.Name = b.Column.Header.ToString();
-            if (b.Name == "Action") {
-              var btn = Extensions.FindFirstChild<Button>(b.Content as FrameworkElement);
-              rst.Action = btn;
-            }
+            if (b.Name != "Action")
+              continue;
+            var btn = Extensions.FindFirstChild<Button>(b.Content as FrameworkElement);
+            rst.Action = btn;
           }
-          
-          st.Event = st.Controller.Run(action, rst);
+
+          st.Event = st.Controller.Run();
+          st.Event.Name = "Task Scheduler";
+          st.Event.Tag = rst;
+          st.Event.Expression = ActionCollection();
 
           dc.RunningTasks.Add(rst.TaskName, st.Event);
 
@@ -165,8 +170,7 @@ namespace ORM_Monitor.View {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void StopButton_Click(object sender, RoutedEventArgs e) {
-      var dc = DataContext as TaskController;
-      if (dc == null)
+      if (!(DataContext is TaskController dc))
         return;
 
       lblStatusBar.Text = dc.RunningTasks.Count > 0 ? @"Canceling tasks." : @"No tasks are running to be canceled.";
@@ -260,8 +264,7 @@ namespace ORM_Monitor.View {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void MyButton_MouseEnter(object sender, MouseEventArgs e) {
-      var btn = sender as Button;
-      if (btn == null)
+      if (!(sender is Button btn))
         return;
 
       ListView1_MouseEnter(sender, e);
@@ -282,8 +285,7 @@ namespace ORM_Monitor.View {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void MyButton_MouseLeave(object sender, MouseEventArgs e) {
-      var btn = sender as Button;
-      if (btn == null)
+      if (!(sender is Button btn))
         return;
 
       ListView1_MouseLeave(sender, e);
@@ -304,8 +306,7 @@ namespace ORM_Monitor.View {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void MyButton_MouseDown(object sender, MouseButtonEventArgs e) {
-      var btn = sender as Button;
-      if (btn == null)
+      if (!(sender is Button btn))
         return;
 
       try {
@@ -317,6 +318,6 @@ namespace ORM_Monitor.View {
     }
 
     //------------------------------------------------------------------------
-    #endregion Event Handlers
+    #endregion Handler Handlers
   }
 }

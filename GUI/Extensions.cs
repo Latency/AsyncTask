@@ -71,11 +71,11 @@ namespace ORM_Monitor {
       for (var i = 0; i < childrenCount; i++) {
         var child = VisualTreeHelper.GetChild(element, i) as FrameworkElement;
         children[i] = child;
-        if (child is T)
-          return (T)child;
+        if (child is T variable)
+          return variable;
       }
 
-      for (int i = 0; i < childrenCount; i++) {
+      for (var i = 0; i < childrenCount; i++) {
         if (children[i] == null)
           continue;
         var subChild = FindFirstChild<T>(children[i]);

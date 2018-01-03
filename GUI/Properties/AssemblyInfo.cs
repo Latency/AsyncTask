@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bio-Hazard Industries")]
 [assembly: AssemblyProduct("ORM-Monitor")]
-[assembly: AssemblyCopyright("Copyright ©  1998-2017")]
+[assembly: AssemblyCopyright("Copyright ©  1998-2018")]
 [assembly: AssemblyTrademark("Latency McLaughlin")]
 [assembly: AssemblyCulture("")]
 
@@ -45,7 +45,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("2.0.*")]
+[assembly: AssemblyVersion("2.1.*")]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: InternalsVisibleTo("TaskName Scheduler.Tests")]
 [assembly: InternalsVisibleTo("TaskScheduler.Explorables")]

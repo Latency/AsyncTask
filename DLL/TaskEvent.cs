@@ -1,283 +1,234 @@
-﻿//  *****************************************************************************
-//  File:       TaskEvent.cs
-//  Solution:   ORM-Monitor
-//  Project:    DLL
-//  Date:       11/04/2016
-//  Author:     Latency McLaughlin
-//  Copywrite:  Bio-Hazard Industries - 1998-2016
-//  *****************************************************************************
+﻿// ****************************************************************************
+// File:       TaskEvent.cs
+// Solution:   ORM-Monitor
+// Project:    ORM-Monitor
+// Date:       01/01/2018
+// Author:     Latency McLaughlin
+// Copywrite:  Bio-Hazard Industries - 1998-2018
+// ****************************************************************************
 
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using ORM_Monitor.Events;
-using ORM_Monitor.Interfaces;
 
 namespace ORM_Monitor {
+  using Evt = EventHandler<TaskEventArgs>;
+
+
   /// <summary>
-  ///   TaskEvent
+  ///   Task_Event
   /// </summary>
-  /// <typeparam name="T"></typeparam>
-  public class TaskEvent<T> : IDisposable {
+  public sealed partial class TaskEvent : TaskEventArgs, IDisposable {
+    #region Constructors
+    // -----------------------------------------------------------------------
+
+    /// <inheritdoc />
     /// <summary>
-    ///   Dispose
+    ///   Constructor
     /// </summary>
-    public void Dispose() {
-      Task.Dispose();
-      Task = null;
-      GC.Collect();
+    /// <param name="duration"></param>
+    public TaskEvent(TimeSpan duration) {
+      TokenSource = new CancellationTokenSource();
+      Duration = duration;
+      Status = TaskStatus.Created;
+      Name = string.Empty;
+
+      canceledEvent = new CanceledEvent(this);
+      completedEvent = new CompletedEvent(this);
+      progressChangedEvent = new ProgressChangedEvent(this);
+      runningEvent = new RunningEvent(this);
+      timedoutEvent = new TimedoutEvent(this);
+      exitedEvent = new ExitedEvent(this);
     }
 
-    #region Driver
 
+    /// <inheritdoc />
+    /// <summary>
+    ///   Default Constructor
+    /// </summary>
+    /// <param name="timeout"></param>
+    public TaskEvent(double timeout = -1) : this(TimeSpan.FromMilliseconds(timeout)) { }
+
+    // -----------------------------------------------------------------------
+    #endregion Constructors
+
+
+    #region Backing Fields
+    // -----------------------------------------------------------------------
+
+    private Evt _onCanceled;
+    private Evt _onCompleted;
+    private Evt _onProgressChanged;
+    private Evt _onRunning;
+    private Evt _onTimedout;
+    private Evt _onExited;
+
+    // -----------------------------------------------------------------------
+    #endregion Backing Fields
+
+
+    #region Properties
     // -----------------------------------------------------------------------
 
     /// <summary>
-    ///   Asyncronous delegate monitor.
+    ///   OnCanceled
     /// </summary>
-    /// <returns>Task</returns>
-    public Task AsyncMonitor() {
-      var name = MethodBase.GetCurrentMethod().Name;
+    public Evt OnCanceled {
+      get => _onCanceled;
+      set {
+        if (canceledEvent.IsSubscribed)
+          canceledEvent.Handler -= _onCanceled;
+        _onCanceled = value;
+        canceledEvent.Handler += _onCanceled;
+      }
+    }
 
-      Task = Task.Run(() => {
-        Thread.CurrentThread.Name = name;
+    /// <summary>
+    ///   OnCompleted
+    /// </summary>
+    public Evt OnCompleted {
+      get => _onCompleted;
+      set {
+        if (completedEvent.IsSubscribed)
+          canceledEvent.Handler -= _onCompleted;
+        _onCompleted = value;
+        completedEvent.Handler += _onCompleted;
+      }
+    }
 
-        // Awaits for blocking main actions.
-        try {
-          var thread = new Thread(() => {
-            // ReSharper disable once InvertIf
-            if (_onRunning != null && _onRunning.IsSubscribed) {
-              try {
-                _onRunning.Invoke();
-                if (_onCompleted != null && _onCompleted.IsSubscribed)
-                  _onCompleted.Invoke();
-              } catch (ThreadAbortException) {
-                Thread.ResetAbort();
-              } catch (Exception ex) {
-                throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
-              }
-            }
-          }) {
-            Name = $"{name}->Worker",
-            IsBackground = true
-          };
+    /// <summary>
+    ///   OnProgressChanged
+    /// </summary>
+    public Evt OnProgressChanged {
+      get => _onProgressChanged;
+      set {
+        if (progressChangedEvent.IsSubscribed)
+          progressChangedEvent.Handler -= _onProgressChanged;
+        _onProgressChanged = value;
+        progressChangedEvent.Handler += _onProgressChanged;
+      }
+    }
 
-          thread.SetApartmentState(ApartmentState.STA);
-          thread.Start();
+    /// <summary>
+    ///   OnRunning
+    /// </summary>
+    public Evt OnRunning {
+      get => _onRunning;
+      set {
+        if (runningEvent.IsSubscribed)
+          runningEvent.Handler -= _onRunning;
+        _onRunning = value;
+        runningEvent.Handler += _onRunning;
+      }
+    }
 
-          var endTime = DateTime.Now.Add(Duration);
+    /// <summary>
+    ///   OnTimedout
+    /// </summary>
+    public Evt OnTimedout {
+      get => _onTimedout;
+      set {
+        if (timedoutEvent.IsSubscribed)
+          timedoutEvent.Handler -= _onTimedout;
+        _onTimedout = value;
+        timedoutEvent.Handler += _onTimedout;
+      }
+    }
 
-          // Poll for cancellation request or timeout.
-          while (thread.IsAlive) {
-            if (TokenSource.IsCancellationRequested) {
-              thread.Abort(TaskStatus.Canceled);
-              if (_onCanceled != null && _onCanceled.IsSubscribed)
-                _onCanceled.Invoke();
-              break;
-            }
-            if (Duration >= TimeSpan.Zero && DateTime.Now >= endTime) {
-              thread.Abort(TaskStatus.Faulted);
-              if (_onTimeout != null && _onTimeout.IsSubscribed)
-                _onTimeout.Invoke();
-              break;
-            }
-
-            _onProgressChanged.Invoke();
-
-            // Pulse 1/2 sec with a logical delay without blocking the current thread.
-            Task.Delay(500, TokenSource.Token);
-          }
-
-          thread.Join();
-        } catch (ThreadInterruptedException ex) {
-          Debug.WriteLine(ex.Message);
-        } catch (OperationCanceledException ex) {
-          Debug.WriteLine(ex.Message);
-        } catch (Exception ex) {
-          throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
-        }
-
-        _onExit.Invoke();
-      }, TokenSource.Token);
-
-      return Task;
+    /// <summary>
+    ///   OnExited
+    /// </summary>
+    public Evt OnExited {
+      get => _onExited;
+      set {
+        if (exitedEvent.IsSubscribed)
+          exitedEvent.Handler -= _onExited;
+        _onExited = value;
+        exitedEvent.Handler += _onExited;
+      }
     }
 
     // -----------------------------------------------------------------------
+    #endregion Properties
 
-    #endregion Driver
+
+    #region Event Handlers
+    // -----------------------------------------------------------------------
+    // ReSharper disable InconsistentNaming
+
+    /// <summary>
+    ///   CanceledEvent
+    /// </summary>
+    private readonly CanceledEvent canceledEvent;
+
+    /// <summary>
+    ///   CompletedEvent
+    /// </summary>
+    private readonly CompletedEvent completedEvent;
+
+    /// <summary>
+    ///   ProgressChangedEvent
+    /// </summary>
+    private readonly ProgressChangedEvent progressChangedEvent;
+
+    /// <summary>
+    ///   RunningEvent
+    /// </summary>
+    private readonly RunningEvent runningEvent;
+
+    /// <summary>
+    ///   TimedoutEvent
+    /// </summary>
+    private readonly TimedoutEvent timedoutEvent;
+
+    /// <summary>
+    ///   ExitedEvent
+    /// </summary>
+    private readonly ExitedEvent exitedEvent;
+
+    // ReSharper restore InconsistentNaming
+    // -----------------------------------------------------------------------
+    #endregion Event Handlers
+
 
     #region Expression Bodies
-
     // -----------------------------------------------------------------------
 
     /// <summary>
     ///   IsDisposed
     /// </summary>
-    public bool IsDisposed => (bool) TokenSource.GetType().GetProperty("IsDisposed", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty).GetValue(TokenSource);
+    public bool IsDisposed {
+      get {
+        var pi = TokenSource.GetType().GetProperty("IsDisposed", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty);
+        return pi != null && (bool)pi.GetValue(TokenSource);
+      }
+    }
+
+
+    /// <inheritdoc />
+    /// <summary>
+    ///   Dispose
+    /// </summary>
+    public void Dispose() {
+      Task?.Dispose();
+      Task = null;
+
+      TokenSource?.Dispose();
+      TokenSource = null;
+
+      canceledEvent?.Dispose();
+      completedEvent?.Dispose();
+      progressChangedEvent?.Dispose();
+      runningEvent?.Dispose();
+      timedoutEvent?.Dispose();
+      exitedEvent?.Dispose();
+
+      GC.Collect();
+    }
 
     // -----------------------------------------------------------------------
-
     #endregion Expression Bodies
-
-    #region Constructors
-
-    // -----------------------------------------------------------------------
-
-    /// <summary>
-    ///   Constructor
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="timeSpan"></param>
-    /// <param name="expression"></param>
-    public TaskEvent(TaskEventArgs<T>.Expression expression, T source, TimeSpan timeSpan) {
-      Name = string.Empty;
-      Status = TaskStatus.Created;
-      Duration = timeSpan;
-      TokenSource = new CancellationTokenSource();
-
-      _onCanceled = new CanceledEvent<T>(this, expression, source);
-      _onCompleted = new CompletedEvent<T>(this, expression, source);
-      _onProgressChanged = new ProgressChangedEvent<T>(this, expression, source);
-      _onRunning = new RunningEvent<T>(this, expression, source);
-      _onTimeout = new TimeoutEvent<T>(this, expression, source);
-      _onExit = new ExitEvent<T>(this, expression, source);
-    }
-
-
-    /// <summary>
-    ///   Constructor
-    /// </summary>
-    public TaskEvent(TaskEventArgs<T>.Expression expression, T source, double timeout = -1) : this(expression, source, TimeSpan.FromMilliseconds(timeout)) {
-    }
-
-    // -----------------------------------------------------------------------
-
-    #endregion Constructors
-
-    #region Events
-
-    // -----------------------------------------------------------------------
-
-    /// <summary>
-    ///   CanceledAction - Event Handler for CanceledEvent<c>T</c>
-    /// </summary>
-    public void OnCanceled(EventHandler<TaskEventArgs<T>> action) {
-      _onCanceled.OnCanceled += action;
-    }
-
-    /// <summary>
-    ///   CompletedAction - Event Handler for CompletedEvent<c>T</c>
-    /// </summary>
-    public void OnCompleted(EventHandler<TaskEventArgs<T>> action) {
-      _onCompleted.OnCompleted += action;
-    }
-    
-    /// <summary>
-    ///   ProgressChangedAction - Event Handler for ProgressChangedEvent<c>T</c>
-    /// </summary>
-    public void OnProgressChanged(EventHandler<TaskEventArgs<T>> action) {
-      _onProgressChanged.OnProgressChanged += action;
-    }
-    
-    /// <summary>
-    ///   RunningAction - Event Handler for RunningEvent<c>T</c>
-    /// </summary>
-    public void OnRunning(EventHandler<TaskEventArgs<T>> action) {
-      _onRunning.OnRunning += action;
-    }
-
-    /// <summary>
-    ///   TimeoutAction - Event Handler for TimeoutEvent<c>T</c>
-    /// </summary>
-    public void OnTimeout(EventHandler<TaskEventArgs<T>> action) {
-      _onTimeout.OnTimeout += action;
-    }
-
-    /// <summary>
-    ///   TimeoutAction - Event Handler for TimeoutEvent<c>T</c>
-    /// </summary>
-    public void OnExit(EventHandler<TaskEventArgs<T>> action) {
-      _onExit.OnExit += action;
-    }
-
-    // -----------------------------------------------------------------------
-
-    #endregion Events
-
-    #region Backing Fields
-
-    // -----------------------------------------------------------------------
-    // ReSharper disable InconsistentNaming
-
-    /// <summary>
-    ///   CanceledAction - Event Handler for CanceledEvent<c>T</c>
-    /// </summary>
-    private readonly ICanceledEvent<T> _onCanceled;
-
-    /// <summary>
-    ///   CompletedAction - Event Handler for CompletedEvent<c>T</c>
-    /// </summary>
-    private readonly ICompletedEvent<T> _onCompleted;
-
-    /// <summary>
-    ///   ProgressChangedAction - Event Handler for ProgressChangedEvent<c>T</c>
-    /// </summary>
-    private readonly IProgressChangedEvent<T> _onProgressChanged;
-
-    /// <summary>
-    ///   RunningAction - Event Handler for RunningEvent<c>T</c>
-    /// </summary>
-    private readonly IRunningEvent<T> _onRunning;
-
-    /// <summary>
-    ///   TimeoutAction - Event Handler for TimeoutEvent<c>T</c>
-    /// </summary>
-    private readonly ITimeoutEvent<T> _onTimeout;
-
-    /// <summary>
-    ///   ExitAction - Event Handler for TimeoutEvent<c>T</c>
-    /// </summary>
-    private readonly IExitEvent<T> _onExit;
-
-    // ReSharper restore InconsistentNaming
-    // -----------------------------------------------------------------------
-
-    #endregion Backing Fields
-
-    #region Properties
-
-    // -----------------------------------------------------------------------
-
-    /// <summary>
-    ///   Task
-    /// </summary>
-    public Task Task { get; private set; }
-
-    /// <summary>
-    ///   TokenSource
-    /// </summary>
-    public CancellationTokenSource TokenSource { get; }
-
-    /// <summary>
-    ///   Duration
-    /// </summary>
-    public TimeSpan Duration { get; }
-
-    /// <summary>
-    ///   Status
-    /// </summary>
-    public TaskStatus Status { get; }
-
-    /// <summary>
-    ///   Name
-    /// </summary>
-    public string Name { get; set; }
-
-    // -----------------------------------------------------------------------
-
-    #endregion Properties
   }
 }

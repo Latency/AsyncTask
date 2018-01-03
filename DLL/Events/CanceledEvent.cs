@@ -2,48 +2,42 @@
 //  File:       CanceledEvent.cs
 //  Solution:   ORM-Monitor
 //  Project:    ORM-Monitor
-//  Date:       11/04/2016
+//  Date:       1/1/2018
 //  Author:     Latency McLaughlin
 //  Copywrite:  Bio-Hazard Industries - 1998-2016
 //  *****************************************************************************
 
-using System;
-using ORM_Monitor.Interfaces;
-
 namespace ORM_Monitor.Events {
+  /// <inheritdoc />
   /// <summary>
-  ///   CanceledEvent - Event handler renamed as custom type definition by composition.
+  ///   CanceledEvent - Handler handler renamed as custom type definition by composition.
   /// </summary>
-  public sealed class CanceledEvent<T> : TaskHandler<T>, ICanceledEvent<T> {
+  public class CanceledEvent : TaskEventHandler {
+    #region Constructor
+    // -----------------------------------------------------------------------
+
+    /// <inheritdoc />
     /// <summary>
     ///   Constructor
     /// </summary>
     /// <param name="taskEvent"></param>
-    /// <param name="expression"></param>
-    /// <param name="source"></param>
-    public CanceledEvent(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, T source) : base(taskEvent, expression, source) {
-    }
-
-    #region Event Invocator
+    public CanceledEvent(TaskEvent taskEvent) : base(taskEvent) { }
 
     // -----------------------------------------------------------------------
+    #endregion Constructor
+
+
+    #region Handler Method
+    // -----------------------------------------------------------------------
+
+    /// <inheritdoc />
     /// <summary>
-    ///   OnCanceled
+    ///   OnCanceledEvent
     /// </summary>
-    public event EventHandler<TaskEventArgs<T>> OnCanceled {
-      add {
-        lock (Mutex) {
-          Handler += value;
-        }
-      }
-      remove {
-        lock (Mutex) {
-          Handler -= value;
-        }
-      }
-    }
+    /// <param name="tea"></param>
+    public override void Invoke(TaskEventArgs tea) => TaskEvent.OnCanceled?.Invoke(this, tea);
 
     // -----------------------------------------------------------------------
-    #endregion Event Invocator
+    #endregion Handler Method
   }
 }

@@ -1,11 +1,11 @@
-﻿//  *****************************************************************************
-//  File:       T_Async_IO.cs
-//  Solution:   ORM-Monitor
-//  Project:    Tests
-//  Date:       11/06/2016
-//  Author:     Latency McLaughlin
-//  Copywrite:  Bio-Hazard Industries - 1998-2016
-//  *****************************************************************************
+﻿// ****************************************************************************
+// File:       T_Async_IO.cs
+// Solution:   ORM-Monitor
+// Project:    Tests
+// Date:       01/01/2018
+// Author:     Latency McLaughlin
+// Copywrite:  Bio-Hazard Industries - 1998-2018
+// ****************************************************************************
 
 using System;
 using System.Collections.Generic;
@@ -15,26 +15,23 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using ORM_Monitor;
 using Tests.Properties;
-using MyType = System.Func<dynamic, string>;
 using Timer = System.Timers.Timer;
 
 namespace Tests {
   [TestFixture]
   // ReSharper disable once InconsistentNaming
   public class T_Async_IO {
+    private Timer _aTimer;
+    private int _tick;
+
+
     /// <summary>
     ///   SetUp
     /// </summary>
     [SetUp]
     public void Setup() {
-      _aTimer = new Timer {
-        Interval = 1000,
-        Enabled = true
-      };
-
-      _aTimer.Elapsed += (sender, args) => {
-        Debug.WriteLine("Tick #{0}", ++_tick);
-      };
+      _aTimer = new Timer {Interval = 1000, Enabled = true};
+      _aTimer.Elapsed += (sender, args) => { Debug.WriteLine("Tick #{0}", ++_tick); };
     }
 
 
@@ -46,143 +43,133 @@ namespace Tests {
       _aTimer.Stop();
     }
 
-    private Timer _aTimer;
-    private int _tick;
+
+    /// <summary>
+    ///   Expr
+    /// </summary>
+    /// <param name="args"></param>
+    private delegate void Expr(params string[] args);
+
 
     /// <summary>
     ///   Test
     /// </summary>
     [Test]
     public void Monitor_Test() {
-      TaskEventArgs<MyType>.Expression expression = args => {
-        var obj = args[0];
-        var str = args[1] as string;
-        var testNo = obj != null ? $"{((TaskEvent<MyType>) obj).Name}: " : string.Empty;
-        Debug.WriteLine(testNo + str);
-        return default(MyType);
-      };
-
-      // Construct started r
-      var tasks = new List<Task>();
-      MyType canceled = id => $"Task ID({id}) has canceled.";
-
       try {
-        // #############################################################
-        Debug.WriteLine("Processing **** NORMAL    **** test");
-
-        var @t0 = new TaskEvent<MyType>(expression, canceled, TimeSpan.FromSeconds(Settings.Default.TTL)) {
-          Name = "t0"
-        };
-
-        @t0.OnRunning((obj, tea) => {
-          SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
-        });
-
-        @t0.OnCompleted((th, tea) => {
-          tea?.Invoke(@t0, Messages.Completed);
-        });
-
-        @t0.OnTimeout((th, tea) => {
-          tea?.Invoke(@t0, Messages.Timeout);
-          Assert.Fail("timeout @t0");
-        });
-
-        @t0.OnCanceled((th, tea) => {
-          tea?.Invoke(@t0, tea.Source.Invoke(tea.Event.Task.Id));
-          Assert.Fail("canceled @t0");
-        });
-
-        @t0.OnExit((th, tea) => {
-          tea?.Invoke(@t0, Messages.Exited);
-          tasks.Remove(@t0.Task);
-        });
-
-        tasks.Add(@t0.AsyncMonitor());
+        string[] test = { "NORMAL", "CANCELED", "TIMED OUT" };
+        var tasks = new List<Task>();
+        var timeout = Convert.ToDouble(Settings.TTL);
+        var actionCollection = new List<Delegate>(
+          new Delegate[] {
+            (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
+            (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
+          }
+        );
 
         // #############################################################
-        Debug.WriteLine("Processing **** CANCELED  **** test");
-        //
+        Debug.WriteLine($"Executing **** {test[0],10} **** test.  Running for {2,2} seconds.  Timeout at {timeout / 1000} seconds.");
 
-        var @t1 = new TaskEvent<MyType>(expression, canceled, TimeSpan.FromSeconds(Settings.Default.TTL)) {
-          Name = "t1"
+        var t1 = new TaskEvent(timeout) {
+          Name = "t1",
+          Expression = actionCollection,
+          OnRunning = (obj, tea) => {
+            SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
+          },
+          OnCompleted = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
+          },
+          OnTimedout = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
+            Assert.Fail($"timedout @{tea.Name}");
+          },
+          OnCanceled = (th, tea) => {
+            tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString()}});
+            Assert.Fail($"canceled @{tea.Name}");
+          },
+          OnExited = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
+            tasks.Remove(tea.Task);
+          }
         };
 
-        @t1.OnRunning((obj, tea) => {
-          // Poll longer than Timeout threshold
-          SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 10));
-        });
+        tasks.Add(t1.AsyncMonitor());
 
-        @t1.OnCompleted((th, tea) => {
-          tea?.Invoke(@t1, Messages.Completed);
-          Assert.Fail("completed @t1");
-        });
 
-        @t1.OnTimeout((th, tea) => {
-          tea?.Invoke(@t1, Messages.Timeout);
-          Assert.Fail("timeout @t1");
-        });
+        // #############################################################
+        Debug.WriteLine($"Executing **** {test[1],10} **** test.  Running for {10,2} seconds.  Timeout at {timeout / 1000} seconds.  Interrupt at 4 seconds.");
 
-        @t1.OnCanceled((th, tea) => {
-          tea?.Invoke(@t1, tea.Source.Invoke(tea.Event.Task.Id));
-        });
-
-        @t1.OnExit((th, tea) => {
-          tea?.Invoke(@t1, Messages.Exited);
-          tasks.Remove(@t1.Task);
-        });
-
+        var t2 = new TaskEvent(timeout) {
+          Name = "t2",
+          Expression = actionCollection,
+          OnRunning = (obj, tea) => {
+            // Poll longer than Timeout threshold
+            SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 10));
+          },
+          OnCompleted = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
+            Assert.Fail($"completed @{tea.Name}");
+          },
+          OnTimedout = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
+            Assert.Fail($"timedout @{tea.Name}");
+          },
+          OnCanceled = (th, tea) => {
+            tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString() } });
+          },
+          OnExited = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
+            tasks.Remove(tea.Task);
+          }
+        };
+        
         #region Triger
         // ------------------------------------
         Task.Run(() => {
-          Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-          @t1.TokenSource.Cancel();
+          Task.Delay(TimeSpan.FromSeconds(4)).Wait();
+          t2.TokenSource.Cancel();
         });
         // ------------------------------------
         #endregion Trigger
 
-        tasks.Add(@t1.AsyncMonitor());
+        tasks.Add(t2.AsyncMonitor());
+
 
         // #############################################################
-        Debug.WriteLine("Processing **** TIMED OUT **** test");
-        //
+        Debug.WriteLine($"Executing **** {test[2],10} **** test.  Running for {10,2} seconds.  Timeout at {timeout / 1000} seconds.");
 
-        var @t2 = new TaskEvent<MyType>(expression, canceled, TimeSpan.FromSeconds(Settings.Default.TTL)) {
-          Name = "t2"
+        var t3 = new TaskEvent(timeout) {
+          Name = "t3",
+          Expression = actionCollection,
+          OnRunning = (obj, tea) => {
+            // Poll longer than Timeout threshold
+            SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 10));
+          },
+          OnCompleted = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
+            Assert.Fail($"completed @{tea.Name}");
+          },
+          OnTimedout = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
+          },
+          OnCanceled = (th, tea) => {
+            tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString() } });
+            Assert.Fail($"canceled @{tea.Name}");
+          },
+          OnExited = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
+            tasks.Remove(tea.Task);
+          }
         };
 
-        @t2.OnRunning((th, tea) => {
-          // Poll longer than Timeout threshold
-          SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 10));
-        });
+        tasks.Add(t3.AsyncMonitor());
 
-        @t2.OnCompleted((th, tea) => {
-          tea?.Invoke(@t2, Messages.Completed);
-          Assert.Fail("completed @t2");
-        });
-
-        @t2.OnTimeout((th, tea) => {
-          tea?.Invoke(@t2, Messages.Timeout);
-        });
-
-        @t2.OnCanceled((th, tea) => {
-          tea?.Invoke(@t2, tea.Source.Invoke(tea.Event.Task.Id));
-          Assert.Fail("canceled @t2");
-        });
-
-        @t2.OnExit((th, tea) => {
-          tea?.Invoke(@t2, Messages.Exited);
-          tasks.Remove(@t2.Task);
-        });
-
-        tasks.Add(@t2.AsyncMonitor());
 
         // Wait for all the tasks to finish.
         Task.WaitAll(tasks.ToArray());
 
-        Debug.WriteLine("All Tasks Completed");
+        Debug.WriteLine(@"All Tasks Completed");
       } catch (OperationCanceledException) {
-      } catch (SuccessException) {
-        // Records a message in the test result.
       } catch (Exception ex) {
         _aTimer.Stop();
         Debug.Print(ex.Message);

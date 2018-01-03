@@ -10,7 +10,6 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using ORM_Monitor.Events;
 using ORM_Monitor.Models;
 using ORM_Monitor.Properties;
 using ReflectSoftware.Insight;
@@ -18,26 +17,16 @@ using ReflectSoftware.Insight.Common;
 
 namespace ORM_Monitor.Controller {
   public sealed partial class TaskController {
-    #region Override Methods
-    // -----------------------------------------------------------------------
-
+    /// <inheritdoc />
     /// <summary>
     ///  Runs the task, returning true for success, false for failure.
     /// </summary>
-    /// <param name="expression"></param>
-    /// <param name="source"></param>
     /// <returns>true or false.</returns>
-    TaskEvent<T> ITaskController.Run<T>(TaskEventArgs<T>.Expression expression, T source) {
-      var @t = new TaskEvent<T>(expression, source, TimeSpan.FromSeconds(Settings.Default.TTL)) {
-        Name = GetType().Name.Substring(2)
-      };
-
-      // ---------------------------------
-      @t.OnRunning(
-        (obj, tea) => {
-          var th = obj as RunningEvent<dynamic>;
-          var ts = tea.Source as TaskRecordSet;
-          if (th == null || ts == null)
+    TaskEvent ITaskController.Run() {
+      var t = new TaskEvent(TimeSpan.FromSeconds(Settings.Default.TTL)) {
+        Name = GetType().Name.Substring(2),
+        OnRunning = (obj, tea) => {
+          if (!(tea.Tag is TaskRecordSet ts))
             throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnRunning"));
 
           double current;
@@ -52,13 +41,13 @@ namespace ORM_Monitor.Controller {
           });
 
           while ((current = targetTime.Subtract(currentTime).TotalMilliseconds) > 0) {
-            if (tea.Event.TokenSource == null || tea.Event.TokenSource.Token.IsCancellationRequested)
+            if (tea.TokenSource == null || tea.TokenSource.Token.IsCancellationRequested)
               return;
 
             var val = 1 - current / diffTime;
 
             service?.Owner.Dispatcher.Invoke(() => {
-              ts.Progress = (ushort) (val*100);
+              ts.Progress = (ushort)(val * 100);
             });
 
             // Pulse 10x per second.
@@ -70,14 +59,9 @@ namespace ORM_Monitor.Controller {
           service?.Owner.Dispatcher.Invoke(() => {
             ts.Progress = 100;
           });
-        }
-      );
-
-      // ---------------------------------
-      @t.OnCompleted(
-        (obj, tea) => {
-          var ts = tea.Source as TaskRecordSet;
-          if (ts == null)
+        },
+        OnCompleted = (obj, tea) => {
+          if (!(tea.Tag is TaskRecordSet ts))
             throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnCompleted"));
 
           var service = ts.Tag as TaskService;
@@ -86,15 +70,10 @@ namespace ORM_Monitor.Controller {
             ts.Progress = 100;
             ts.Status = TaskStatus.RanToCompletion;
           });
-        }
-      );
-
-      // ---------------------------------
-      @t.OnTimeout(
-        (obj, tea) => {
-          var ts = tea.Source as TaskRecordSet;
-          if (ts == null)
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnTimeout"));
+        },
+        OnTimedout = (obj, tea) => {
+          if (!(tea.Tag is TaskRecordSet ts))
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnTimedout"));
 
           var service = ts.Tag as TaskService;
           service?.Owner.Dispatcher.Invoke(() => {
@@ -102,37 +81,21 @@ namespace ORM_Monitor.Controller {
             ts.Action.Content = "Remove";
             ts.Status = TaskStatus.Faulted;
           });
-        }
-      );
-
-      // ---------------------------------
-      @t.OnProgressChanged(
-        (obj, tea) => {
-          var ts = tea.Source as TaskRecordSet;
-          if (ts == null)
+        },
+        OnProgressChanged = (obj, tea) => {
+          if (!(tea.Tag is TaskRecordSet))
             throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnProgressChanged"));
-        }
-      );
-
-      // ---------------------------------
-      @t.OnExit(
-        (obj, tea) => {
-          var ts = tea.Source as TaskRecordSet;
-          if (ts == null)
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnExit"));
+        },
+        OnExited = (obj, tea) => {
+          if (!(tea.Tag is TaskRecordSet ts))
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnExited"));
 
           RunningTasks.Remove(ts.TaskName);
 
           RILogManager.Default.SendInformation($"Disposing {GetType().Name} token source.");
-          t.TokenSource.Dispose();
-        }
-      );
-
-      // ---------------------------------
-      @t.OnCanceled(
-        (obj, tea) => {
-          var ts = tea.Source as TaskRecordSet;
-          if (ts == null)
+        },
+        OnCanceled = (obj, tea) => {
+          if (!(tea.Tag is TaskRecordSet ts))
             throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnCanceled"));
 
           var service = ts.Tag as TaskService;
@@ -142,13 +105,9 @@ namespace ORM_Monitor.Controller {
             ts.Action.Content = "Remove";
           });
         }
-      );
+      };
 
-      return @t;
+      return t;
     }
-
-
-    // -----------------------------------------------------------------------
-    #endregion Override Methods
   }
 }

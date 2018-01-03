@@ -20,7 +20,7 @@ namespace ORM_Monitor.Controller {
     /// <summary>
     ///  Concurrent llist container.
     /// </summary>
-    public volatile Dictionary<string, TaskEvent<dynamic>> RunningTasks = new Dictionary<string, TaskEvent<dynamic>>();
+    public volatile Dictionary<string, TaskEvent> RunningTasks = new Dictionary<string, TaskEvent>();
 
     // -----------------------------------------------------------------------
     #endregion Properties

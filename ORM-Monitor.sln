@@ -1,13 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{BA33716C-FAC1-4DA8-B668-5731342A0266}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORM-Monitor", "DLL\ORM-Monitor.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORM-Monitor", "DLL\ORM-Monitor.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9B7DA3DF-4D94-4363-9504-8969DB578C1C}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Flow-Chart.png = Flow-Chart.png
+		LICENSE.txt = LICENSE.txt
+		ORM-Monitor.png = ORM-Monitor.png
+		Output.png = Output.png
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +25,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BA33716C-FAC1-4DA8-B668-5731342A0266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA33716C-FAC1-4DA8-B668-5731342A0266}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA33716C-FAC1-4DA8-B668-5731342A0266}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA33716C-FAC1-4DA8-B668-5731342A0266}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{6ED688CD-50C6-45B2-8AE0-759D28E468AE}.Debug|Any CPU.ActiveCfg = Release|Any CPU
 		{6ED688CD-50C6-45B2-8AE0-759D28E468AE}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{6ED688CD-50C6-45B2-8AE0-759D28E468AE}.Debug|Any CPU.Deploy.0 = Release|Any CPU
@@ -27,8 +33,15 @@ Global
 		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A775AB79-AE9C-4175-B4A3-DC61BD24223D}
 	EndGlobalSection
 EndGlobal

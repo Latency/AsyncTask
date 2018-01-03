@@ -1,106 +1,43 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6ED688CD-50C6-45B2-8AE0-759D28E468AE}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ORM_Monitor</RootNamespace>
-    <AssemblyName>ORM-Monitor</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFrameworks>net471;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>snKey.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile />
+    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
+    <ApplicationIcon>project.ico</ApplicationIcon>
+    <Version>2.2.0</Version>
+    <FileVersion>2.2.0</FileVersion>
+    <AssemblyVersion>2.2.0</AssemblyVersion>
+    <Description>Object Relational Mapped Monitor Extension Library</Description>
+    <Company>Bio-Hazard Industries</Company>
+    <Copyright>Copyright ©  1998-2018</Copyright>
+    <Authors>Latency McLaughlin</Authors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <PackageReleaseNotes>Support for .NET 4.7.1 and .NET Core 2.0
+Changed TaskEvent to include additional constructors and clean up constructor handling.
+Simplified use for API overall.
+Revamped unit tests and GUI for the new versoin.</PackageReleaseNotes>
+    <RepositoryType>GIT</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseUrl>http://www.gnu.org/licenses/gpl-3.0.en.html</PackageLicenseUrl>
+    <PackageIconUrl>http://bio-hazard.us/ico/kitty.ico</PackageIconUrl>
+    <PackageProjectUrl>http://latency.github.io/ORM-Monitor</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Latency/ORM-Monitor</RepositoryUrl>
+    <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
+    <DelaySign>false</DelaySign>
+    <RootNamespace>ORM_Monitor</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\ORM-Monitor.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>8C6163BF5E6DF4DB8F97E20DFE424749519CE944</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>kryterion_code_signing.p12</ManifestKeyFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Events\ProgressChangedEvent.cs" />
-    <Compile Include="Interfaces\IProgressChangedEvent.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Events\CanceledEvent.cs" />
-    <Compile Include="Events\CompletedEvent.cs" />
-    <Compile Include="Events\ExitEvent.cs" />
-    <Compile Include="Events\RuningEvent.cs" />
-    <Compile Include="Events\TimeoutEvent.cs" />
-    <Compile Include="Interfaces\ICanceledEvent.cs" />
-    <Compile Include="Interfaces\ICompletedEvent.cs" />
-    <Compile Include="Interfaces\IExitEvent.cs" />
-    <Compile Include="Interfaces\IRunningEvent.cs" />
-    <Compile Include="Interfaces\ITaskHandler.cs" />
-    <Compile Include="Interfaces\ITimeoutEvent.cs" />
-    <Compile Include="TaskEvent.cs" />
-    <Compile Include="TaskEventArgs.cs" />
-    <Compile Include="TaskHandler.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="snKey.snk" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- This section is used for code-signing the application. This should not be confused with manifest signing or with strong-name assembly signing, which can both be done from the Visual Studio interface. -->
-  <Target Name="SignOutput" AfterTargets="CoreCompile">
-    <ItemGroup>
-      <SignableFiles Include="$(ProjectDir)obj\$(ConfigurationName)\$(TargetName)" />
-    </ItemGroup>
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe&quot; sign /a /fd sha256 /sha1 $(ManifestCertificateThumbprint) /t &quot;$(ManifestTimestampUrl)&quot; &quot;%(SignableFiles.Identity)$(TargetExt)&quot;" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!-- <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe&quot; sign /a /f &quot;D:\Documents\Visual Studio 2017\Projects\Sentinel\Resources\Kryterion\kryterion_code_signing.p12&quot; /p kryterion /fd sha256 /t &quot;$(ManifestTimestampUrl)&quot; &quot;$(TargetPath)&quot;" /> -->
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe&quot; sign /a /fd sha256 /t &quot;$(ManifestTimestampUrl)&quot; &quot;$(TargetPath)&quot;" />
   </Target>
-  <!-- Code to merge the assemblies into one:setup.exe -->
-  <PropertyGroup>
-    <ILMergeTarget>..\NuGet\ILMerge.targets</ILMergeTarget>
-  </PropertyGroup>
-  <Target Name="ILMerge" />
-  <Import Project="$(ILMergeTarget)" Condition="Exists('$(ILMergeTarget)')" />
-  <Target Name="AfterBuild" DependsOnTargets="ILMerge" />
-  <Target Name="Clean">
-    <RemoveDir Directories="..\NuGet\lib\;..\NuGet\bin\;..\NuGet\obj\" Condition="Exists('$(ILMergeTarget)')" />
-  </Target>
-  <Target Name="SpicNSpan" AfterTargets="Clean">
-    <!-- Remove obj folder -->
-    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
-    <!-- Remove bin folder -->
-    <RemoveDir Directories="$(BaseOutputPath)" />
-  </Target>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+  </ItemGroup>
 </Project>

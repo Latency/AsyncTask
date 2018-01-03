@@ -1,49 +1,43 @@
-﻿//  *****************************************************************************
-//  File:       CompletedEvent.cs
-//  Solution:   ORM-Monitor
-//  Project:    ORM-Monitor
-//  Date:       11/04/2016
-//  Author:     Latency McLaughlin
-//  Copywrite:  Bio-Hazard Industries - 1998-2016
-//  *****************************************************************************
-
-using System;
-using ORM_Monitor.Interfaces;
+﻿// **************************************************************************
+// File:      CompletedEvent.cs
+// Solution:  ORM-Monitor
+// Project:   ORM-Monitor
+// Date:      01/01/2018
+// Author:    Latency McLaughlin
+// Copywrite: Bio-Hazard Industries - 1998-2018
+// ***************************************************************************
 
 namespace ORM_Monitor.Events {
+  /// <inheritdoc />
   /// <summary>
-  ///   CompletedEvent - Event handler renamed as custom type definition by composition.
+  ///   CompletedEvent - Handler handler renamed as custom type definition by composition.
   /// </summary>
-  public sealed class CompletedEvent<T> : TaskHandler<T>, ICompletedEvent<T> {
+  public class CompletedEvent : TaskEventHandler {
+    #region Constructor
+    // -----------------------------------------------------------------------
+
+    /// <inheritdoc />
     /// <summary>
     ///   Constructor
     /// </summary>
     /// <param name="taskEvent"></param>
-    /// <param name="expression"></param>
-    /// <param name="source"></param>
-    public CompletedEvent(TaskEvent<T> taskEvent, TaskEventArgs<T>.Expression expression, T source) : base(taskEvent, expression, source) {
-    }
+    public CompletedEvent(TaskEvent taskEvent) : base(taskEvent) { }
 
-    #region Event Invocator
+    // -----------------------------------------------------------------------
+    #endregion Constructor
+
+
+    #region Handler Method
     // -----------------------------------------------------------------------
 
+    /// <inheritdoc />
     /// <summary>
-    ///   OnCompleted
+    ///   OnCompletedEvent
     /// </summary>
-    public event EventHandler<TaskEventArgs<T>> OnCompleted {
-      add {
-        lock (Mutex) {
-          Handler += value;
-        }
-      }
-      remove {
-        lock (Mutex) {
-          Handler -= value;
-        }
-      }
-    }
+    /// <param name="tea"></param>
+    public override void Invoke(TaskEventArgs tea) => TaskEvent.OnCompleted?.Invoke(this, tea);
 
     // -----------------------------------------------------------------------
-    #endregion Event Invocator
+    #endregion Handler Method
   }
 }

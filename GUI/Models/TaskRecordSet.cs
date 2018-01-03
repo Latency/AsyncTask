@@ -15,6 +15,7 @@ using System.Windows.Controls;
 
 namespace ORM_Monitor.Models {
   public class TaskRecordSet : TaskRecordSetBase, ITaskRecordSet {
+    /// <inheritdoc />
     /// <summary>
     ///   Copy Constructor
     /// </summary>
@@ -32,6 +33,7 @@ namespace ORM_Monitor.Models {
     }
 
 
+    /// <inheritdoc />
     /// <summary>
     ///  Copy Constructor
     /// </summary>
@@ -42,76 +44,84 @@ namespace ORM_Monitor.Models {
     #region Properties
     // -----------------------------------------------------------------------
 
+    /// <inheritdoc />
     /// <summary>
     ///   TaskName
     /// </summary>
     [GridColumn(Header = "Task", Name = "ColTask", Width = 80, IsReadOnly = true)]
     public string TaskName {
-      get { return Get<string>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<string>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Description
     /// </summary>
     [GridColumn(Name = "ColDescription", Width = 280, IsReadOnly = true, Visibility = Visibility.Collapsed)]
     public string Description {
-      get { return Get<string>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<string>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Priority
     /// </summary>
     [GridColumn(Name = "ColPriority", Width = 50, IsReadOnly = true)]
     public int Priority {
-      get { return Get<int>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<int>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Progress
     /// </summary>
     [GridColumn(Name = "ColProgress", Width = 60, IsReadOnly = true)]
     public ushort Progress {
-      get { return Get<ushort>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<ushort>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Status
     /// </summary>
     [GridColumn(Name = "ColStatus", Width = 100, IsReadOnly = true)]
     public TaskStatus Status {
-      get { return Get<TaskStatus>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<TaskStatus>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Action
     /// </summary>
     [GridColumn(Name = "ColAction", Width = 100, IsReadOnly = true)]
     public Button Action {
-      get { return Get<Button>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<Button>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Date
     /// </summary>
     [GridColumn(Name = "ColDate", Width = 120, IsReadOnly = true)]
     public DateTime? Date {
-      get { return Get<DateTime?>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<DateTime?>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
 
+    /// <inheritdoc />
     /// <summary>
     ///   Tag
     /// </summary>
     [GridColumn(IsReadOnly = true, Visibility = Visibility.Collapsed)]
     public object Tag {
-      get { return Get<object>(MethodBase.GetCurrentMethod().Name.Substring(4)); }
-      set { Set(MethodBase.GetCurrentMethod().Name.Substring(4), value); }
+      get => Get<object>(MethodBase.GetCurrentMethod().Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
     }
     // -----------------------------------------------------------------------
     #endregion Properties

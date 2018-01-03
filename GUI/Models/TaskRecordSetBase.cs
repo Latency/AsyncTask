@@ -32,6 +32,7 @@ namespace ORM_Monitor.Models {
     #endregion Fields
 
 
+    /// <inheritdoc />
     /// <summary>
     ///  Constructor
     /// </summary>
@@ -69,8 +70,7 @@ namespace ORM_Monitor.Models {
       return (T)this.InvokeIfRequired(
         objs => {
           lock (Mutex) {
-            var key = objs[0] as string;
-            return key != null ? GetValue(DependancyCollection[key]) : null;
+            return objs[0] is string key ? GetValue(DependancyCollection[key]) : null;
           }
         }, DispatcherPriority.Send, property
       );
@@ -87,10 +87,9 @@ namespace ORM_Monitor.Models {
       this.InvokeIfRequired(
         objs => {
           lock (Mutex) {
-            var key = objs[0] as string;
-            if (key == null)
+            if (!(objs[0] is string key))
               return;
-            var v = objs[1] is T ? (T)objs[1] : default(T);
+            var v = objs[1] is T variable ? variable : default(T);
             SetValue(DependancyCollection[key], v);
           }
         }, DispatcherPriority.Send, property, value

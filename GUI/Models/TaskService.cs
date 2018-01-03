@@ -9,6 +9,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using ORM_Monitor.Controller;
 
 namespace ORM_Monitor.Models {
   /// <summary>
@@ -41,27 +42,27 @@ namespace ORM_Monitor.Models {
     /// <summary>
     ///   Owner
     /// </summary>
-    public Window Owner { get; private set; }
+    public Window Owner { get; }
 
     /// <summary>
     ///   Controller
     /// </summary>
-    public ITaskController Controller { get; private set; }
+    public ITaskController Controller { get; }
 
     /// <summary>
     ///   RecordSet
     /// </summary>
-    public ITaskRecordSet Parent { get; private set; }
+    public ITaskRecordSet Parent { get; }
 
     /// <summary>
     ///   View
     /// </summary>
-    public DataGridRow GridRow { get; private set; }
+    public DataGridRow GridRow { get; }
 
     /// <summary>
-    ///   Event
+    ///   Handler
     /// </summary>
-    public TaskEvent<dynamic> Event { get; set; }
+    public TaskEvent Event { get; set; }
 
     // -----------------------------------------------------------------------
     #endregion Properties

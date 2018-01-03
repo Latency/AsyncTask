@@ -7,12 +7,12 @@
 ## Task-based Asynchronous Pattern ([TAP])
 
 * CREATED BY:   [Latency McLaughlin]
-* FRAMEWORK:    [.NET] v[4.6.2](https://www.microsoft.com/en-us/download/details.aspx?id=53345)
-* LANGUAGE:     [C#] (v6.0)
+* FRAMEWORK:    [.NET] v[4.7.1] & Core v[[2.0]](https://www.microsoft.com/net/download/windows)
+* LANGUAGE:     [C#] (v7.0)
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      3/2/2017
-* VERSION:      [2.1.3](https://www.nuget.org/packages/ORM-Monitor/2.1.3/)
+* UPDATED:      1/1/2018
+* VERSION:      [2.2.0](https://www.nuget.org/packages/ORM-Monitor/2.2.0/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -26,6 +26,7 @@
 * <a href="#overview">Overview</a>
 * <a href="#installation">Installation</a>
 * <a href="#using">Using the code</a>
+* <a href="#other">Output</a>
 * <a href="#other">Other features</a>
 * <a href="#references">References</a>
 * <a href="#license">License</a>
@@ -52,6 +53,10 @@ In fact, our methodology for this article is to use '<i>generic programming</i>'
 <h2><a name="introduction">Introduction</a></h2>
 
 This article introduces an [API] which wraps processes asynchronously; supporting deadlock protection, timeout, cancellation requests, checkpointing, and a parametric polymorphic [MVC] design by convention.
+
+<p align="center">
+ <img src="https://github.com/Latency/ORM-Monitor/blob/master/Flow-Chart.png?raw=true" alt="Flow Chart of ORM-Monitor">
+</p>
 
 Callback support for the following delegates:
 * OnCompleted
@@ -156,13 +161,13 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
     <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.1.3</td>
-    <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.2100.60</td>
+    <td><i>ORM-Monitor</i> - v2.2.0</td>
+    <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.5906.29906</td>
   </tr>
   <tr>
     <td>Exception logging & UI application hooks</td>
-    <td><i>ReflectSoftware.Insight</i> - v5.6.1.2</td>
-    <td><i>Newtonsoft.Json - JSON.NET</i> - v9.0.1</td>
+    <td><i>ReflectSoftware.Insight</i> - v5.7.1.1</td>
+    <td><i>Newtonsoft.Json - JSON.NET</i> - v10.0.3</td>
   </tr>
 </table>
 
@@ -171,22 +176,34 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
     <th width="300" style="min-width:300px; max-width: 300px">Description</th>
     <th width="587" style="min-width:531px;" colspan="2">Assembly - DLL</th>
   </tr>
-  <td>API</td>
-  <td><i>ORM-Monitor</i> - v2.1.3</td>
+   <tr>
+    <td>External References</td>
+    <td><i>Microsoft.CSharp</i> - v4.4.1</td>
+    <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
+  </tr> 
+  <tr>
+    <td>API</td>
+    <td><i>ORM-Monitor</i> - v2.2.0</td>
+    <td></td>
+  </tr>
 </table>
 
 <table>
   <tr>
     <th width="300" style="min-width:300px; max-width: 300px">Description</th>
-    <th width="587" style="min-width:531px;">Assembly - Tests</th>
+    <th width="587" style="min-width:531px;" colspan="3">Assembly - Tests</th>
   </tr>
   <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.1.3</td>
+    <td><i>ORM-Monitor</i> - v2.2.0</td>
+    <td><i>Microsoft.CSharp</i> - v4.4.1</td>
+    <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
   </tr>
   <tr>
     <td>Unit Testing</td>
-    <td><i>NUnit</i> - v3.6.1</td>
+    <td><i>NUnit</i> - v3.9.0</td>
+    <td><i>NUnit3TestAdapter</i> - v3.9.0</td>
+    <td></td>
   </tr>
 </table>
 
@@ -196,26 +213,23 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
 There are four essential steps to using this:
 
 &nbsp;1. Optional:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setup a `TaskEventArgs<T>.Expression` delegate source with ... parameters.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setup a `TaskEventArgs.Expression` delegate collection.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Make any <i>delegate</i> use the expression, which is basically a wrapper for invocating a method across<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; boundary switching thread contexts.
 
 ```csharp
-   TaskEventArgs<MyType>.Expression expression = args => {
-     var ctl = args[0] as Control;
-     var a   = args[1] as MethodInvoker;
-     ...
-     if (ctl.InvokeRequired)
-       ctl.Invoke(a);
-     else
-       a();
-     ...  
-     return default(MyType);  
-   };
+    delegate void Expr(params string[] args);
+
+    var actionCollection = new List<Delegate>(
+      new Delegate[] {
+        (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
+        (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
+      }
+    );
 ```
 
 &nbsp;2. Create a \`<i>TaskEvent</i>\` with type parameter matching the type from #1. (if specified)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using <i>object initialization</i>, specify the timeout for 5 seconds which is shorter than the default.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using <i>object initialization</i>, assign the properties and specify the timeout (milliseconds / TimeSpan) whereby the default (-1) for infinate.<br>
 &nbsp;3. Specify the `OnRunning` event handler delegate.  (<b>Required</b>)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;There is an exception handler for this in the \`<i>AsyncMonitor</i>\` method if omitted.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
@@ -223,62 +237,60 @@ There are four essential steps to using this:
 &nbsp;4. Invoke the extension method.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>[TaskEvent.cs]</i>:   Extension methods for asynchronous routines.
 
-   Usage:
+### Usage:
 ```csharp
-   //<Task> = <TaskEvent>.AsyncMonitor();
-   Task task = @t0.AsyncMonitor();
-```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Or since it is an extension method, it can be called explicitly since static:
-```csharp
-   Async_IO.AsyncMonitor(@t0);
+   var t1 = new TaskEvent(timeout) {
+     ...object initializers...
+   };
+   Task task = t1.AsyncMonitor();
 ```
 
 ### Example #1
 ```csharp
-    TaskEventArgs<MyType>.Expression expression = args => {
-      var obj = args[0];
-      var str = args[1] as string;
-      var testNo = obj != null ? $"{((TaskEvent<MyType>) obj).Name}: " : string.Empty;
-      Debug.WriteLine(testNo + str);
-      return default(MyType);
-    };
-    
-    MyType canceled = id => $"Task ID({id}) has canceled.";
-      
-    var @t0 = new TaskEvent<MyType>(expression, source: canceled, timeout: TimeSpan.FromSeconds(5)) {
-      Name = "t0"
-    };
+        var timeout = Convert.ToDouble(Settings.TTL);
+        var actionCollection = new List<Delegate>(
+          new Delegate[] {
+            (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
+            (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
+          }
+        );
 
-    @t0.OnRunning((th, tea) => {
-      SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
-    });
+        var t1 = new TaskEvent(timeout) {
+          Name = "t1",
+          Expression = actionCollection,
+          OnRunning = (obj, tea) => {
+            SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
+          },
+          OnCompleted = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
+          },
+          OnTimedout = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
+            Assert.Fail($"timedout @{tea.Name}");
+          },
+          OnCanceled = (th, tea) => {
+            tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString()}});
+            Assert.Fail($"canceled @{tea.Name}");
+          },
+          OnExited = (th, tea) => {
+            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
+            tasks.Remove(tea.Task);
+          }
+        };
 
-    @t0.OnCompleted((th, tea) => {
-      tea?.Invoke(@t0, Messages.Completed);
-    });
-
-    @t0.OnTimeout((th, tea) => {
-      tea?.Invoke(@t0, Messages.Timeout);
-      Assert.Fail("timeout @t0");
-    });
-
-    @t0.OnCanceled((th, tea) => {
-      tea?.Invoke(@t0, tea.Source.Invoke(tea.Event.Task.Id));
-      Assert.Fail("canceled @t0");
-    });
-
-    @t0.OnExit((th, tea) => {
-      tea?.Invoke(@t0, Messages.Exited);
-    });
-
-    // The extension method to use.
-    Task task = @t0.AsyncMonitor();
+        tasks.Add(t1.AsyncMonitor());
 ```
 
-1. Run \`<i>TaskScheduler.exe</i>\`.
+1. Run \`<i>.\GUI\\&lt;Release&gt;\TaskScheduler.exe</i>\`.
 2. Click the `Start New Task` button in the window pane to spawn a new event.
 3. Click the `Cancel` button to stop the event.
 4. Click the `Remove` button to remove the row from the list.
+
+<h2><a name="output">Output</a></h2>
+
+<p align="center">
+ <img src="https://github.com/Latency/ORM-Monitor/blob/master//Output.png?raw=true" alt="Output">
+</p>
 
 <h2><a name="other">Other Features</a></h2>
 

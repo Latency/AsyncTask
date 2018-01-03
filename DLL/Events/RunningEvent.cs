@@ -1,18 +1,18 @@
-﻿// **************************************************************************
-// File:      ProgressChangedEvent.cs
-// Solution:  ORM-Monitor
-// Project:   ORM-Monitor
-// Date:      01/01/2018
-// Author:    Latency McLaughlin
-// Copywrite: Bio-Hazard Industries - 1998-2018
-// ***************************************************************************
+﻿// ****************************************************************************
+// File:       RuningEvent.cs
+// Solution:   ORM-Monitor
+// Project:    ORM-Monitor
+// Date:       01/01/2018
+// Author:     Latency McLaughlin
+// Copywrite:  Bio-Hazard Industries - 1998-2018
+// ****************************************************************************
 
 namespace ORM_Monitor.Events {
   /// <inheritdoc />
   /// <summary>
-  ///   RunningEvent - Handler handler renamed as custom type definition by composition.
+  ///   RunningEvent - Event handler renamed as custom type definition by composition.
   /// </summary>
-  public class ProgressChangedEvent : TaskEventHandler {
+  public class RunningEvent : TaskEventHandler {
     #region Constructor
     // -----------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace ORM_Monitor.Events {
     ///   Constructor
     /// </summary>
     /// <param name="taskEvent"></param>
-    public ProgressChangedEvent(TaskEvent taskEvent) : base(taskEvent) { }
+    public RunningEvent(TaskEvent taskEvent) : base(taskEvent) { }
 
     // -----------------------------------------------------------------------
     #endregion Constructor
@@ -32,10 +32,10 @@ namespace ORM_Monitor.Events {
 
     /// <inheritdoc />
     /// <summary>
-    ///   OnCanceledEvent
+    ///   OnRunningEvent
     /// </summary>
     /// <param name="tea"></param>
-    public override void Invoke(TaskEventArgs tea) => TaskEvent.OnProgressChanged?.Invoke(this, tea);
+    public override void Invoke(TaskEventArgs tea) => TaskEvent.OnRunning?.Invoke(this, tea);
 
     // -----------------------------------------------------------------------
     #endregion Handler Method
