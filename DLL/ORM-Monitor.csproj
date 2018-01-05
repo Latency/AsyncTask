@@ -5,18 +5,15 @@
     <AssemblyOriginatorKeyFile>snKey.snk</AssemblyOriginatorKeyFile>
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
     <ApplicationIcon>project.ico</ApplicationIcon>
-    <Version>2.2.0</Version>
-    <FileVersion>2.2.0</FileVersion>
-    <AssemblyVersion>2.2.0</AssemblyVersion>
+    <Version>2.3.0</Version>
+    <FileVersion>2.3.0</FileVersion>
+    <AssemblyVersion>2.3.0</AssemblyVersion>
     <Description>Object Relational Mapped Monitor Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2018</Copyright>
     <Authors>Latency McLaughlin</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageReleaseNotes>Support for .NET 4.7.1 and .NET Core 2.0
-Changed TaskEvent to include additional constructors and clean up constructor handling.
-Simplified use for API overall.
-Revamped unit tests and GUI for the new versoin.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed exception handling not being entirely correct for cancellation operations.</PackageReleaseNotes>
     <RepositoryType>GIT</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseUrl>http://www.gnu.org/licenses/gpl-3.0.en.html</PackageLicenseUrl>
@@ -26,6 +23,8 @@ Revamped unit tests and GUI for the new versoin.</PackageReleaseNotes>
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
     <DelaySign>false</DelaySign>
     <RootNamespace>ORM_Monitor</RootNamespace>
+    <SignTool>C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe</SignTool>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
@@ -33,11 +32,4 @@ Revamped unit tests and GUI for the new versoin.</PackageReleaseNotes>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DocumentationFile>bin\$(Configuration)\ORM-Monitor.xml</DocumentationFile>
   </PropertyGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-  <!-- <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe&quot; sign /a /f &quot;D:\Documents\Visual Studio 2017\Projects\Sentinel\Resources\Kryterion\kryterion_code_signing.p12&quot; /p kryterion /fd sha256 /t &quot;$(ManifestTimestampUrl)&quot; &quot;$(TargetPath)&quot;" /> -->
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe&quot; sign /a /fd sha256 /t &quot;$(ManifestTimestampUrl)&quot; &quot;$(TargetPath)&quot;" />
-  </Target>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
-  </ItemGroup>
 </Project>

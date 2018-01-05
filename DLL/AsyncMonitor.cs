@@ -8,12 +8,12 @@
 // ****************************************************************************
 
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ORM_Monitor {
+  /// <inheritdoc cref="TaskEventArgs" />
   /// <summary>
   ///   Task_Event
   /// </summary>
@@ -42,7 +42,12 @@ namespace ORM_Monitor {
                   completedEvent.Invoke(this);
               } catch (ThreadAbortException) {
                 Thread.ResetAbort();
+              } catch (OperationCanceledException) {
               } catch (Exception ex) {
+                if (ex.InnerException != null && ex.InnerException.GetType() == typeof(AggregateException)) {
+                  if (ex.InnerException.InnerException != null && ex.InnerException.InnerException.GetType() == typeof(OperationCanceledException))
+                    return;
+                }
                 throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
               }
             }
@@ -78,10 +83,6 @@ namespace ORM_Monitor {
           }
 
           thread.Join();
-        } catch (ThreadInterruptedException ex) {
-          Debug.WriteLine(ex.Message);
-        } catch (OperationCanceledException ex) {
-          Debug.WriteLine(ex.Message);
         } catch (Exception ex) {
           throw new Exception(MethodBase.GetCurrentMethod().Name, ex);
         }

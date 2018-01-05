@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9B7DA3DF-4D94-4363-9504-8969DB578C1C}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		DataModel.md = DataModel.md
 		Flow-Chart.png = Flow-Chart.png
 		LICENSE.txt = LICENSE.txt
 		ORM-Monitor.png = ORM-Monitor.png

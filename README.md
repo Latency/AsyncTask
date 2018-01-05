@@ -11,8 +11,8 @@
 * LANGUAGE:     [C#] (v7.0)
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      1/1/2018
-* VERSION:      [2.2.0](https://www.nuget.org/packages/ORM-Monitor/2.2.0/)
+* UPDATED:      1/5/2018
+* VERSION:      [2.3.0](https://www.nuget.org/packages/ORM-Monitor/2.2.0/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -45,10 +45,10 @@ Any developer can therefore use it to construct new code with the same underlyin
 When we reference an <i>Object Relational Mapped</i> sub-system it means it is polymorphic and is generic by convention that doesn't depend on specific references to types.  Think of it as a universal template which can inject the types in question as its specified type parameter and let any of the mapping be done under the hood in a <i>dynamic</i> manor.
 
 Some nice things about the C# language is that it is far superior to Java and can detect within a certain tolerance what the type might be so that the type parameter can be omitted from its calling convention.
-Also, that both languages have Reflection built-in so it is possible to be able to drill down many OSI layers and pull out information used for dynamic / RT calling conventions.
+Note that both languages have Reflection built-in, which technically makes it is possible to drill down many OSI layers and pull out information used for dynamic / RT calling conventions.
 
 Java has limitations and has nothing to offer of greater value which is described here for [Comparison].
-In fact, our methodology for this article is to use '<i>generic programming</i>'; a feature set of Java not properly support since reflection cannot be used to construct new generic realizations nor allows generics directly for primitive types.
+In fact, our methodology for this article is to use '<i>generic programming</i>'; a feature set of Java not properly supported since reflection in Java cannot be used to construct new generic realizations nor allows generics directly for primitive types.
 
 <h2><a name="introduction">Introduction</a></h2>
 
@@ -78,36 +78,10 @@ The view is a user interface element (typically a window) that presents the data
 
 The controller is a connection point between the model and views: views register in the controller and reports changes in the model to them.
 
-The data model is a set of data structures that lay the base for the businnes logic of an application. In typical object-oriented application, the data model is built of client-side classes and collections. The data model typically is somehow stored into a Database Management System, however how the data is exactly stored is not a concern of [MVC].  In fact, other than speed in it's performance, models stored within the DBMS is not as efficient as an ORM based one.
-There are many references for this and it only makes sense.   Injection efforts and security risks are not of a concern as old myths die hard dictate.   Dynamic and parametric polymorphic efforts show that RT constructs perform with much better flexibility and tightly coupled integration within a projects design.
-Future efforts for extension and modification can be reduced and even eliminated when used in conjunction with a reflective based programming language.
-
-So you have to ask yourself, why would we use deprecated features such as stored procedures to construct a data model integrating in all the business logic which is much more difficult to implement and maintain, when there are options to construct a more dynamic, flexible, easier to maintain, and understand model?
-There are alternatives which are far superior; such as using an ORM sub-system.
-
--- Disadvantages
-1. A DBA will be required for performance tuning
-2. All developers will have to be very well versed in your particular SQL dialect(T-SQL, Pl/SQL, etc)
-3. SQL code isn't as expressive and thus harder to write when covering higher level concepts that aren't really related to data
-4. A lot more unnecessary load on the database
-
-Practically, only a fool would have all business logic in the database.
-
-1. Very few developers will be able to create a consistent stored procedure interface that works easily across applications. Usually this is because certain assumptions are made of that calling application
-2. Same goes for documenting all of those stored procedures
-3. Database servers are generally bottlenecked enough as it is. Putting the unnecessary load on them just further narrows this bottleneck. Intricate load balancing and beefy hardware will be required for anything with a decent amount of traffic
-4. SQL is just barely a programming language. I once had the pleasure of maintaining a scripting engine written as a T-SQL stored procedure. It was slow, nearly impossible to understand, and took days to implement what would have been a trivial extension in most languages
-5. What happens when you have a client that needs their database to run a different SQL server? You'll basically have to start from scratch -- You're very tied to your database. Same goes for when Microsoft decides to deprecate a few functions you use a couple hundred times across your stored procedures
-6. Source control is extremely difficult to do properly with stored procedures, more so when you have a lot of them
-7. Databases are hard to keep in sync. What about when you have a conflict of some sort between 2 developers that are working in the database at the same time? They'll be overwriting each others code not really aware of it, depending on your "development database" setup
-8. The tools are definitely less easy to work with, no matter which database engine you use.
-
-Forget about the data model and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
+Forget about the [data model](https://github.com/Latency/ORM-Monitor/blob/master/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
 The model–view–adapter solves this rather differently from the model–view–controller by arranging model, adapter or mediating controller and view linearly without any connections whatsoever directly between model and view.
+
 What do you call something that has connections directly related?   Dependancies!  If a dependancy breaks down, so does the rest of the system.  Think about it!  In an alternative scenario, you can use [DI] to replace additional constraints that may be binded as well.   This is where aspect oriented programming ([AOP]) will reduce the amount of boilerplate code which in effect also reduces the maintence efforts and cost along with the project size and complexity.
-<!--
- This is what many companies fail to understand and I have been passed over several times by hiring managers because they don't even have a clue or simpily don't want to look bad knowing that you could take their job and would never admit to feeling intimidated.  Companies want what they want, use what they have currently in place to sustain their development efforts, and not have to re-train their staff to use more efficient designs.  Do you really want to work for a company who is complacent in their way of doing things anyway?    Is it cost effective for the company to use efforts that are behind the curve?  Eventually there comes a time where continous integration and patching dictate a rewrite or redesign.   Why prolong efforts when eventually it will need to be done?   Get with the times ... for real!!!  Their support staff may be using efforts that work but are not as efficient as alternative methodologies being proposed here.
--->
 
 ---
 
@@ -178,13 +152,11 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
    <tr>
     <td>External References</td>
-    <td><i>Microsoft.CSharp</i> - v4.4.1</td>
     <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
   </tr> 
   <tr>
     <td>API</td>
     <td><i>ORM-Monitor</i> - v2.2.0</td>
-    <td></td>
   </tr>
 </table>
 
@@ -196,14 +168,12 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   <tr>
     <td>External References</td>
     <td><i>ORM-Monitor</i> - v2.2.0</td>
-    <td><i>Microsoft.CSharp</i> - v4.4.1</td>
     <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
   </tr>
   <tr>
     <td>Unit Testing</td>
     <td><i>NUnit</i> - v3.9.0</td>
     <td><i>NUnit3TestAdapter</i> - v3.9.0</td>
-    <td></td>
   </tr>
 </table>
 
@@ -214,71 +184,73 @@ There are four essential steps to using this:
 
 &nbsp;1. Optional:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setup a `TaskEventArgs.Expression` delegate collection.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Make any <i>delegate</i> use the expression, which is basically a wrapper for invocating a method across<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; boundary switching thread contexts.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Make any <i>delegate</i> use the expression, which is basically a wrapper for invocating a method<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;across boundary switching thread contexts.
 
 ```csharp
-    delegate void Expr(params string[] args);
+delegate void Expr(params string[] args);
 
-    var actionCollection = new List<Delegate>(
-      new Delegate[] {
-        (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
-        (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
-      }
-    );
+var actionCollection = new List<Delegate>(
+  new Delegate[] {
+    (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
+    (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
+  }
+);
 ```
 
 &nbsp;2. Create a \`<i>TaskEvent</i>\` with type parameter matching the type from #1. (if specified)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using <i>object initialization</i>, assign the properties and specify the timeout (milliseconds / TimeSpan) whereby the default (-1) for infinate.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using <i>object initialization</i>, assign the properties and specify the timeout<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(milliseconds / TimeSpan) whereby the default (-1) for infinate.<br>
 &nbsp;3. Specify the `OnRunning` event handler delegate.  (<b>Required</b>)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;There is an exception handler for this in the \`<i>AsyncMonitor</i>\` method if omitted.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnExit`, `OnProgressChanged`, `OnCanceled`, `OnCompleted`, and `OnTimeout` event handler delegates similarly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnExit`, `OnProgressChanged`, `OnCanceled`, `OnCompleted`, and `OnTimeout`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;event handler delegates similarly.<br>
 &nbsp;4. Invoke the extension method.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>[TaskEvent.cs]</i>:   Extension methods for asynchronous routines.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>[TaskEvent.cs]</i>:   Extension methods for asynchronous routines.
 
 ### Usage:
 ```csharp
-   var t1 = new TaskEvent(timeout) {
-     ...object initializers...
-   };
-   Task task = t1.AsyncMonitor();
+var t1 = new TaskEvent(timeout) {
+  ...object initializers...
+};
+Task task = t1.AsyncMonitor();
 ```
 
 ### Example #1
 ```csharp
-        var timeout = Convert.ToDouble(Settings.TTL);
-        var actionCollection = new List<Delegate>(
-          new Delegate[] {
-            (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
-            (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
-          }
-        );
+var timeout = Convert.ToDouble(Settings.TTL);
+var actionCollection = new List<Delegate>(
+  new Delegate[] {
+    (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
+    (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
+  }
+);
 
-        var t1 = new TaskEvent(timeout) {
-          Name = "t1",
-          Expression = actionCollection,
-          OnRunning = (obj, tea) => {
-            SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
-          },
-          OnCompleted = (th, tea) => {
-            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
-          },
-          OnTimedout = (th, tea) => {
-            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
-            Assert.Fail($"timedout @{tea.Name}");
-          },
-          OnCanceled = (th, tea) => {
-            tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString()}});
-            Assert.Fail($"canceled @{tea.Name}");
-          },
-          OnExited = (th, tea) => {
-            tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
-            tasks.Remove(tea.Task);
-          }
-        };
+var t1 = new TaskEvent(timeout) {
+  Name = "t1",
+  Expression = actionCollection,
+  OnRunning = (obj, tea) => {
+    SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
+  },
+  OnCompleted = (th, tea) => {
+    tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
+  },
+  OnTimedout = (th, tea) => {
+    tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
+    Assert.Fail($"timedout @{tea.Name}");
+  },
+  OnCanceled = (th, tea) => {
+    tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString()}});
+    Assert.Fail($"canceled @{tea.Name}");
+  },
+  OnExited = (th, tea) => {
+    tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
+    tasks.Remove(tea.Task);
+  }
+};
 
-        tasks.Add(t1.AsyncMonitor());
+tasks.Add(t1.AsyncMonitor());
 ```
 
 1. Run \`<i>.\GUI\\&lt;Release&gt;\TaskScheduler.exe</i>\`.
