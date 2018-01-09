@@ -37,13 +37,19 @@ namespace ORM_Monitor {
             // ReSharper disable once InvertIf
             if (runningEvent != null && runningEvent.IsSubscribed) {
               try {
+                Status = TaskEventStatus.Running;
                 runningEvent.Invoke(this);
-                if (completedEvent != null && completedEvent.IsSubscribed)
+                if (completedEvent != null && completedEvent.IsSubscribed) {
+                  Status = TaskEventStatus.RanToCompletion;
                   completedEvent.Invoke(this);
+                }
               } catch (ThreadAbortException) {
+                Status = TaskEventStatus.Aborted;
                 Thread.ResetAbort();
               } catch (OperationCanceledException) {
+                Status = TaskEventStatus.Canceled;
               } catch (Exception ex) {
+                Status = TaskEventStatus.Faulted;
                 if (ex.InnerException != null && ex.InnerException.GetType() == typeof(AggregateException)) {
                   if (ex.InnerException.InnerException != null && ex.InnerException.InnerException.GetType() == typeof(OperationCanceledException))
                     return;
@@ -65,14 +71,18 @@ namespace ORM_Monitor {
           while (thread.IsAlive) {
             if (TokenSource.IsCancellationRequested) {
               thread.Abort(TaskStatus.Canceled);
-              if (canceledEvent != null && canceledEvent.IsSubscribed)
+              if (canceledEvent != null && canceledEvent.IsSubscribed) {
+                Status = TaskEventStatus.Canceled;
                 canceledEvent.Invoke(this);
+              }
               break;
             }
             if (Duration >= TimeSpan.Zero && DateTime.Now >= endTime) {
               thread.Abort(TaskStatus.Faulted);
-              if (timedoutEvent != null && timedoutEvent.IsSubscribed)
+              if (timedoutEvent != null && timedoutEvent.IsSubscribed) {
+                Status = TaskEventStatus.TimedOut;
                 timedoutEvent.Invoke(this);
+              }
               break;
             }
 

@@ -39,7 +39,7 @@ namespace ORM_Monitor {
     /// <summary>
     ///   Status
     /// </summary>
-    public TaskStatus Status { get; protected set; }
+    public TaskEventStatus Status { get; protected set; }
 
     /// <summary>
     ///   Name

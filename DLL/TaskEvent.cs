@@ -10,13 +10,13 @@
 using System;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using ORM_Monitor.Events;
 
 namespace ORM_Monitor {
   using Evt = EventHandler<TaskEventArgs>;
 
 
+  /// <inheritdoc cref="TaskEventArgs" />
   /// <summary>
   ///   Task_Event
   /// </summary>
@@ -32,7 +32,7 @@ namespace ORM_Monitor {
     public TaskEvent(TimeSpan duration) {
       TokenSource = new CancellationTokenSource();
       Duration = duration;
-      Status = TaskStatus.Created;
+      Status = TaskEventStatus.WaitingToRun;
       Name = string.Empty;
 
       canceledEvent = new CanceledEvent(this);
@@ -204,6 +204,16 @@ namespace ORM_Monitor {
         var pi = TokenSource.GetType().GetProperty("IsDisposed", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty);
         return pi != null && (bool)pi.GetValue(TokenSource);
       }
+    }
+
+
+    /// <summary>
+    ///   Cancel
+    /// </summary>
+    /// <param name="throwOnFirstException"></param>
+    public void Cancel(bool throwOnFirstException = false) {
+      Status = TaskEventStatus.Cancelling;
+      TokenSource.Cancel(throwOnFirstException);
     }
 
 
