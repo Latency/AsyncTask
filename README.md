@@ -12,7 +12,7 @@
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2017, 2015, 2013, 2012, 2010, 2008
 * UPDATED:      1/5/2018
-* VERSION:      [2.3.0](https://www.nuget.org/packages/ORM-Monitor/2.2.0/)
+* VERSION:      [2.3.2](https://www.nuget.org/packages/ORM-Monitor/2.2.0/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -135,7 +135,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
     <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.2.0</td>
+    <td><i>ORM-Monitor</i> - v2.3.2</td>
     <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.5906.29906</td>
   </tr>
   <tr>
@@ -156,7 +156,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr> 
   <tr>
     <td>API</td>
-    <td><i>ORM-Monitor</i> - v2.2.0</td>
+    <td><i>ORM-Monitor</i> - v2.3.2</td>
   </tr>
 </table>
 
@@ -167,7 +167,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
   <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.2.0</td>
+    <td><i>ORM-Monitor</i> - v2.3.2</td>
     <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
   </tr>
   <tr>

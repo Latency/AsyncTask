@@ -273,6 +273,7 @@
             </summary>
         </member>
         <member name="T:ORM_Monitor.TaskEventHandler">
+            <inheritdoc />
             <summary>
               TaskEventHandler
             </summary>
@@ -283,7 +284,7 @@
             </summary>
             <param name="taskEvent"></param>
         </member>
-        <member name="F:ORM_Monitor.TaskEventHandler.TaskEvent">
+        <member name="P:ORM_Monitor.TaskEventHandler.TaskEvent">
             <summary>
               TaskEvent
             </summary>

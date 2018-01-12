@@ -14,6 +14,7 @@ namespace ORM_Monitor {
   using Evt = EventHandler<TaskEventArgs>;
 
 
+  /// <inheritdoc />
   /// <summary>
   ///   TaskEventHandler
   /// </summary>
@@ -39,7 +40,7 @@ namespace ORM_Monitor {
     /// <summary>
     ///   TaskEvent
     /// </summary>
-    protected readonly TaskEvent TaskEvent;
+    public TaskEvent TaskEvent { get; }
 
     /// <summary>
     ///   Backing Field for Handler

@@ -5,17 +5,15 @@
     <AssemblyOriginatorKeyFile>snKey.snk</AssemblyOriginatorKeyFile>
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
     <ApplicationIcon>project.ico</ApplicationIcon>
-    <Version>2.3.1</Version>
-    <FileVersion>2.3.1</FileVersion>
-    <AssemblyVersion>2.3.1</AssemblyVersion>
+    <Version>2.3.2</Version>
+    <FileVersion>2.3.2</FileVersion>
+    <AssemblyVersion>2.3.2</AssemblyVersion>
     <Description>Object Relational Mapped Monitor Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2018</Copyright>
     <Authors>Latency McLaughlin</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageReleaseNotes>Added 'TaskEvent.Cancel()' which was left out and signals the CancellationToken.
-Added enum TaskEventStatus.
-Updated versioning.</PackageReleaseNotes>
+    <PackageReleaseNotes>Changed property in EventHandler.TaskEvent from protected to public.</PackageReleaseNotes>
     <RepositoryType>GIT</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseUrl>http://www.gnu.org/licenses/gpl-3.0.en.html</PackageLicenseUrl>
