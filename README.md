@@ -7,12 +7,12 @@
 ## Task-based Asynchronous Pattern ([TAP])
 
 * CREATED BY:   [Latency McLaughlin]
-* FRAMEWORK:    [.NET] v[4.7.1] & Core v[[2.0]](https://www.microsoft.com/net/download/windows)
+* FRAMEWORK:    [.NET] v4.5 - v4.7.1, Standard 2.0, & Core v[[2.0]](https://www.microsoft.com/net/download/windows)
 * LANGUAGE:     [C#] (v7.0)
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2017, 2015, 2013, 2012, 2010, 2008
 * UPDATED:      1/5/2018
-* VERSION:      [2.3.2](https://www.nuget.org/packages/ORM-Monitor/2.2.0/)
+* VERSION:      [2.3.3](https://www.nuget.org/packages/ORM-Monitor/2.3.3/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot

@@ -11,10 +11,14 @@
 *.userprefs
 
 # Build results
+DLL/[Bb]in/[Dd]ebug/**/*
+DLL/[Bbin]/[Rr]elease/**/*
 GUI/[Bb]in/[Dd]ebug/
 GUI/[Bbin]/[Rr]elease/
+
 Tests/[Bb]in/[Dd]ebug/
 Tests/[Bbin]/[Rr]elease/
+
 [Dd]ebugPublic/
 [Rr]eleases/
 x64/
