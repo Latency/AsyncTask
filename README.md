@@ -1,4 +1,4 @@
-# Object Relational Mapped Monitor Extension
+# Asyncronous Task API
 
 ### Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/A [DLL])
 
@@ -7,16 +7,16 @@
 ## Task-based Asynchronous Pattern ([TAP])
 
 * CREATED BY:   [Latency McLaughlin]
-* FRAMEWORK:    [.NET] v4.5 - v4.7.1, Standard 2.0, & Core v[[2.0]](https://www.microsoft.com/net/download/windows)
-* LANGUAGE:     [C#] (v7.0)
+* FRAMEWORK:    [.NET] v4.5 - v5.0, Standard 2.1, & Core v[3.1](https://www.microsoft.com/net/download/windows)
+* LANGUAGE:     [C#] (v8.0)
 * GFX SUBSYS:   [WPF]
-* SUPPORTS:     [Visual Studio] 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      1/5/2018
-* VERSION:      [2.3.3](https://www.nuget.org/packages/ORM-Monitor/2.3.3/)
+* SUPPORTS:     [Visual Studio] 2019, 2017, 2015, 2013, 2012, 2010, 2008
+* UPDATED:      8/22/2020
+* VERSION:      [3.0.0](https://www.nuget.org/packages/AsyncTask/3.0.0/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
- <img src="https://github.com/Latency/ORM-Monitor/blob/master/ORM-Monitor.png?raw=true">
+ <img src="https://github.com/Latency/AsyncTask/blob/master/AsyncTask.png?raw=true">
 
 <hr>
 
@@ -55,7 +55,7 @@ In fact, our methodology for this article is to use '<i>generic programming</i>'
 This article introduces an [API] which wraps processes asynchronously; supporting deadlock protection, timeout, cancellation requests, checkpointing, and a parametric polymorphic [MVC] design by convention.
 
 <p align="center">
- <img src="https://github.com/Latency/ORM-Monitor/blob/master/Flow-Chart.png?raw=true" alt="Flow Chart of ORM-Monitor">
+ <img src="https://github.com/Latency/AsyncTask/blob/master/Flow-Chart.png?raw=true" alt="Flow Chart of AsyncTask">
 </p>
 
 Callback support for the following delegates:
@@ -66,7 +66,7 @@ Callback support for the following delegates:
 * OnRunning
 * OnCancellation
 
-[ORM-Monitor] is compiled as a library packaged for the [NuGet] marketplace.  The project itself, supplies an application driver, test suite, and the library's source code.
+[AsyncTask] is compiled as a library packaged for the [NuGet] marketplace.  The project itself, supplies an application driver, test suite, and the library's source code.
 
 Model-View-Controller ([MVC]) is an architectural pattern that separates application's data model and user interface views into separate components. This is what the definition says. However, to fully understand the [MVC] we have to introduce required terms and point benefits of [MVC].
 
@@ -78,7 +78,7 @@ The view is a user interface element (typically a window) that presents the data
 
 The controller is a connection point between the model and views: views register in the controller and reports changes in the model to them.
 
-Forget about the [data model](https://github.com/Latency/ORM-Monitor/blob/master/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
+Forget about the [data model](https://github.com/Latency/AsyncTask/blob/master/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
 The model–view–adapter solves this rather differently from the model–view–controller by arranging model, adapter or mediating controller and view linearly without any connections whatsoever directly between model and view.
 
 What do you call something that has connections directly related?   Dependancies!  If a dependancy breaks down, so does the rest of the system.  Think about it!  In an alternative scenario, you can use [DI] to replace additional constraints that may be binded as well.   This is where aspect oriented programming ([AOP]) will reduce the amount of boilerplate code which in effect also reduces the maintence efforts and cost along with the project size and complexity.
@@ -87,7 +87,7 @@ What do you call something that has connections directly related?   Dependancies
 
 This API has several benefits, such as:
 
--- *[ORM-Monitor] helps you to know exactly what your code does.*
+-- *[AsyncTask] helps you to know exactly what your code does.*
 * Removes pitfalls, anti-patterns, and programming mistakes.
 * Eliminate code redundancy.
 * Reusable functional procedural code.
@@ -119,7 +119,7 @@ This API has several benefits, such as:
  When running your tests, it might be that you want to create a sample of functional or regressive tasks.  Interchanging the delegates make it easy.  For example, switching contexts from an administrator area in your [CMS] / web-application.
 
 * <b>Multiple O/R mapper framework concurrent scheduling.</b><br>
- [ORM-Monitor] uses a wrapping factory for the delegates supplied as its generic type. It doesn't matter whether your application uses multiple event handlers with specific listeners for each.  This [API] will consolidate those into a universal system regardless of type.   It will reduce the boilerplate code and overhead which will ultimately reduce the overall risk of failure since everything will funnel through the same sub-system.
+ [AsyncTask] uses a wrapping factory for the delegates supplied as its generic type. It doesn't matter whether your application uses multiple event handlers with specific listeners for each.  This [API] will consolidate those into a universal system regardless of type.   It will reduce the boilerplate code and overhead which will ultimately reduce the overall risk of failure since everything will funnel through the same sub-system.
 
 <h2><a name="installation">Installation</a></h2>
 
@@ -135,7 +135,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
     <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.3.2</td>
+    <td><i>AsyncTask</i> - v2.3.2</td>
     <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.5906.29906</td>
   </tr>
   <tr>
@@ -156,7 +156,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr> 
   <tr>
     <td>API</td>
-    <td><i>ORM-Monitor</i> - v2.3.2</td>
+    <td><i>AsyncTask</i> - v2.3.2</td>
   </tr>
 </table>
 
@@ -167,7 +167,7 @@ There are plug-ins that this project uses as dependency from [NuGet] that are bu
   </tr>
   <tr>
     <td>External References</td>
-    <td><i>ORM-Monitor</i> - v2.3.2</td>
+    <td><i>AsyncTask</i> - v2.3.2</td>
     <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
   </tr>
   <tr>
@@ -261,7 +261,7 @@ tasks.Add(t1.AsyncMonitor());
 <h2><a name="output">Output</a></h2>
 
 <p align="center">
- <img src="https://github.com/Latency/ORM-Monitor/blob/master//Output.png?raw=true" alt="Output">
+ <img src="https://github.com/Latency/AsyncTask/blob/master//Output.png?raw=true" alt="Output">
 </p>
 
 <h2><a name="other">Other Features</a></h2>
@@ -284,8 +284,8 @@ tasks.Add(t1.AsyncMonitor());
 
    [GNU LESSER GENERAL PUBLIC LICENSE]: <http://www.gnu.org/licenses/lgpl-3.0.en.html>
    [Comparison]: <https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java>
-   [TaskEvent.cs]: <https://github.com/Latency/ORM-Monitor/blob/master/DLL/TaskEvent.cs>
-   [NuGet]: <https://www.nuget.org/packages/ORM-Monitor/>
+   [TaskEvent.cs]: <https://github.com/Latency/AsyncTask/blob/master/DLL/TaskEvent.cs>
+   [NuGet]: <https://www.nuget.org/packages/AsyncTask/>
    [.NET]: <https://en.wikipedia.org/wiki/.NET_Framework/>
    [WPF]: <https://en.wikipedia.org/wiki/Windows_Presentation_Foundation/>
    [Visual Studio]: <https://en.wikipedia.org/wiki/Microsoft_Visual_Studio/>
@@ -293,7 +293,7 @@ tasks.Add(t1.AsyncMonitor());
    [API]: <https://en.wikipedia.org/wiki/Application_programming_interface>
    [AOP]: <https://en.wikipedia.org/wiki/Aspect-oriented_programming>
    [Parametric Polymorphism]: <https://en.wikipedia.org/wiki/Parametric_polymorphism>
-   [ORM-Monitor]: <https://github.com/Latency/ORM-Monitor/>
+   [AsyncTask]: <https://github.com/Latency/AsyncTask/>
    [TAP]: <https://msdn.microsoft.com/en-us/library/hh873175(v=vs.110).aspx>
    [AMI]: <https://en.wikipedia.org/wiki/Asynchronous_method_invocation>
    [TPL]: <https://msdn.microsoft.com/en-us/library/dd460717(v=vs.110).aspx>
