@@ -1,18 +1,16 @@
-﻿// *****************************************************************************
-// File:       ILogger.cs
-// Solution:   ORM-Monitor
-// Project:    ORM-Monitor
-// Date:       08/22/2020
-// Author:     Latency McLaughlin
-// Copywrite:  Bio-Hazard Industries - 1998-2020
-// *****************************************************************************
+﻿// ****************************************************************************
+// Project:  AsyncTask
+// File:     ILogger.cs
+// Author:   Latency McLaughlin
+// Date:     08/24/2020
+// ****************************************************************************
 
 using System;
 using System.Collections.Generic;
-using ORM_Monitor.Enums;
-using ORM_Monitor.EventArgs;
+using AsyncTask.Enums;
+using AsyncTask.EventArgs;
 
-namespace ORM_Monitor.Interfaces
+namespace AsyncTask.Interfaces
 {
     public interface ILogger
     {

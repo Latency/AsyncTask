@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net472;net48;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.1;net45;net472;net48;net5.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Properties\snKey.snk</AssemblyOriginatorKeyFile>
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
@@ -17,12 +17,10 @@
     <RepositoryType>GIT</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <License>MIT</License>
-    <PackageProjectUrl>http://latency.github.io/ORM-Monitor</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Latency/ORM-Monitor</RepositoryUrl>
+    <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
-    <RootNamespace>ORM_Monitor</RootNamespace>
     <SignTool>C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe</SignTool>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <AllowPrAeview>true</AllowPrAeview>
   </PropertyGroup>
 

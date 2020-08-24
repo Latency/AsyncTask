@@ -1,22 +1,19 @@
-﻿// *****************************************************************************
-// File:       DefaultLogger.cs
-// Solution:   ORM-Monitor
-// Project:    ORM-Monitor
-// Date:       08/22/2020
-// Author:     Latency McLaughlin
-// Copywrite:  Bio-Hazard Industries - 1998-2020
-// *****************************************************************************
+﻿// ****************************************************************************
+// Project:  AsyncTask
+// File:     DefaultLogger.cs
+// Author:   Latency McLaughlin
+// Date:     08/24/2020
+// ****************************************************************************
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using ORM_Monitor.Enums;
-using ORM_Monitor.EventArgs;
-using ORM_Monitor.Interfaces;
+using AsyncTask.Enums;
+using AsyncTask.EventArgs;
+using AsyncTask.Interfaces;
 using static System.Diagnostics.Trace;
 
-namespace ORM_Monitor.Logging
+namespace AsyncTask.Logging
 {
     /// <summary>
     ///     SECS Connector Logger
@@ -31,7 +28,9 @@ namespace ORM_Monitor.Logging
         public DefaultLogger()
         {
             Listeners.Clear();
+#if !NETSTANDARD2_1
             _listeners.Add(new ConsoleTraceListener());
+#endif
             IsEnabled = true;
         }
 
@@ -60,7 +59,8 @@ namespace ORM_Monitor.Logging
                     _events = LoggingEvents;
                     LoggingEvents.Clear();
                     Listeners.Clear();
-                } else
+                }
+                else
                 {
                     if (LoggingEvents.Count == 0)
                         LoggingEvents = new Dictionary<LogType, EventElement<MessageEventArgs>>(_events);

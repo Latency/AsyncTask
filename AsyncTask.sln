@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30404.54
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORM-Monitor", "DLL\ORM-Monitor.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncTask", "DLL\AsyncTask.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GUI", "GUI\GUI.csproj", "{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}"
 EndProject

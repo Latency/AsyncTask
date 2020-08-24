@@ -1,15 +1,13 @@
-﻿// *****************************************************************************
-// File:       TimeExtensions.cs
-// Solution:   ORM-Monitor
-// Project:    ORM-Monitor
-// Date:       08/22/2020
-// Author:     Latency McLaughlin
-// Copywrite:  Bio-Hazard Industries - 1998-2020
-// *****************************************************************************
+﻿// ****************************************************************************
+// Project:  AsyncTask
+// File:     TimeExtensions.cs
+// Author:   Latency McLaughlin
+// Date:     08/24/2020
+// ****************************************************************************
 
 using System;
 
-namespace ORM_Monitor.Extensions
+namespace AsyncTask.Extensions
 {
     public static class TimeExtensions
     {

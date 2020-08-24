@@ -1,21 +1,19 @@
-﻿// *****************************************************************************
-// File:       TaskBase.cs
-// Solution:   ORM-Monitor
-// Project:    ORM-Monitor
-// Date:       08/22/2020
-// Author:     Latency McLaughlin
-// Copywrite:  Bio-Hazard Industries - 1998-2020
-// *****************************************************************************
+﻿// ****************************************************************************
+// Project:  AsyncTask
+// File:     TaskBase.cs
+// Author:   Latency McLaughlin
+// Date:     08/24/2020
+// ****************************************************************************
 
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ORM_Monitor.EventArgs;
-using ORM_Monitor.Interfaces;
+using AsyncTask.EventArgs;
+using AsyncTask.Interfaces;
 
-namespace ORM_Monitor.Tasks
+namespace AsyncTask.Tasks
 {
     /// <summary>
     ///     AsyncTask
@@ -48,6 +46,8 @@ namespace ORM_Monitor.Tasks
         public Action<TaskEventArgs<TTask>> OnCanceled { get; set; }
         public Action<TaskEventArgs<TTask>> OnTimeout { get; set; }
 
+        public Task Task => _eventArgs.Task as Task;
+
         public ConcurrentDictionary<ITaskInfo, ITask> TaskList
         {
             get => _eventArgs.TaskList;
@@ -66,8 +66,6 @@ namespace ORM_Monitor.Tasks
             set => _eventArgs.Logger = value;
         }
 
-        public Task Task => _eventArgs.Task as Task;
-
         public override string ToString() => _eventArgs.TaskInfo.Name;
 
 
@@ -85,13 +83,18 @@ namespace ORM_Monitor.Tasks
             task.Start();
 
             // Reset start time.
+#if NET45
+            _eventArgs = new Tuple<TaskEventArgs<TTask>, DateTime>(_eventArgs, DateTime.Now);
+#else
             _eventArgs = (_eventArgs, DateTime.Now);
+#endif
 
             if (Timeout != null)
             {
                 await Task.Run(async () =>
                 {
-                    await Task.Delay((TimeSpan) Timeout, Token).ContinueWith(async t => {
+                    await Task.Delay((TimeSpan) Timeout, Token).ContinueWith(async t =>
+                    {
                         if (t.IsCompleted)
                             await Task.Run(() => OnTimeout?.Invoke(_eventArgs)).ConfigureAwait(false);
                     }).ConfigureAwait(false);
@@ -123,14 +126,19 @@ namespace ORM_Monitor.Tasks
                         method?.Invoke(Token);
                     }).ConfigureAwait(false);
                     await Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false);
-                } finally
+                }
+                finally
                 {
                     UnRegister();
                 }
             }
-            
+
             // Implicit assignment since Task doesn't have a setter.
+#if NET45
+            _eventArgs = new Tuple<TaskEventArgs<TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task), (Action)WrappedDelegate));
+#else
             _eventArgs = (_eventArgs, (TTask) Activator.CreateInstance(typeof(Task), (Action) WrappedDelegate));
+#endif
         }
 
 
@@ -147,14 +155,19 @@ namespace ORM_Monitor.Tasks
                     }).ConfigureAwait(false).GetAwaiter().GetResult();
                     Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false).GetAwaiter().GetResult();
                     return result;
-                } finally
+                }
+                finally
                 {
                     UnRegister();
                 }
             }
 
             // Implicit assignment since Task doesn't have a setter.
+#if NET45
+            _eventArgs = new Tuple<TaskEventArgs<TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>)WrappedDelegate));
+#else
             _eventArgs = (_eventArgs, (TTask) Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>) WrappedDelegate));
+#endif
         }
     }
 }

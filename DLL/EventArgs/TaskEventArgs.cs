@@ -1,19 +1,17 @@
-﻿// *****************************************************************************
-// File:       TaskEventArgs.cs
-// Solution:   ORM-Monitor
-// Project:    ORM-Monitor
-// Date:       08/22/2020
-// Author:     Latency McLaughlin
-// Copywrite:  Bio-Hazard Industries - 1998-2020
-// *****************************************************************************
+﻿// ****************************************************************************
+// Project:  AsyncTask
+// File:     TaskEventArgs.cs
+// Author:   Latency McLaughlin
+// Date:     08/24/2020
+// ****************************************************************************
 
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using ORM_Monitor.Extensions;
-using ORM_Monitor.Interfaces;
+using AsyncTask.Extensions;
+using AsyncTask.Interfaces;
 
-namespace ORM_Monitor.EventArgs
+namespace AsyncTask.EventArgs
 {
     public class TaskEventArgs<T> : System.EventArgs, ITask
     {
@@ -27,6 +25,20 @@ namespace ORM_Monitor.EventArgs
         }
 
 
+#if NET45
+        private TaskEventArgs(Tuple<TaskEventArgs<T>, DateTime> tuple)
+        {
+            tuple.Item1.TaskStartTime = tuple.Item2;
+            Clone(tuple.Item1);
+        }
+
+
+        private TaskEventArgs(Tuple<TaskEventArgs<T>, T> tuple)
+        {
+            tuple.Item1.Task = tuple.Item2;
+            Clone(tuple.Item1);
+        }
+#else
         private TaskEventArgs((TaskEventArgs<T> tea, DateTime startTime) tuple)
         {
             var (tea, startTime) = tuple;
@@ -41,6 +53,7 @@ namespace ORM_Monitor.EventArgs
             tea.Task = task;
             Clone(tea);
         }
+#endif
 
 
         public T Task { get; private set; }
@@ -72,8 +85,12 @@ namespace ORM_Monitor.EventArgs
         }
 
 
+#if NET45
+        public static implicit operator TaskEventArgs<T>(Tuple<TaskEventArgs<T>, DateTime> tuple) => new TaskEventArgs<T>(tuple);
+        public static implicit operator TaskEventArgs<T>(Tuple<TaskEventArgs<T>, T> tuple) => new TaskEventArgs<T>(tuple);
+#else
         public static implicit operator TaskEventArgs<T>((TaskEventArgs<T> tea, DateTime startTime) tuple) => new TaskEventArgs<T>(tuple);
-
         public static implicit operator TaskEventArgs<T>((TaskEventArgs<T> tea, T task) tuple) => new TaskEventArgs<T>(tuple);
+#endif
     }
 }
