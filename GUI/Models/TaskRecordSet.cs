@@ -60,8 +60,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(Name = "ColDescription", Width = 280, IsReadOnly = true, Visibility = Visibility.Collapsed)]
     public string Description {
-      get => Get<string>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<string>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
 
     /// <inheritdoc />
@@ -70,8 +70,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(Name = "ColPriority", Width = 50, IsReadOnly = true)]
     public int Priority {
-      get => Get<int>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<int>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
 
     /// <inheritdoc />
@@ -80,8 +80,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(Name = "ColProgress", Width = 60, IsReadOnly = true)]
     public ushort Progress {
-      get => Get<ushort>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<ushort>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
 
     /// <inheritdoc />
@@ -90,8 +90,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(Name = "ColStatus", Width = 100, IsReadOnly = true)]
     public TaskStatus Status {
-      get => Get<TaskStatus>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<TaskStatus>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
 
     /// <inheritdoc />
@@ -100,8 +100,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(Name = "ColAction", Width = 100, IsReadOnly = true)]
     public Button Action {
-      get => Get<Button>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<Button>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
 
     /// <inheritdoc />
@@ -110,8 +110,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(Name = "ColDate", Width = 120, IsReadOnly = true)]
     public DateTime? Date {
-      get => Get<DateTime?>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<DateTime?>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
 
     /// <inheritdoc />
@@ -120,8 +120,8 @@ namespace ORM_Monitor.Models {
     /// </summary>
     [GridColumn(IsReadOnly = true, Visibility = Visibility.Collapsed)]
     public object Tag {
-      get => Get<object>(MethodBase.GetCurrentMethod().Name.Substring(4));
-      set => Set(MethodBase.GetCurrentMethod().Name.Substring(4), value);
+      get => Get<object>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
+      set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
     }
     // -----------------------------------------------------------------------
     #endregion Properties

@@ -10,6 +10,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows;
+using Microsoft.Extensions.Logging;
 using ORM_Monitor.View;
 
 namespace ORM_Monitor {
@@ -54,7 +55,17 @@ namespace ORM_Monitor {
 
 
       try {
-        var mainView = new MainWindow();
+        var loggerFactory = LoggerFactory.Create(builder => {
+          builder
+            .AddFilter("Microsoft", LogLevel.Warning)
+            .AddFilter("System", LogLevel.Warning)
+            .AddFilter("LoggingConsoleApp.Program", LogLevel.Debug)
+            .AddConsole()
+            .AddDebug();
+        });
+        ILogger logger = loggerFactory.CreateLogger<App>();
+
+        var mainView = new MainWindow(logger);
         mainView.Show();
       } catch (Exception ex) {
         Debug.WriteLine(ex);

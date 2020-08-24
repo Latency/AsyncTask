@@ -27,7 +27,7 @@ namespace ORM_Monitor.Controller {
         Name = GetType().Name.Substring(2),
         OnRunning = (obj, tea) => {
           if (!(tea.Tag is TaskRecordSet ts))
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnRunning"));
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod()?.Name, new NullReferenceException("OnRunning"));
 
           double current;
           var targetTime = DateTime.Now.AddSeconds(3);
@@ -62,7 +62,7 @@ namespace ORM_Monitor.Controller {
         },
         OnCompleted = (obj, tea) => {
           if (!(tea.Tag is TaskRecordSet ts))
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnCompleted"));
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod()?.Name, new NullReferenceException("OnCompleted"));
 
           var service = ts.Tag as TaskService;
           service?.Owner.Dispatcher.Invoke(() => {
@@ -73,7 +73,7 @@ namespace ORM_Monitor.Controller {
         },
         OnTimedout = (obj, tea) => {
           if (!(tea.Tag is TaskRecordSet ts))
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnTimedout"));
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod()?.Name, new NullReferenceException("OnTimedout"));
 
           var service = ts.Tag as TaskService;
           service?.Owner.Dispatcher.Invoke(() => {
@@ -84,11 +84,11 @@ namespace ORM_Monitor.Controller {
         },
         OnProgressChanged = (obj, tea) => {
           if (!(tea.Tag is TaskRecordSet))
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnProgressChanged"));
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod()?.Name, new NullReferenceException("OnProgressChanged"));
         },
         OnExited = (obj, tea) => {
           if (!(tea.Tag is TaskRecordSet ts))
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnExited"));
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod()?.Name, new NullReferenceException("OnExited"));
 
           RunningTasks.Remove(ts.TaskName);
 
@@ -96,7 +96,7 @@ namespace ORM_Monitor.Controller {
         },
         OnCanceled = (obj, tea) => {
           if (!(tea.Tag is TaskRecordSet ts))
-            throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException("OnCanceled"));
+            throw new ReflectInsightException(MethodBase.GetCurrentMethod()?.Name, new NullReferenceException("OnCanceled"));
 
           var service = ts.Tag as TaskService;
           service?.Owner.Dispatcher.Invoke(() => {

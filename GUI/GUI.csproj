@@ -1,187 +1,45 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net5.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>snKey.snk</AssemblyOriginatorKeyFile>
+    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
+    <ApplicationIcon>project.ico</ApplicationIcon>
+    <AssemblyVersion>2.3.3</AssemblyVersion>
+    <Description>Object Relational Mapped Monitor Extension Application</Description>
+    <Company>Bio-Hazard Industries</Company>
+    <Copyright>Copyright ©  1998-2020</Copyright>
+    <Authors>Latency McLaughlin</Authors>
     <RootNamespace>ORM_Monitor</RootNamespace>
-    <AssemblyName>TaskScheduler</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <SignTool>C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe</SignTool>
+    <UseWPF>true</UseWPF>
+    <OutputType>WinExe</OutputType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>ORM_Monitor.App</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Resources\sBIO2.ico</ApplicationIcon>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="ExceptionMessageBox">
-      <HintPath>..\packages\Microsoft.ExceptionMessageBox.11.0.5906.29906\lib\net461\ExceptionMessageBox.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="ReflectSoftware.Insight, Version=5.7.1.1706, Culture=neutral, PublicKeyToken=c78ddbdaf1f32b08, processorArchitecture=MSIL">
-      <HintPath>..\packages\ReflectSoftware.Insight.5.7.1.1\lib\net45\ReflectSoftware.Insight.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0-preview.6.20305.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0-preview.6.20305.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0-preview.6.20305.6" />
   </ItemGroup>
+
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Controller\TaskController.cs" />
-    <Compile Include="Controller\TaskController.Designer.cs">
-      <DependentUpon>TaskController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Extensions.cs" />
-    <Compile Include="GridColumnAttribute.cs" />
-    <Compile Include="Models\ITaskRecordSet.cs" />
-    <Compile Include="Controller\ITaskController.cs" />
-    <Compile Include="Models\TaskRecordSet.cs" />
-    <Compile Include="Program.Sinks.cs" />
-    <Page Include="GlassButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Models\TaskRecordSetBase.cs" />
-    <Compile Include="View\MainWindow.xaml.Designer.cs" />
-    <Compile Include="View\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
+    <ProjectReference Include="..\DLL\ORM-Monitor.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Models\TaskService.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <AppDesigner Include="Properties\" />
-    <None Include="ReflectInsight.config" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DLL\ORM-Monitor.csproj">
-      <Project>{6ed688cd-50c6-45b2-8ae0-759d28e468ae}</Project>
-      <Name>ORM-Monitor</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\sBIO2.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Add.bmp" />
-    <Resource Include="Resources\Button-Hover.bmp" />
-    <Resource Include="Resources\Button-Normal.bmp" />
-    <Resource Include="Resources\Button-Pressed.bmp" />
-    <Resource Include="Resources\Cancel.bmp" />
-    <Resource Include="Resources\Checked.bmp" />
-    <Resource Include="Resources\Heart.bmp" />
-    <Resource Include="Resources\Image-0.bmp" />
-    <Resource Include="Resources\Image-1.bmp" />
-    <Resource Include="Resources\Image-2.bmp" />
-    <Resource Include="Resources\Image-3.bmp" />
-    <Resource Include="Resources\Image-4.bmp" />
-    <Resource Include="Resources\Image-5.bmp" />
-    <Resource Include="Resources\Image-6.bmp" />
-    <Resource Include="Resources\Image-7.bmp" />
-    <Resource Include="Resources\Lamp.bmp" />
-    <Resource Include="Resources\Token.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

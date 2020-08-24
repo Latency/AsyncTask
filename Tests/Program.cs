@@ -12,7 +12,7 @@ using System;
 namespace Tests {
   internal class Program {
     [STAThread]
-    static void Main() {
+    private static void Main() {
       var t = new T_Async_IO();
 
       t.Setup();

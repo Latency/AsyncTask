@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,10 +21,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Microsoft.Extensions.Logging;
 using ORM_Monitor.Controller;
+using ORM_Monitor.Enums;
+using ORM_Monitor.EventArgs;
 using ORM_Monitor.Models;
-using ReflectSoftware.Insight;
-using ReflectSoftware.Insight.Common;
+using Color = System.Drawing.Color;
+using ILogger = ORM_Monitor.Interfaces.ILogger;
 
 namespace ORM_Monitor.View {
   /// <summary>
@@ -33,6 +35,8 @@ namespace ORM_Monitor.View {
   /// </summary>
   public partial class MainWindow {
     private readonly Mutex _mutex = new Mutex();
+    private readonly ILogger _logger;
+
 
     /// <summary>
     ///  Constructor
@@ -47,18 +51,86 @@ namespace ORM_Monitor.View {
     
       DataContext = new TaskController();
 
+      _logger.LoggingEvents[LogType.Info] += Info;
+      _logger.LoggingEvents[LogType.Warning] += Warning;
+      _logger.LoggingEvents[LogType.Error] += Error;
+      _logger.LoggingEvents[LogType.Debug] += Debug;
     }
 
-    #region Handler Handlers
-
-    //------------------------------------------------------------------------
 
     /// <summary>
-    ///   RadForm1_FormClosed
+    ///   Constructor
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Window_Closed(object sender, EventArgs e) {
+    /// <param name="logger"></param>
+    public MainWindow(ILogger logger) {
+      _logger = logger;
+    }
+
+        #region Handler Handlers
+
+        //------------------------------------------------------------------------
+
+
+
+        public void Info(object sender, MessageEventArgs messageEventArgs)
+        {
+            TextBoxMessageLog.InvokeIfRequired(a =>
+            {
+                if (!(a is MessageEventArgs args))
+                    throw new NullReferenceException();
+                TextBoxMessageLog.SelectionColor = Color.DodgerBlue;
+                TextBoxMessageLog.AppendText(args.Message);
+            }, messageEventArgs, new EventHandler<MessageEventArgs>(Info), sender, messageEventArgs);
+        }
+
+
+        public void Warning(object sender, MessageEventArgs messageEventArgs)
+        {
+            TextBoxMessageLog.InvokeIfRequired(a =>
+            {
+                if (!(a is MessageEventArgs args))
+                    throw new NullReferenceException();
+                TextBoxMessageLog.SelectionColor = Color.Yellow;
+                TextBoxMessageLog.AppendText(args.Message);
+            }, messageEventArgs, new EventHandler<MessageEventArgs>(Warning), sender, messageEventArgs);
+        }
+
+
+        public void Error(object sender, MessageEventArgs messageEventArgs)
+        {
+            TextBoxMessageLog.InvokeIfRequired(a =>
+            {
+                if (!(a is MessageEventArgs args))
+                    throw new NullReferenceException();
+                TextBoxMessageLog.SelectionColor = Color.Red;
+                TextBoxMessageLog.AppendText(args.Message);
+                if (args.Exception != null)
+                {
+                    TextBoxMessageLog.SelectionColor = Color.Gray;
+                    TextBoxMessageLog.AppendText(args.Exception.Message);
+                }
+            }, messageEventArgs, new EventHandler<MessageEventArgs>(Error), sender, messageEventArgs);
+        }
+
+
+        public void Debug(object sender, MessageEventArgs messageEventArgs)
+        {
+            TextBoxMessageLog.InvokeIfRequired(a =>
+            {
+                if (!(a is MessageEventArgs args))
+                    throw new NullReferenceException();
+                TextBoxMessageLog.SelectionColor = Color.DarkOrange;
+                TextBoxMessageLog.AppendText(args.Message);
+            }, messageEventArgs, new EventHandler<MessageEventArgs>(Debug), sender, messageEventArgs);
+        }
+
+
+        /// <summary>
+        ///   RadForm1_FormClosed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closed(object sender, System.EventArgs e) {
       if (!(DataContext is TaskController dc))
         return;
       dc.Dispose();
@@ -73,12 +145,12 @@ namespace ORM_Monitor.View {
     /// <param name="e"></param>
     private void RemoveButton_Click(object sender, RoutedEventArgs e) {
       if (!(sender is Button btn))
-        throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(btn)));
+        throw new NullReferenceException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(btn)));
 
       // Traverse up the VisualTree and find the DataGridRow.
       var row = Extensions.FindAncestorOrSelf<DataGridRow>(btn);
       if (row == null)
-        throw new ReflectInsightException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(row)));
+        throw new NullReferenceException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(row)));
 
       var index = row.GetIndex();
 
@@ -111,7 +183,7 @@ namespace ORM_Monitor.View {
     private static List<Delegate> ActionCollection() {
       return new List<Delegate>(
         new Delegate[] {
-          (Action<string,string>)  ((name, status) => RILogManager.Default.SendInformation($"@{name}: {status}")),
+          (Action<string,string>)  ((name, status) =>         _logger.Log(LogLevel.Information, new EventId(), ); ($"@{name}: {status}")),
         }
       );
     }
@@ -159,7 +231,7 @@ namespace ORM_Monitor.View {
           st.Event.AsyncMonitor();
         }
       } catch (Exception ex) {
-        RILogManager.Default.SendError(ex.Message);
+        _logger.Log(LogLevel.Error, new EventId(), ex, ex.Message);
       }
     }
 
@@ -222,6 +294,7 @@ namespace ORM_Monitor.View {
         return;
 
       // Callback to return the result of the hit test.
+      // ReSharper disable once ConvertToLocalFunction
       HitTestResultCallback myHitTestResult = result => {
         var hit = result.VisualHit;
 
