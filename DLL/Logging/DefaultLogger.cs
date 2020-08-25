@@ -6,47 +6,30 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using AsyncTask.Enums;
-using AsyncTask.EventArgs;
 using AsyncTask.Interfaces;
 using static System.Diagnostics.Trace;
 
 namespace AsyncTask.Logging
 {
     /// <summary>
-    ///     SECS Connector Logger
+    ///     Logger
     /// </summary>
     public class DefaultLogger : ILogger
     {
-        private readonly List<TraceListener> _listeners = new List<TraceListener>();
-        private Dictionary<LogType, EventElement<MessageEventArgs>> _events;
+        private readonly TraceListenerCollection _listeners;
         private bool _isEnabled;
 
 
         public DefaultLogger()
         {
-            Listeners.Clear();
-#if !NETSTANDARD2_1
-            _listeners.Add(new ConsoleTraceListener());
-#endif
+            _listeners = Listeners;
+            // ReSharper disable once VirtualMemberCallInConstructor
             IsEnabled = true;
         }
 
 
-        /// <summary>
-        ///     EventHandlers for all the connection states.
-        /// </summary>
-        public Dictionary<LogType, EventElement<MessageEventArgs>> LoggingEvents { get; set; } = new Dictionary<LogType, EventElement<MessageEventArgs>>
-        {
-            {LogType.Info, new EventElement<MessageEventArgs>()},
-            {LogType.Warning, new EventElement<MessageEventArgs>()},
-            {LogType.Error, new EventElement<MessageEventArgs>()},
-            {LogType.Debug, new EventElement<MessageEventArgs>()}
-        };
-
-        public bool IsEnabled
+        public virtual bool IsEnabled
         {
             get => _isEnabled;
             set
@@ -56,15 +39,11 @@ namespace AsyncTask.Logging
                 _isEnabled = value;
                 if (!_isEnabled)
                 {
-                    _events = LoggingEvents;
-                    LoggingEvents.Clear();
                     Listeners.Clear();
                 }
                 else
                 {
-                    if (LoggingEvents.Count == 0)
-                        LoggingEvents = new Dictionary<LogType, EventElement<MessageEventArgs>>(_events);
-                    Listeners.AddRange(_listeners.ToArray());
+                    Listeners.AddRange(_listeners);
                 }
             }
         }

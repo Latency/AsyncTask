@@ -1,18 +1,14 @@
 ﻿// ****************************************************************************
 // Project:  AsyncTask
-// File:     Message.cs
+// File:     TaskList.cs
 // Author:   Latency McLaughlin
 // Date:     08/24/2020
 // ****************************************************************************
 
-using System;
+using System.Collections.Concurrent;
 using AsyncTask.Interfaces;
 
-namespace AsyncTask.EventArgs
+namespace AsyncTask.DTO
 {
-    public class MessageEventArgs : System.EventArgs, IMessageEventArgs
-    {
-        public string Message { get; set; }
-        public Exception Exception { get; set; }
-    }
+    public class TaskList : ConcurrentDictionary<ITaskInfo, ITask>, ITaskList { }
 }

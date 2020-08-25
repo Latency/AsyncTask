@@ -1,18 +1,16 @@
 ﻿// ****************************************************************************
 // Project:  AsyncTask
-// File:     Message.cs
+// File:     TaskInfo.cs
 // Author:   Latency McLaughlin
 // Date:     08/24/2020
 // ****************************************************************************
 
-using System;
 using AsyncTask.Interfaces;
 
-namespace AsyncTask.EventArgs
+namespace AsyncTask.DTO
 {
-    public class MessageEventArgs : System.EventArgs, IMessageEventArgs
+    public class TaskInfo : ITaskInfo
     {
-        public string Message { get; set; }
-        public Exception Exception { get; set; }
+        public string Name { get; set; }
     }
 }

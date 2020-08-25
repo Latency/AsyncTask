@@ -1,18 +1,17 @@
 ﻿// ****************************************************************************
 // Project:  AsyncTask
-// File:     Message.cs
+// File:     IMessageEventArgs.cs
 // Author:   Latency McLaughlin
 // Date:     08/24/2020
 // ****************************************************************************
 
 using System;
-using AsyncTask.Interfaces;
 
-namespace AsyncTask.EventArgs
+namespace AsyncTask.Interfaces
 {
-    public class MessageEventArgs : System.EventArgs, IMessageEventArgs
+    public interface IMessageEventArgs
     {
-        public string Message { get; set; }
-        public Exception Exception { get; set; }
+        string Message { get; set; }
+        Exception Exception { get; set; }
     }
 }

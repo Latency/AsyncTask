@@ -26,35 +26,36 @@ namespace AsyncTask.Tasks
     ///     null.
     ///     Note that although collisions are very rare, task identifiers are not guaranteed to be unique.
     /// </remarks>
-    public abstract class TaskBase<TDelegate, TTask> : CancellationTokenSource, ITask
+    public abstract class TaskBase<TDelegate, TParent, TTaskInfo, TTaskList, TTask> : CancellationTokenSource, ITask where TTaskInfo : ITaskInfo where TTaskList : ITaskList
     {
-        private TaskEventArgs<TTask> _eventArgs;
+        private TaskEventArgs<TTaskInfo, TTaskList, TTask> _eventArgs;
+        protected TParent Parent;
 
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        protected TaskBase() => _eventArgs = new TaskEventArgs<TTask>(this, typeof(TTask).GenericTypeArguments.Any());
+        protected TaskBase() => _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList, TTask>(this, typeof(TTask).GenericTypeArguments.Any());
 
 
         public TDelegate Delegate { get; set; }
         public TimeSpan? Timeout { get; set; }
 
-        public Action<TaskEventArgs<TTask>> OnAdd { get; set; }
-        public Action<TaskEventArgs<TTask>> OnRemove { get; set; }
-        public Action<TaskEventArgs<TTask>> OnComplete { get; set; }
-        public Action<TaskEventArgs<TTask>> OnCanceled { get; set; }
-        public Action<TaskEventArgs<TTask>> OnTimeout { get; set; }
+        public Action<TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnAdd { get; set; }
+        public Action<TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnRemove { get; set; }
+        public Action<TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnComplete { get; set; }
+        public Action<TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnCanceled { get; set; }
+        public Action<TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnTimeout { get; set; }
 
         public Task Task => _eventArgs.Task as Task;
 
-        public ConcurrentDictionary<ITaskInfo, ITask> TaskList
+        public TTaskList TaskList
         {
             get => _eventArgs.TaskList;
             set => _eventArgs.TaskList = value;
         }
 
-        public ITaskInfo TaskInfo
+        public TTaskInfo TaskInfo
         {
             get => _eventArgs.TaskInfo;
             set => _eventArgs.TaskInfo = value;
@@ -74,7 +75,8 @@ namespace AsyncTask.Tasks
             Token.Register(async () => await Task.Run(() => OnCanceled?.Invoke(_eventArgs)).ConfigureAwait(false));
 
             Logger.Debug($"\tAdding task '{_eventArgs.TaskInfo.Name}'");
-            TaskList.TryAdd(TaskInfo, this);
+            var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
+            taskList?.TryAdd(TaskInfo, this);
 
             await Task.Run(() => OnAdd?.Invoke(_eventArgs)).ConfigureAwait(false);
 
@@ -84,7 +86,7 @@ namespace AsyncTask.Tasks
 
             // Reset start time.
 #if NET45
-            _eventArgs = new Tuple<TaskEventArgs<TTask>, DateTime>(_eventArgs, DateTime.Now);
+            _eventArgs = new Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, DateTime>(_eventArgs, DateTime.Now);
 #else
             _eventArgs = (_eventArgs, DateTime.Now);
 #endif
@@ -109,7 +111,8 @@ namespace AsyncTask.Tasks
         {
             await Task.Run(() => OnRemove?.Invoke(_eventArgs)).ConfigureAwait(false);
             Logger.Debug($"\tRemoving task '{_eventArgs.TaskInfo.Name}'");
-            TaskList.TryRemove(TaskInfo, out _);
+            var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
+            taskList?.TryRemove(TaskInfo, out _);
             Dispose(); // Cancellation token
         }
 
@@ -123,7 +126,7 @@ namespace AsyncTask.Tasks
                     await Task.Run(() =>
                     {
                         dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
-                        method?.Invoke(Token);
+                        method?.Invoke(Parent);
                     }).ConfigureAwait(false);
                     await Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false);
                 }
@@ -135,7 +138,7 @@ namespace AsyncTask.Tasks
 
             // Implicit assignment since Task doesn't have a setter.
 #if NET45
-            _eventArgs = new Tuple<TaskEventArgs<TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task), (Action)WrappedDelegate));
+            _eventArgs = new Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task), (Action)WrappedDelegate));
 #else
             _eventArgs = (_eventArgs, (TTask) Activator.CreateInstance(typeof(Task), (Action) WrappedDelegate));
 #endif
@@ -151,7 +154,7 @@ namespace AsyncTask.Tasks
                     var result = Task.Run(() =>
                     {
                         dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
-                        return method?.Invoke(Token);
+                        return method?.Invoke(Parent);
                     }).ConfigureAwait(false).GetAwaiter().GetResult();
                     Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false).GetAwaiter().GetResult();
                     return result;
@@ -164,7 +167,7 @@ namespace AsyncTask.Tasks
 
             // Implicit assignment since Task doesn't have a setter.
 #if NET45
-            _eventArgs = new Tuple<TaskEventArgs<TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>)WrappedDelegate));
+            _eventArgs = new Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>)WrappedDelegate));
 #else
             _eventArgs = (_eventArgs, (TTask) Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>) WrappedDelegate));
 #endif
