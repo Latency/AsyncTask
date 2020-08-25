@@ -6,13 +6,17 @@
 // ****************************************************************************
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+using AsyncTask.DTO;
 
 namespace AsyncTask.Tasks
 {
-    public sealed class AsyncTask<T> : TaskBase<Func<CancellationToken, T>, Task<T>>
+    public sealed class AsyncTask<T> : TaskBase<Func<AsyncTask<T>, T>, AsyncTask<T>, TaskInfo, TaskList, Task<T>>
     {
-        public AsyncTask() => Wrap<T>();
+        public AsyncTask()
+        {
+            Parent = this;
+            Wrap<T>();
+        }
     }
 }

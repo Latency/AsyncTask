@@ -6,14 +6,14 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using AsyncTask.Extensions;
 using AsyncTask.Interfaces;
+using AsyncTask.Logging;
 
 namespace AsyncTask.EventArgs
 {
-    public class TaskEventArgs<T> : System.EventArgs, ITask
+    public class TaskEventArgs<TTaskInfo, TTaskList, TTask> : System.EventArgs where TTaskInfo : ITaskInfo where TTaskList : ITaskList
     {
         protected DateTime TaskStartTime = DateTime.Now;
 
@@ -26,20 +26,20 @@ namespace AsyncTask.EventArgs
 
 
 #if NET45
-        private TaskEventArgs(Tuple<TaskEventArgs<T>, DateTime> tuple)
+        private TaskEventArgs(Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, DateTime> tuple)
         {
             tuple.Item1.TaskStartTime = tuple.Item2;
             Clone(tuple.Item1);
         }
 
 
-        private TaskEventArgs(Tuple<TaskEventArgs<T>, T> tuple)
+        private TaskEventArgs(Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, TTask> tuple)
         {
             tuple.Item1.Task = tuple.Item2;
             Clone(tuple.Item1);
         }
 #else
-        private TaskEventArgs((TaskEventArgs<T> tea, DateTime startTime) tuple)
+        private TaskEventArgs((TaskEventArgs<TTaskInfo, TTaskList,  TTask> tea, DateTime startTime) tuple)
         {
             var (tea, startTime) = tuple;
             tea.TaskStartTime = startTime;
@@ -47,7 +47,7 @@ namespace AsyncTask.EventArgs
         }
 
 
-        private TaskEventArgs((TaskEventArgs<T> tea, T task) tuple)
+        private TaskEventArgs((TaskEventArgs<TTaskInfo, TTaskList,  TTask> tea, TTask task) tuple)
         {
             var (tea, task) = tuple;
             tea.Task = task;
@@ -56,7 +56,7 @@ namespace AsyncTask.EventArgs
 #endif
 
 
-        public T Task { get; private set; }
+        public TTask Task { get; private set; }
 
         public bool IsGeneric { get; private set; }
 
@@ -66,14 +66,14 @@ namespace AsyncTask.EventArgs
 
         public void Cancel(bool throwOnFirstException = false) => CancellationTokenSource.Cancel();
 
-        public ConcurrentDictionary<ITaskInfo, ITask> TaskList { get; set; }
+        public TTaskList TaskList { get; set; }
 
-        public ITaskInfo TaskInfo { get; set; }
+        public TTaskInfo TaskInfo { get; set; }
 
-        public ILogger Logger { get; set; }
+        public ILogger Logger { get; set; } = new DefaultLogger();
 
 
-        private void Clone(TaskEventArgs<T> tea)
+        private void Clone(TaskEventArgs<TTaskInfo, TTaskList, TTask> tea)
         {
             TaskStartTime = tea.TaskStartTime;
             Task = tea.Task;
@@ -86,11 +86,11 @@ namespace AsyncTask.EventArgs
 
 
 #if NET45
-        public static implicit operator TaskEventArgs<T>(Tuple<TaskEventArgs<T>, DateTime> tuple) => new TaskEventArgs<T>(tuple);
-        public static implicit operator TaskEventArgs<T>(Tuple<TaskEventArgs<T>, T> tuple) => new TaskEventArgs<T>(tuple);
+        public static implicit operator TaskEventArgs<TTaskInfo, TTaskList, TTask>(Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, DateTime> tuple) => new TaskEventArgs<TTaskInfo, TTaskList, TTask>(tuple);
+        public static implicit operator TaskEventArgs<TTaskInfo, TTaskList, TTask>(Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, TTask> tuple) => new TaskEventArgs<TTaskInfo, TTaskList, TTask>(tuple);
 #else
-        public static implicit operator TaskEventArgs<T>((TaskEventArgs<T> tea, DateTime startTime) tuple) => new TaskEventArgs<T>(tuple);
-        public static implicit operator TaskEventArgs<T>((TaskEventArgs<T> tea, T task) tuple) => new TaskEventArgs<T>(tuple);
+        public static implicit operator TaskEventArgs<TTaskInfo, TTaskList,  TTask>((TaskEventArgs<TTaskInfo, TTaskList,  TTask> tea, DateTime startTime) tuple) => new TaskEventArgs<TTaskInfo, TTaskList,  TTask>(tuple);
+        public static implicit operator TaskEventArgs<TTaskInfo, TTaskList,  TTask>((TaskEventArgs<TTaskInfo, TTaskList,  TTask> tea, TTask task) tuple) => new TaskEventArgs<TTaskInfo, TTaskList,  TTask>(tuple);
 #endif
     }
 }
