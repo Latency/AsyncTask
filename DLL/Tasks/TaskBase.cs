@@ -123,11 +123,9 @@ namespace AsyncTask.Tasks
             {
                 try
                 {
-                    await Task.Run(() =>
-                    {
-                        dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
-                        method?.Invoke(Parent);
-                    }).ConfigureAwait(false);
+                    Console.WriteLine();
+                    dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
+                    method?.Invoke(Parent);
                     await Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false);
                 }
                 finally

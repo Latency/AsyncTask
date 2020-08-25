@@ -2,10 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
-
-    <StartupObject>Tests.Program</StartupObject>
+    <ApplicationIcon>E:\Documents\Visual Studio 2019\Projects\AsyncTask\\..\sBIO2.ico</ApplicationIcon>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,13 +12,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <Compile Remove="Program.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DLL\ORM-Monitor.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0-preview-20200812-03" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-alpha.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DLL\AsyncTask.csproj" />
   </ItemGroup>
 
   <ItemGroup>
