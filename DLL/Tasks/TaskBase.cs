@@ -72,13 +72,13 @@ namespace AsyncTask.Tasks
 
         public async void Register()
         {
-            Token.Register(async () => await Task.Run(() => OnCanceled?.Invoke(_eventArgs)).ConfigureAwait(false));
+            Token.Register(() => OnCanceled?.Invoke(_eventArgs));
 
             Logger.Debug($"\tAdding task '{_eventArgs.TaskInfo.Name}'");
             var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
             taskList?.TryAdd(TaskInfo, this);
 
-            await Task.Run(() => OnAdd?.Invoke(_eventArgs)).ConfigureAwait(false);
+            OnAdd?.Invoke(_eventArgs);
 
             if (!(_eventArgs.Task is Task task))
                 throw new NullReferenceException();
@@ -95,11 +95,11 @@ namespace AsyncTask.Tasks
             {
                 await Task.Run(async () =>
                 {
-                    await Task.Delay((TimeSpan) Timeout, Token).ContinueWith(async t =>
+                    await Task.Delay((TimeSpan) Timeout, Token).ContinueWith(t =>
                     {
                         if (t.IsCompleted)
-                            await Task.Run(() => OnTimeout?.Invoke(_eventArgs)).ConfigureAwait(false);
-                    }).ConfigureAwait(false);
+                            OnTimeout?.Invoke(_eventArgs);
+                    });
                     Cancel();
                 }, Token);
                 Console.Write("");
@@ -107,9 +107,9 @@ namespace AsyncTask.Tasks
         }
 
 
-        private async void UnRegister()
+        private void UnRegister()
         {
-            await Task.Run(() => OnRemove?.Invoke(_eventArgs)).ConfigureAwait(false);
+            OnRemove?.Invoke(_eventArgs);
             Logger.Debug($"\tRemoving task '{_eventArgs.TaskInfo.Name}'");
             var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
             taskList?.TryRemove(TaskInfo, out _);
@@ -119,14 +119,22 @@ namespace AsyncTask.Tasks
 
         protected void Wrap()
         {
-            async void WrappedDelegate()
+            void WrappedDelegate()
             {
                 try
                 {
-                    Console.WriteLine();
                     dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
                     method?.Invoke(Parent);
-                    await Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false);
+                    if (Timeout != null)
+                    {
+                        if (Task.Wait((int) Timeout.Value.TotalMilliseconds, Token))
+                            OnComplete?.Invoke(_eventArgs);
+                        else
+                            OnTimeout?.Invoke(_eventArgs);
+                    }
+                    else
+                        Task.Wait(Token);
+                    OnComplete?.Invoke(_eventArgs);
                 }
                 finally
                 {
@@ -149,12 +157,9 @@ namespace AsyncTask.Tasks
             {
                 try
                 {
-                    var result = Task.Run(() =>
-                    {
-                        dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
-                        return method?.Invoke(Parent);
-                    }).ConfigureAwait(false).GetAwaiter().GetResult();
-                    Task.Run(() => OnComplete?.Invoke(_eventArgs)).ConfigureAwait(false).GetAwaiter().GetResult();
+                    dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
+                    var result = method?.Invoke(Parent);
+                    OnComplete?.Invoke(_eventArgs);
                     return result;
                 }
                 finally

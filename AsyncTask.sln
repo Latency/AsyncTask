@@ -15,7 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		DataModel.md = DataModel.md
 		Flow-Chart.png = Flow-Chart.png
 		LICENSE.txt = LICENSE.txt
-		ORM-Monitor.png = ORM-Monitor.png
 		Output.png = Output.png
 		README.md = README.md
 	EndProjectSection

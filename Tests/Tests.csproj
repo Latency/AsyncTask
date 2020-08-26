@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <SignAssembly>false</SignAssembly>
     <IsPackable>false</IsPackable>
-    <ApplicationIcon>E:\Documents\Visual Studio 2019\Projects\AsyncTask\\..\sBIO2.ico</ApplicationIcon>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
@@ -16,9 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0-preview-20200812-03" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-alpha.1" />
+    <PackageReference Include="NUnit" Version="3.5.0" />
   </ItemGroup>
 
   <ItemGroup>
