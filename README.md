@@ -16,7 +16,7 @@
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
- <img src="https://github.com/Latency/AsyncTask/blob/master/AsyncTask.png?raw=true">
+![AsyncTask](Properties/AsyncTask.png)
 
 <hr>
 
