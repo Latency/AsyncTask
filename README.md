@@ -42,8 +42,6 @@ The goal was to develop an [API] that would be universal and simple to use in he
 The goal was to reduce time & development costs in validating efforts for risk mitigation serving as a universal multi-functional paradigm.
 Any developer can therefore use it to construct new code with the same underlying mechanics and reduce boilerplate code.
 
-When we reference an <i>Object Relational Mapped</i> sub-system it means it is polymorphic and is generic by convention that doesn't depend on specific references to types.  Think of it as a universal template which can inject the types in question as its specified type parameter and let any of the mapping be done under the hood in a <i>dynamic</i> manor.
-
 Some nice things about the C# language is that it is far superior to Java and can detect within a certain tolerance what the type might be so that the type parameter can be omitted from its calling convention.
 Note that both languages have Reflection built-in, which technically makes it is possible to drill down many OSI layers and pull out information used for dynamic / RT calling conventions.
 
@@ -118,145 +116,55 @@ This API has several benefits, such as:
 * <b>Create reusable parametric polymorphic / [lambda expression] / FP methods in code.</b><br>
  When running your tests, it might be that you want to create a sample of functional or regressive tasks.  Interchanging the delegates make it easy.  For example, switching contexts from an administrator area in your [CMS] / web-application.
 
-* <b>Multiple O/R mapper framework concurrent scheduling.</b><br>
+* <b>Task Parallel Library ([TPL]) concurrent scheduling.</b><br>
  [AsyncTask] uses a wrapping factory for the delegates supplied as its generic type. It doesn't matter whether your application uses multiple event handlers with specific listeners for each.  This [API] will consolidate those into a universal system regardless of type.   It will reduce the boilerplate code and overhead which will ultimately reduce the overall risk of failure since everything will funnel through the same sub-system.
 
 <h2><a name="installation">Installation</a></h2>
 
 This library can be installed from [NuGet]:
 
-There are plug-ins that this project uses as dependency from [NuGet] that are built-in and merged into the [API].
-
-
-<table>
-  <tr>
-    <th width="300" style="min-width:300px; max-width: 300px">Description</th>
-    <th width="587" style="min-width:531px;" colspan="2">Assembly - GUI</th>
-  </tr>
-    <tr>
-    <td>External References</td>
-    <td><i>AsyncTask</i> - v2.3.2</td>
-    <td><i>Microsoft.ExceptionMessageBox</i> - v11.0.5906.29906</td>
-  </tr>
-  <tr>
-    <td>Exception logging & UI application hooks</td>
-    <td><i>ReflectSoftware.Insight</i> - v5.7.1.1</td>
-    <td><i>Newtonsoft.Json - JSON.NET</i> - v10.0.3</td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th width="300" style="min-width:300px; max-width: 300px">Description</th>
-    <th width="587" style="min-width:531px;" colspan="2">Assembly - DLL</th>
-  </tr>
-   <tr>
-    <td>External References</td>
-    <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
-  </tr> 
-  <tr>
-    <td>API</td>
-    <td><i>AsyncTask</i> - v2.3.2</td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th width="300" style="min-width:300px; max-width: 300px">Description</th>
-    <th width="587" style="min-width:531px;" colspan="3">Assembly - Tests</th>
-  </tr>
-  <tr>
-    <td>External References</td>
-    <td><i>AsyncTask</i> - v2.3.2</td>
-    <td><i>Microsoft.NETCore.App</i> - v2.0.0</td>
-  </tr>
-  <tr>
-    <td>Unit Testing</td>
-    <td><i>NUnit</i> - v3.9.0</td>
-    <td><i>NUnit3TestAdapter</i> - v3.9.0</td>
-  </tr>
-</table>
-
-
 <h2><a name="using">Using The Code</a></h2>
 
-There are four essential steps to using this:
+There are three essential steps to using this:
 
-&nbsp;1. Optional:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setup a `TaskEventArgs.Expression` delegate collection.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Make any <i>delegate</i> use the expression, which is basically a wrapper for invocating a method<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;across boundary switching thread contexts.
-
-```csharp
-delegate void Expr(params string[] args);
-
-var actionCollection = new List<Delegate>(
-  new Delegate[] {
-    (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
-    (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
-  }
-);
-```
-
-&nbsp;2. Create a \`<i>TaskEvent</i>\` with type parameter matching the type from #1. (if specified)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using <i>object initialization</i>, assign the properties and specify the timeout<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(milliseconds / TimeSpan) whereby the default (-1) for infinate.<br>
-&nbsp;3. Specify the `OnRunning` event handler delegate.  (<b>Required</b>)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;There is an exception handler for this in the \`<i>AsyncMonitor</i>\` method if omitted.<br>
+&nbsp;1. Create an \`<i>AsyncTask</i>\` with an optional generic type parameter matching the return value from `Delegate`.<br>
+&nbsp;2. Specify the `Delegate` used to perform the work.  (<b>Required</b>)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnExit`, `OnProgressChanged`, `OnCanceled`, `OnCompleted`, and `OnTimeout`<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;event handler delegates similarly.<br>
-&nbsp;4. Invoke the extension method.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>[TaskEvent.cs]</i>:   Extension methods for asynchronous routines.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnAdd`, `OnRemove`, `OnComplete`, `OnTimeout`, and `OnCanceled` delegates similarly.<br>
+&nbsp;3. Register the `AsyncTask` instanciated.<br>
+&nbsp;4. Optional:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Timeout` = A property specifing the maximum duration the task will run.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Logger` = Override the internal logging class containing callbacks specified from `AsyncTask.Interfaces.ILogger`.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`TaskList` = Reference to the container collection used to store AsyncTasks.   Handles asynchronous cleanup and disposition internally.<br>
 
 ### Usage:
 ```csharp
-var t1 = new TaskEvent(timeout) {
-  ...object initializers...
-};
-Task task = t1.AsyncMonitor();
+    var t2 = new AsyncTask.Tasks.AsyncTask {
+      ...object initializers...
+    };
+    t2.Register();
 ```
 
 ### Example #1
 ```csharp
-var timeout = Convert.ToDouble(Settings.TTL);
-var actionCollection = new List<Delegate>(
-  new Delegate[] {
-    (Action<string,string>)  ((name, status) => Debug.WriteLine($"@{name}: {status}")                 ),
-    (Expr)                   (arg => Debug.WriteLine($"@{arg[0]}: Task ID({arg[1]}) has canceled.")   )
-  }
-);
-
-var t1 = new TaskEvent(timeout) {
-  Name = "t1",
-  Expression = actionCollection,
-  OnRunning = (obj, tea) => {
-    SpinWait.SpinUntil(() => false, new TimeSpan(0, 0, 2));
-  },
-  OnCompleted = (th, tea) => {
-    tea.Expression[0].DynamicInvoke(tea.Name, Messages.Completed);
-  },
-  OnTimedout = (th, tea) => {
-    tea.Expression[0].DynamicInvoke(tea.Name, Messages.Timeout);
-    Assert.Fail($"timedout @{tea.Name}");
-  },
-  OnCanceled = (th, tea) => {
-    tea.Expression[1].DynamicInvoke(new object[] { new[] { tea.Name, tea.Task.Id.ToString()}});
-    Assert.Fail($"canceled @{tea.Name}");
-  },
-  OnExited = (th, tea) => {
-    tea.Expression[0].DynamicInvoke(tea.Name, Messages.Exited);
-    tasks.Remove(tea.Task);
-  }
-};
-
-tasks.Add(t1.AsyncMonitor());
+    var t2 = new AsyncTask.Tasks.AsyncTask
+    {
+        TaskInfo = new TaskInfo
+        {
+            Name = "t2"
+        },
+        Timeout = TimeSpan.FromSeconds(5),
+        Logger = new DefaultLogger(),
+        TaskList = taskList,
+        Delegate = _ => Thread.Sleep(TimeSpan.FromSeconds(10)),
+        OnAdd = atask => Console.WriteLine($"Adding task for '{atask.TaskInfo.Name}'."),
+        OnRemove = atask => Console.WriteLine($"Removing task for '{atask.TaskInfo.Name}'."),
+        OnComplete = atask => Console.WriteLine($"Completed task for '{atask.TaskInfo.Name}'."),
+        OnTimeout = atask => Console.WriteLine($"Timeout for '{atask.TaskInfo.Name}'."),
+        OnCanceled = atask => Console.WriteLine($"Canceled task for '{atask.TaskInfo.Name}'.")
+    };
+    t2.Register();
 ```
-
-1. Run \`<i>.\GUI\\&lt;Release&gt;\TaskScheduler.exe</i>\`.
-2. Click the `Start New Task` button in the window pane to spawn a new event.
-3. Click the `Cancel` button to stop the event.
-4. Click the `Remove` button to remove the row from the list.
 
 <h2><a name="output">Output</a></h2>
 
@@ -284,7 +192,6 @@ tasks.Add(t1.AsyncMonitor());
 
    [GNU LESSER GENERAL PUBLIC LICENSE]: <http://www.gnu.org/licenses/lgpl-3.0.en.html>
    [Comparison]: <https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java>
-   [TaskEvent.cs]: <https://github.com/Latency/AsyncTask/blob/master/DLL/TaskEvent.cs>
    [NuGet]: <https://www.nuget.org/packages/AsyncTask/>
    [.NET]: <https://en.wikipedia.org/wiki/.NET_Framework/>
    [WPF]: <https://en.wikipedia.org/wiki/Windows_Presentation_Foundation/>

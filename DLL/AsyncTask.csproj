@@ -24,6 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\README.md" Link="Properties\README.md" />
     <None Include="Properties\Kitty.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
