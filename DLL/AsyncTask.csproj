@@ -26,6 +26,7 @@
   <ItemGroup>
     <None Include="..\.gitignore" Link="Properties\.gitignore" />
     <None Include="..\README.md" Link="Properties\README.md" />
+    <None Include="..\Properties\DataModel.md" Link="Properties\DataModel.md" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' And '$(TargetFramework)' != 'netstandard2.1' And '$(TargetFramework)' != 'netcoreapp3.1' ">

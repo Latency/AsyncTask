@@ -52,9 +52,7 @@ In fact, our methodology for this article is to use '<i>generic programming</i>'
 
 This article introduces an [API] which wraps processes asynchronously; supporting deadlock protection, timeout, cancellation requests, checkpointing, and a parametric polymorphic [MVC] design by convention.
 
-<p align="center">
 ![AsyncTask](Properties/Flow-Chart.png)
-</p>
 
 Callback support for the following delegates:
 * OnCompleted
@@ -68,15 +66,13 @@ Callback support for the following delegates:
 
 Model-View-Controller ([MVC]) is an architectural pattern that separates application's data model and user interface views into separate components. This is what the definition says. However, to fully understand the [MVC] we have to introduce required terms and point benefits of [MVC].
 
-<p align="center">
- <img src="http://www.ii.uni.wroc.pl/~wzychla/images/mvc.png" alt="A wiki image of MVC">
-</p>
+![AsyncTask](Properties/mvc.png)
 
 The view is a user interface element (typically a window) that presents the data to the user and allows the user to change the data. It is a typical situation to have several views active at the same time (for example in the Multiple-Document Interface).
 
 The controller is a connection point between the model and views: views register in the controller and reports changes in the model to them.
 
-Forget about the ![AsyncTask](Properties/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
+Forget about the [data model](Properties/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
 The model–view–adapter solves this rather differently from the model–view–controller by arranging model, adapter or mediating controller and view linearly without any connections whatsoever directly between model and view.
 
 What do you call something that has connections directly related?   Dependancies!  If a dependancy breaks down, so does the rest of the system.  Think about it!  In an alternative scenario, you can use [DI] to replace additional constraints that may be binded as well.   This is where aspect oriented programming ([AOP]) will reduce the amount of boilerplate code which in effect also reduces the maintence efforts and cost along with the project size and complexity.
@@ -168,9 +164,7 @@ There are three essential steps to using this:
 
 <h2><a name="output">Output</a></h2>
 
-<p align="center">
-![AsyncTask](Properties\Output.png)
-</p>
+![AsyncTask](Properties/Output.png)
 
 <h2><a name="other">Other Features</a></h2>
 

@@ -1,8 +1,6 @@
-﻿# Object Relational Mapped Monitor Extension
+﻿## Data Model
 
-### Data Model
-
---- Explaination
+### Explaination
 
   The data model is a set of data structures that lay the base for the businnes logic of an application. In typical object-oriented application, the data model is built of client-side classes and collections. Typically, it is somehow stored into a Database Management System, however how the data is exactly stored is not a concern of [MVC].  In fact, other than speed in it's performance, models stored within the DBMS is not as efficient as an ORM based one.
   
@@ -16,7 +14,10 @@
   
   Similarly, T-SQL is generated automatically by the ORM content generators.  If you used EF, you would know this.  You should not need to modify this file.
 
--- Disadvantages
+---
+
+### Disadvantages
+
   1. A DBA will be required for performance tuning
   2. All developers will have to be very well versed in your particular SQL dialect(T-SQL, Pl/SQL, etc)
   3. SQL code isn't as expressive and thus harder to write when covering higher level concepts that aren't really related to data
