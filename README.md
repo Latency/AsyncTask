@@ -16,7 +16,7 @@
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
-![AsyncTask](Properties/AsyncTask.png)
+!(Properties/AsyncTask.png)
 
 <hr>
 
@@ -53,7 +53,7 @@ In fact, our methodology for this article is to use '<i>generic programming</i>'
 This article introduces an [API] which wraps processes asynchronously; supporting deadlock protection, timeout, cancellation requests, checkpointing, and a parametric polymorphic [MVC] design by convention.
 
 <p align="center">
- <img src="https://github.com/Latency/AsyncTask/blob/master/Flow-Chart.png?raw=true" alt="Flow Chart of AsyncTask">
+![Flow-Chart](Properties/Flow-Chart.png)
 </p>
 
 Callback support for the following delegates:
@@ -76,7 +76,7 @@ The view is a user interface element (typically a window) that presents the data
 
 The controller is a connection point between the model and views: views register in the controller and reports changes in the model to them.
 
-Forget about the [data model](https://github.com/Latency/AsyncTask/blob/master/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
+Forget about the ![data model](Properties/DataModel.md) and focus on replacing this with an adapter.  Model–view–adapter [MVA] or mediating-controller [MVC] is a software architectural pattern and multitier architecture.
 The model–view–adapter solves this rather differently from the model–view–controller by arranging model, adapter or mediating controller and view linearly without any connections whatsoever directly between model and view.
 
 What do you call something that has connections directly related?   Dependancies!  If a dependancy breaks down, so does the rest of the system.  Think about it!  In an alternative scenario, you can use [DI] to replace additional constraints that may be binded as well.   This is where aspect oriented programming ([AOP]) will reduce the amount of boilerplate code which in effect also reduces the maintence efforts and cost along with the project size and complexity.
@@ -169,7 +169,7 @@ There are three essential steps to using this:
 <h2><a name="output">Output</a></h2>
 
 <p align="center">
- <img src="https://github.com/Latency/AsyncTask/blob/master//Output.png?raw=true" alt="Output">
+![Output](Properties\Output.png)
 </p>
 
 <h2><a name="other">Other Features</a></h2>
