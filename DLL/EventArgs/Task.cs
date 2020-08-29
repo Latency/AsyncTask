@@ -15,9 +15,6 @@ namespace AsyncTask.EventArgs
 {
     public class TaskEventArgs<TTaskInfo, TTaskList, TTask> : System.EventArgs where TTaskInfo : ITaskInfo where TTaskList : ITaskList
     {
-        protected DateTime TaskStartTime = DateTime.Now;
-
-
         public TaskEventArgs(CancellationTokenSource cts, bool isGeneric)
         {
             CancellationTokenSource = cts;
@@ -64,6 +61,8 @@ namespace AsyncTask.EventArgs
 
         public string Duration => TimeExtensions.ToString(DateTime.Now.Subtract(TaskStartTime));
 
+        public DateTime TaskStartTime { get; set; } = DateTime.Now;
+
         public void Cancel(bool throwOnFirstException = false) => CancellationTokenSource.Cancel();
 
         public TTaskList TaskList { get; set; }
@@ -71,6 +70,8 @@ namespace AsyncTask.EventArgs
         public TTaskInfo TaskInfo { get; set; }
 
         public ILogger Logger { get; set; } = new DefaultLogger();
+
+        public Exception Exception { get; set; }
 
 
         private void Clone(TaskEventArgs<TTaskInfo, TTaskList, TTask> tea)

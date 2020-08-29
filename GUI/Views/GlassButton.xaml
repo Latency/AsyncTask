@@ -7,29 +7,29 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="ButtonBorder" 
-                      CornerRadius="25,25,25,25" 
-                      BorderThickness="3,1,1,2" 
-                      Background="CadetBlue"  
-                      BorderBrush="Gray"
-                      RenderTransformOrigin="0.5,0.5">
+                    <Border x:Name="ButtonBorder"
+                            CornerRadius="25,25,25,25"
+                            BorderThickness="3,1,1,2"
+                            Background="CadetBlue"
+                            BorderBrush="Gray"
+                            RenderTransformOrigin="0.5,0.5">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="1.7*"/>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="1.7*" />
                             </Grid.RowDefinitions>
                             <Border Grid.Row="0" CornerRadius="23,23,0,0">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                        <GradientStop Color="#08FFFFFF" Offset="0"/>
-                                        <GradientStop Color="DarkGray" Offset="1"/>
+                                        <GradientStop Color="#08FFFFFF" Offset="0" />
+                                        <GradientStop Color="DarkGray" Offset="1" />
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
                             <ContentPresenter x:Name="ButtonContentPresenter"
-                                VerticalAlignment="Center"  
-                                Grid.RowSpan="2" 
-                                HorizontalAlignment="Center"/>
+                                              VerticalAlignment="Center"
+                                              Grid.Row="0" Grid.RowSpan="2"
+                                              HorizontalAlignment="Center" />
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -37,7 +37,7 @@
                             <Setter Property="RenderTransform" TargetName="ButtonBorder">
                                 <Setter.Value>
                                     <TransformGroup>
-                                        <ScaleTransform ScaleX="0.9" ScaleY="0.9"/>
+                                        <ScaleTransform ScaleX="0.9" ScaleY="0.9" />
                                     </TransformGroup>
                                 </Setter.Value>
                             </Setter>

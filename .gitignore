@@ -11,14 +11,7 @@
 *.userprefs
 
 # Build results
-DLL/[Bb]in/[Dd]ebug/**/*
-DLL/[Bbin]/[Rr]elease/**/*
-GUI/[Bb]in/[Dd]ebug/
-GUI/[Bbin]/[Rr]elease/
-
-Tests/[Bb]in/[Dd]ebug/
-Tests/[Bbin]/[Rr]elease/
-
+[Bb]in/
 [Dd]ebugPublic/
 [Rr]eleases/
 x64/
@@ -204,3 +197,4 @@ NuGet/
 # Git
 .gitignore
 .gitattributes
+

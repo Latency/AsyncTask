@@ -16,8 +16,9 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ORM_Monitor.Models;
 
-namespace ORM_Monitor.View {
+namespace ORM_Monitor.Views {
   public partial class MainWindow {
     private void DataBind_Columns<T>(ObservableCollection<T> collection) {
       foreach (var p in typeof(T).GetProperties()) {
@@ -31,7 +32,7 @@ namespace ORM_Monitor.View {
             btn.SetResourceReference(TemplateProperty, "ButtonControlTemplate1");
 
             btn.SetValue(NameProperty, p.Name);
-            btn.SetValue(BackgroundProperty, new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/Button-Normal.bmp"))));
+            btn.SetValue(BackgroundProperty, new ImageBrush(new BitmapImage(new Uri("/Resources/Button-Normal.bmp", UriKind.Relative))));
             btn.SetValue(MarginProperty, new Thickness(2));
             btn.SetValue(ForegroundProperty, new SolidColorBrush(Colors.Black));
             btn.SetValue(FontFamilyProperty, new FontFamily("Courier New"));

@@ -24,8 +24,7 @@ namespace AsyncTask.Logging
         public DefaultLogger()
         {
             _listeners = Listeners;
-            // ReSharper disable once VirtualMemberCallInConstructor
-            IsEnabled = true;
+            _isEnabled = true;
         }
 
 
@@ -39,11 +38,11 @@ namespace AsyncTask.Logging
                 _isEnabled = value;
                 if (!_isEnabled)
                 {
-                    Listeners.Clear();
+                    _listeners.Clear();
                 }
                 else
                 {
-                    Listeners.AddRange(_listeners);
+                    _listeners.AddRange(Listeners);
                 }
             }
         }

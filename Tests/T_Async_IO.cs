@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using AsyncTask.DTO;
 using AsyncTask.Logging;
 using NUnit.Framework;
-using Tests.Properties;
 using Timer = System.Timers.Timer;
 
 namespace Tests
@@ -61,33 +60,34 @@ namespace Tests
                 Action<string, string> expr = (name, msg) => TestContext.Progress.WriteLine($"@{name}:  {msg}");
 
                 // #############################################################
-                //TestContext.Progress.WriteLine($"Executing **** {test[0]} **** test.  Running for 2 seconds.  Timeout at {timeout} seconds.");
+                TestContext.Progress.WriteLine($"Executing **** {test[0]} **** test.  Running for 2 seconds.  Timeout at {timeout} seconds.");
 
-                //var t1 = new AsyncTask.Tasks.AsyncTask
-                //{
-                //    TaskInfo = new TaskInfo
-                //    {
-                //        Name = "t1"
-                //    },
-                //    Timeout = TimeSpan.FromSeconds(timeout),
-                //    Logger = new DefaultLogger(),
-                //    TaskList = taskList,
-                //    Delegate = _ => SpinWait.SpinUntil(() => false, TimeSpan.FromSeconds(2)),
-                //    OnAdd = args => TestContext.Progress.WriteLine($"Adding task for '{args.TaskInfo.Name}'"),
-                //    OnRemove = args => TestContext.Progress.WriteLine($"Removing task for '{args.TaskInfo.Name}'."),
-                //    OnComplete = args => expr.DynamicInvoke(args.TaskInfo.Name, Messages.Completed),
-                //    OnTimeout = args =>
-                //    {
-                //        expr.DynamicInvoke(args.TaskInfo.Name, Messages.Timeout);
-                //        Assert.Fail($"OnTimeout @{args.TaskInfo.Name}");
-                //    },
-                //    OnCanceled = args =>
-                //    {
-                //        expr.DynamicInvoke(args.TaskInfo.Name, Messages.Canceled);
-                //        Assert.Fail($"OnCanceled @{args.TaskInfo.Name}");
-                //    }
-                //};
-                //t1.Register();
+                var t1 = new AsyncTask.Tasks.AsyncTask
+                {
+                    TaskInfo = new TaskInfo
+                    {
+                        Name = "t1"
+                    },
+                    Timeout = TimeSpan.FromSeconds(timeout),
+                    Logger = new DefaultLogger(),
+                    TaskList = taskList,
+                    Delegate = (asyncTask, args) => Thread.Sleep(TimeSpan.FromSeconds(2)),
+                    OnAdd = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, "Adding task"),
+                    OnRemove = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, "Removing task"),
+                    OnComplete = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, $"Completing task for '{args.TaskInfo.Name}'."),
+                    OnTimeout = (asyncTask, args) =>
+                    {
+                        expr.DynamicInvoke(args.TaskInfo.Name, $"Timeout for '{args.TaskInfo.Name}'.");
+                        Assert.Fail($"OnTimeout @{args.TaskInfo.Name}");
+                    },
+                    OnCanceled = (asyncTask, args) =>
+                    {
+                        expr.DynamicInvoke(args.TaskInfo.Name, $"Canceling '{args.TaskInfo.Name}'.");
+                        Assert.Fail($"OnCanceled @{args.TaskInfo.Name}");
+                    }
+                };
+                t1.Start();
+
 
                 // #############################################################
                 TestContext.Progress.WriteLine($"Executing **** {test[1]} **** test.  Running for 10 seconds.  Timeout at {timeout} seconds.  Interrupt at 4 seconds.");
@@ -101,18 +101,22 @@ namespace Tests
                     Timeout = TimeSpan.FromSeconds(timeout),
                     Logger = new DefaultLogger(),
                     TaskList = taskList,
-                    Delegate = _ => SpinWait.SpinUntil(() => false, TimeSpan.FromSeconds(10)),
-                    OnAdd = args => TestContext.Progress.WriteLine($"Adding task for '{args.TaskInfo.Name}'"),
-                    OnRemove = args => TestContext.Progress.WriteLine($"Removing task for '{args.TaskInfo.Name}'."),
-                    OnComplete = args => expr.DynamicInvoke(args.TaskInfo.Name, Messages.Completed),
-                    OnTimeout = args =>
+                    Delegate = (asyncTask, args) => Thread.Sleep(TimeSpan.FromSeconds(10)),
+                    OnAdd = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, "Adding task"),
+                    OnRemove = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, "Removing task"),
+                    OnComplete = (asyncTask, args) =>
                     {
-                        expr.DynamicInvoke(args.TaskInfo.Name, Messages.Timeout);
+                        expr.DynamicInvoke(args.TaskInfo.Name, $"Completing task for '{args.TaskInfo.Name}'.");
+                        Assert.Fail($"OnComplete @{args.TaskInfo.Name}");
+                    },
+                    OnTimeout = (asyncTask, args) =>
+                    {
+                        expr.DynamicInvoke(args.TaskInfo.Name, $"Timeout for '{args.TaskInfo.Name}'.");
                         Assert.Fail($"OnTimeout @{args.TaskInfo.Name}");
                     },
-                    OnCanceled = args => expr.DynamicInvoke(args.TaskInfo.Name, Messages.Canceled)
+                    OnCanceled = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, $"Canceling '{args.TaskInfo.Name}'.")
                 };
-                t2.Register();
+                t2.Start();
 
                 #region Triger
 
@@ -128,38 +132,45 @@ namespace Tests
 
 
                 //// #############################################################
-                //TestContext.Progress.WriteLine($"Executing **** {test[2]} **** test.  Running for 10 seconds.  Timeout at {timeout} seconds.");
+                TestContext.Progress.WriteLine($"Executing **** {test[2]} **** test.  Running for 10 seconds.  Timeout at {timeout} seconds.");
 
-                //var t3 = new AsyncTask.Tasks.AsyncTask
-                //{
-                //    TaskInfo = new TaskInfo()
-                //    {
-                //        Name = "t3"
-                //    },
-                //    Timeout = TimeSpan.FromSeconds(timeout),
-                //    Logger = new DefaultLogger(),
-                //    TaskList = taskList,
-                //    Delegate = _ => SpinWait.SpinUntil(() => false, TimeSpan.FromSeconds(10)),
-                //    OnAdd = args => TestContext.Progress.WriteLine($"Adding task for '{args.TaskInfo.Name}'"),
-                //    OnRemove = args => TestContext.Progress.WriteLine($"Removing task for '{args.TaskInfo.Name}'."),
-                //    OnComplete = args => expr.DynamicInvoke(args.TaskInfo.Name, Messages.Completed),
-                //    OnTimeout = args => expr.DynamicInvoke(args.TaskInfo.Name, Messages.Timeout),
-                //    OnCanceled = args =>
-                //    {
-                //        expr.DynamicInvoke(args.TaskInfo.Name, Messages.Canceled);
-                //        Assert.Fail($"OnCanceled @{args.TaskInfo.Name}");
-                //    }
-                //};
-                //t3.Register();
+                var t3 = new AsyncTask.Tasks.AsyncTask
+                {
+                    TaskInfo = new TaskInfo()
+                    {
+                        Name = "t3"
+                    },
+                    Timeout = TimeSpan.FromSeconds(timeout),
+                    Logger = new DefaultLogger(),
+                    TaskList = taskList,
+                    Delegate = (asyncTask, args) => Thread.Sleep(TimeSpan.FromSeconds(10)),
+                    OnAdd = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, "Adding task"),
+                    OnRemove = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, "Removing task"),
+                    OnComplete = (asyncTask, args) =>
+                    {
+                        expr.DynamicInvoke(args.TaskInfo.Name, $"Completing task for '{args.TaskInfo.Name}'.");
+                        Assert.Fail($"OnComplete @{args.TaskInfo.Name}");
+                    },
+                    OnTimeout = (asyncTask, args) => expr.DynamicInvoke(args.TaskInfo.Name, $"Timeout for '{args.TaskInfo.Name}'."),
+                    OnCanceled = (asyncTask, args) =>
+                    {
+                        expr.DynamicInvoke(args.TaskInfo.Name, $"Canceling '{args.TaskInfo.Name}'.");
+                        Assert.Fail($"OnCanceled @{args.TaskInfo.Name}");
+                    }
+                };
+                t3.Start();
 
-                //// Wait for all the tasks to finish.
-                //Task.WaitAll(t1.Task, t2.Task, t3.Task);
-
-                Task.WaitAll(t2.Task);
+                // Wait for all the tasks to finish.
+                try
+                {
+                    Task.WaitAll(t1.Task, t2.Task, t3.Task);
+                }
+                catch
+                {
+                }
 
                 TestContext.Progress.WriteLine(@"All Tasks Completed");
             }
-            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 Assert.Fail(ex.Message);

@@ -1,70 +1,46 @@
-﻿//  *****************************************************************************
-//  File:       TaskService.cs
-//  Solution:   ORM-Monitor
-//  Project:    GUI
-//  Date:       12/13/2016
-//  Author:     Latency McLaughlin
-//  Copywrite:  Bio-Hazard Industries - 1998-2016
-//  *****************************************************************************
+﻿// ****************************************************************************
+// Project:  GUI
+// File:     TaskService.cs
+// Author:   Latency McLaughlin
+// Date:     08/28/2020
+// ****************************************************************************
 
 using System.Windows;
 using System.Windows.Controls;
-using ORM_Monitor.Controller;
+using ORM_Monitor.Interfaces;
 
-namespace ORM_Monitor.Models {
-  /// <summary>
-  ///   ServiceTask
-  /// </summary>
-  public class TaskService {
-    #region Constructor
-    // -----------------------------------------------------------------------
-
+namespace ORM_Monitor.Models
+{
     /// <summary>
-    ///   Constructor
+    ///     ServiceTask
     /// </summary>
-    /// <param name="owner"></param>
-    /// <param name="parent"></param>
-    /// <param name="ctrlr"></param>
-    /// <param name="dgRow"></param>
-    public TaskService(Window owner, ITaskRecordSet parent, ITaskController ctrlr, DataGridRow dgRow) {
-      Owner = owner;
-      Parent = parent;
-      Controller = ctrlr;
-      GridRow = dgRow;
+    public class TaskService
+    {
+        #region Properties
+
+        // -----------------------------------------------------------------------
+        /// <summary>
+        ///     Owner
+        /// </summary>
+        public Window Owner { get; set; }
+
+        /// <summary>
+        ///     RecordSet
+        /// </summary>
+        public ITaskRecordSet TaskInfo { get; set; }
+
+        /// <summary>
+        ///     View
+        /// </summary>
+        public DataGridRow GridRow { get; set; }
+
+        /// <summary>
+        ///     Handler
+        /// </summary>
+        public Tasks.AsyncTask Task { get; set; }
+
+        // -----------------------------------------------------------------------
+
+        #endregion Properties
     }
-
-    // -----------------------------------------------------------------------
-    #endregion Constructor
-
-
-    #region Properties
-    // -----------------------------------------------------------------------
-    /// <summary>
-    ///   Owner
-    /// </summary>
-    public Window Owner { get; }
-
-    /// <summary>
-    ///   Controller
-    /// </summary>
-    public ITaskController Controller { get; }
-
-    /// <summary>
-    ///   RecordSet
-    /// </summary>
-    public ITaskRecordSet Parent { get; }
-
-    /// <summary>
-    ///   View
-    /// </summary>
-    public DataGridRow GridRow { get; }
-
-    /// <summary>
-    ///   Handler
-    /// </summary>
-    public TaskEvent Event { get; set; }
-
-    // -----------------------------------------------------------------------
-    #endregion Properties
-  }
 }

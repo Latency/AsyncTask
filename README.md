@@ -55,12 +55,13 @@ This article introduces an [API] which wraps processes asynchronously; supportin
 ![AsyncTask](Properties/Flow-Chart.png)
 
 Callback support for the following delegates:
-* OnCompleted
+* OnAdd
+* OnRemove
+* OnComplete
+* OnError
+* OnCanceled
 * OnTimeout
-* OnExit
-* OnProgressChanged
-* OnRunning
-* OnCancellation
+
 
 [AsyncTask] is compiled as a library packaged for the [NuGet] marketplace.  The project itself, supplies an application driver, test suite, and the library's source code.
 
@@ -126,7 +127,7 @@ There are three essential steps to using this:
 &nbsp;1. Create an \`<i>AsyncTask</i>\` with an optional generic type parameter matching the return value from `Delegate`.<br>
 &nbsp;2. Specify the `Delegate` used to perform the work.  (<b>Required</b>)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `OnAdd`, `OnRemove`, `OnComplete`, `OnTimeout`, and `OnCanceled` delegates similarly.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `On<...>` delegates similarly.<br>
 &nbsp;3. Register the `AsyncTask` instanciated.<br>
 &nbsp;4. Optional:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Timeout` = A property specifing the maximum duration the task will run.<br>
@@ -151,12 +152,13 @@ There are three essential steps to using this:
         },
         Timeout = TimeSpan.FromSeconds(5),
         Logger = new DefaultLogger(),
-        TaskList = taskList,
+        TaskList = new TaskList(),
         Delegate = _ => Thread.Sleep(TimeSpan.FromSeconds(10)),
         OnAdd = atask => Console.WriteLine($"Adding task for '{atask.TaskInfo.Name}'."),
         OnRemove = atask => Console.WriteLine($"Removing task for '{atask.TaskInfo.Name}'."),
         OnComplete = atask => Console.WriteLine($"Completed task for '{atask.TaskInfo.Name}'."),
         OnTimeout = atask => Console.WriteLine($"Timeout for '{atask.TaskInfo.Name}'."),
+        OnError = atask => Console.WriteLine($"An error occured for '{atask.TaskInfo.Name}'."),
         OnCanceled = atask => Console.WriteLine($"Canceled task for '{atask.TaskInfo.Name}'.")
     };
     t2.Register();

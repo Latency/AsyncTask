@@ -117,13 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Completed" xml:space="preserve">
-    <value>Completed successfully!</value>
-  </data>
-  <data name="Canceled" xml:space="preserve">
-    <value>Canceling task!</value>
-  </data>
-  <data name="Timeout" xml:space="preserve">
-    <value>Time out failure!</value>
-  </data>
 </root>
