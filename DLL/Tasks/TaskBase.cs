@@ -7,9 +7,9 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AsyncTask.DTO;
 using AsyncTask.Enums;
 using AsyncTask.EventArgs;
 using AsyncTask.Interfaces;
@@ -27,26 +27,28 @@ namespace AsyncTask.Tasks
     ///     null.
     ///     Note that although collisions are very rare, task identifiers are not guaranteed to be unique.
     /// </remarks>
-    public abstract class TaskBase<TDelegate, TParent, TTaskInfo, TTaskList, TTask> : CancellationTokenSource, ITask where TTaskInfo : ITaskInfo where TTaskList : ITaskList
+    public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask where TTaskInfo : TaskInfo where TTaskList : TaskList where TParent : new()
     {
-        protected TParent Parent;
-        private TaskEventArgs<TTaskInfo, TTaskList, TTask> _eventArgs;
+        private TTaskInfo _taskInfo;
+        private TTaskList _taskList;
+        private ILogger _logger;
+        private TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
         private bool TimeOut => Timeout != null && DateTime.Now >= _eventArgs.TaskStartTime.Add((TimeSpan)Timeout);
         private void DebugStatus(TaskType type, string msg) => Logger.Debug($"{type} '{TaskInfo.Name}':  {msg}");
 
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> Delegate { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnAdd { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnRemove { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnComplete { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnError { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnCanceled { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList, TTask>> OnTimeout { get; set; }
+        public TDelegate Delegate { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnAdd { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnRemove { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnComplete { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnCanceled { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout { get; set; }
 
 
         /// <summary>
-        ///     Constructor
+        ///     Parent
         /// </summary>
-        protected TaskBase() => _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList, TTask>(this, typeof(TTask).GenericTypeArguments.Any());
+        protected abstract TParent Parent { get; }
 
 
         /// <summary>
@@ -58,17 +60,7 @@ namespace AsyncTask.Tasks
         /// <summary>
         ///     Task
         /// </summary>
-        public Task Task => _eventArgs.Task as Task;
-
-
-        /// <summary>
-        ///     TaskList
-        /// </summary>
-        public TTaskList TaskList
-        {
-            get => _eventArgs.TaskList;
-            set => _eventArgs.TaskList = value;
-        }
+        public Task Task => _eventArgs.Task;
 
 
         /// <summary>
@@ -77,17 +69,27 @@ namespace AsyncTask.Tasks
         public TTaskInfo TaskInfo
         {
             get => _eventArgs.TaskInfo;
-            set => _eventArgs.TaskInfo = value;
+            set => _taskInfo = value;
         }
 
 
+        /// <summary>
+        ///     TaskList
+        /// </summary>
+        public TTaskList TaskList
+        {
+            get => _eventArgs.TaskList;
+            set =>_taskList = value;
+        }
+
+        
         /// <summary>
         ///     Logger
         /// </summary>
         public ILogger Logger
         {
             get => _eventArgs.Logger;
-            set => _eventArgs.Logger = value;
+            set => _logger = value;
         }
 
 
@@ -103,12 +105,7 @@ namespace AsyncTask.Tasks
         /// </summary>
         public void Start()
         {
-            // Reset start time.
-#if NET45
-            _eventArgs = new Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, DateTime>(_eventArgs, DateTime.Now);
-#else
-            _eventArgs = (_eventArgs, DateTime.Now);
-#endif
+            _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList>(Wrap(), _taskInfo, _taskList, _logger);
 
             var isCompleted = false;
 
@@ -156,19 +153,17 @@ namespace AsyncTask.Tasks
                         CancellationToken = Token,
                         MaxDegreeOfParallelism = Environment.ProcessorCount
                     };
-                    Parallel.ForEach(new[] { _eventArgs.Task }, po, (item, loopState) =>
+                    Parallel.ForEach(new[] { _eventArgs.Task }, po, (task, loopState) =>
                     {
                         using (Token.Register(Thread.CurrentThread.Abort))
                         {
-                            if (!(item is Task task))
-                                throw new NullReferenceException();
                             task.RunSynchronously();
                         }
                     });
                 }
                 catch (OperationCanceledException)
                 {
-                    // User canceled
+                    // User canceled or timeout
                 }
                 catch (Exception ex)
                 {
@@ -179,74 +174,41 @@ namespace AsyncTask.Tasks
                 {
                     isCompleted = true;
                 }
-            }).ContinueWith(t =>
+            }).ContinueWith(t => // Cleanup
             {
-                Dispose();
+                Dispose(); // Cancellation token
+                _eventArgs.Task.Dispose();
+                DebugStatus(TaskType.Task, "Removing task");
+                var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
+                taskList?.TryRemove(TaskInfo, out _);
+                OnRemove?.Invoke(Parent, _eventArgs);
             });
         }
 
 
-        private new void Dispose()
+        /// <summary>
+        ///     Wrap
+        /// </summary>
+        private Task Wrap() => new Task(() =>
         {
-            DebugStatus(TaskType.Task, "Removing task");
-            OnRemove?.Invoke(Parent, _eventArgs);
-            var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
-            taskList?.TryRemove(TaskInfo, out _);
-            base.Dispose(); // Cancellation token
-            if (!(_eventArgs.Task is Task task))
-                throw new NullReferenceException();
-            task.Dispose();
-        }
-        
-
-        protected void Wrap()
-        {
-            void WrappedDelegate()
+            try
             {
-                try
-                {
-                    dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
-                    method?.Invoke(Parent, _eventArgs);
-                    OnComplete?.Invoke(Parent, _eventArgs);
-                }
-                catch (ThreadAbortException)
-                {
-                    Thread.ResetAbort();
-                    throw new TaskCanceledException();
-                }
+                var method = (Delegate) GetType().GetProperty("Delegate")?.GetValue(this, null);
+                if (method == null)
+                    throw new NullReferenceException();
+
+                if (method.GetType().GenericTypeArguments[0].IsGenericType)
+                    _eventArgs.Result = method.DynamicInvoke(Parent, _eventArgs);
+                else
+                    method.DynamicInvoke(Parent, _eventArgs);
+
+                OnComplete?.Invoke(Parent, _eventArgs);
             }
-            // Implicit assignment since Task won't have a setter.
-#if NET45
-            _eventArgs = new Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task), (Action)WrappedDelegate, Token));
-#else
-            _eventArgs = (_eventArgs, (TTask) Activator.CreateInstance(typeof(Task), (Action) WrappedDelegate, Token));
-#endif
-        }
-
-
-        protected void Wrap<T>()
-        {
-            T WrappedDelegate()
+            catch (ThreadAbortException)
             {
-                try
-                {
-                    dynamic method = GetType().GetProperty("Delegate")?.GetValue(this, null);
-                    var result = method?.Invoke(Parent, _eventArgs);
-                    OnComplete?.Invoke(Parent, _eventArgs);
-                    return result;
-                }
-                catch (ThreadAbortException)
-                {
-                    Thread.ResetAbort();
-                    throw new TaskCanceledException();
-                }
+                Thread.ResetAbort();
+                throw new TaskCanceledException();
             }
-            // Implicit assignment since Task won't have a setter.
-#if NET45
-            _eventArgs = new Tuple<TaskEventArgs<TTaskInfo, TTaskList, TTask>, TTask>(_eventArgs, (TTask)Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>)WrappedDelegate, Token));
-#else
-            _eventArgs = (_eventArgs, (TTask) Activator.CreateInstance(typeof(Task<>).MakeGenericType(typeof(T)), (Func<T>) WrappedDelegate, Token));
-#endif
-        }
+        }, Token);
     }
 }

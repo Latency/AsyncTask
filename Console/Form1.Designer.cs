@@ -98,7 +98,7 @@
             this.splitContainer1.Panel1.Controls.Add(this.ButtonClear);
             this.splitContainer1.Panel1.Controls.Add(this.ButtonDisable);
             this.splitContainer1.Panel1.Controls.Add(this.lbBlockTime);
-            this.splitContainer1.Panel1MinSize = 30;
+            this.splitContainer1.Panel1MinSize = 60;
             // 
             // splitContainer1.Panel2
             // 

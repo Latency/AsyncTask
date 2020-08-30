@@ -7,7 +7,6 @@
 //  Copywrite:  Bio-Hazard Industries - 1998-2017
 //  *****************************************************************************
 
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -15,7 +14,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Views {
@@ -23,6 +21,7 @@ namespace ORM_Monitor.Views {
     private void DataBind_Columns<T>(ObservableCollection<T> collection) {
       foreach (var p in typeof(T).GetProperties()) {
         DataGridColumn dgc = null;
+
         switch (p.Name) {
           case "Action": {
             var btn = new FrameworkElementFactory(typeof(Button)) {
@@ -32,25 +31,47 @@ namespace ORM_Monitor.Views {
             btn.SetResourceReference(TemplateProperty, "ButtonControlTemplate1");
 
             btn.SetValue(NameProperty, p.Name);
-            btn.SetValue(BackgroundProperty, new ImageBrush(new BitmapImage(new Uri("/Resources/Button-Normal.bmp", UriKind.Relative))));
+            btn.SetValue(BackgroundProperty, new ImageBrush((ImageSource) Application.Current.Resources["Button-Normal"]));
             btn.SetValue(MarginProperty, new Thickness(2));
             btn.SetValue(ForegroundProperty, new SolidColorBrush(Colors.Black));
             btn.SetValue(FontFamilyProperty, new FontFamily("Courier New"));
             btn.SetValue(FontSizeProperty, 12.0);
             btn.SetValue(FontWeightProperty, FontWeights.Bold);
-            btn.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(RemoveButton_Click));
-            btn.AddHandler(MouseLeaveEvent, new MouseEventHandler(MyButton_MouseLeave));
-            btn.AddHandler(MouseEnterEvent, new MouseEventHandler(MyButton_MouseEnter));
-            btn.AddHandler(MouseDownEvent, new MouseButtonEventHandler(MyButton_MouseDown));
             
             var dc = new DataGridTemplateColumn {
-              Header = "Action",
-              Width = 100,
-              CanUserResize = false,
-              CellTemplate = new DataTemplate {
-                VisualTree = btn
-              }
+                CellStyle = new Style()
+                {
+                    Setters = {
+                        new EventSetter {
+                            Event = MouseEnterEvent,
+                            Handler = new MouseEventHandler(ListView1_MouseEnter)
+                        },
+                        new EventSetter {
+                            Event = MouseLeaveEvent,
+                            Handler = new MouseEventHandler(ListView1_MouseLeave)
+                        },
+                        new EventSetter {
+                            Event = MouseDownEvent,
+                            Handler = new MouseButtonEventHandler(MyButton_MouseDown)
+                        }
+                    },
+                    Triggers = {
+                        new Trigger {
+                            Property = IsMouseOverProperty,
+                            Value = true,
+                            Setters = {
+                                new Setter(BackgroundProperty, Brushes.DarkSeaGreen)
+                            }
+                        }
+                    }
+                },
+                Width = DataGridLength.SizeToCells,
+                CanUserResize = false,
+                CellTemplate = new DataTemplate {
+                  VisualTree = btn
+                }  
             };
+
             dgc = dc;
             break;
           }
@@ -70,7 +91,7 @@ namespace ORM_Monitor.Views {
               },
               ElementStyle = new Style() {
                 Setters = {
-                  new EventSetter {
+                    new EventSetter {
                     Event = MouseEnterEvent,
                     Handler = new MouseEventHandler(ListView1_MouseEnter)
                   },

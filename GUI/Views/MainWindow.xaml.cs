@@ -8,17 +8,17 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using ORM_Monitor.Extensions;
+using AsyncTask.DTO;
+using AsyncTask.EventArgs;
 using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Views
@@ -28,6 +28,9 @@ namespace ORM_Monitor.Views
     /// </summary>
     public partial class MainWindow
     {
+        private readonly Dispatcher _dispatcher;
+
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -35,6 +38,8 @@ namespace ORM_Monitor.Views
         {
             InitializeComponent();
 
+            _dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
+            
             // Dynamically create columns in DataGrid from Dependancy property databinding.
             DataBind_Columns(new ObservableCollection<TaskRecordSet>());
 
@@ -61,37 +66,29 @@ namespace ORM_Monitor.Views
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button btn))
-                throw new NullReferenceException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(btn)));
+                throw new NullReferenceException();
 
-            // Traverse up the VisualTree and find the DataGridRow.
-            var row = Extensions.Extensions.FindAncestorOrSelf<DataGridRow>(btn);
-            if (row == null)
-                throw new NullReferenceException(MethodBase.GetCurrentMethod().Name, new NullReferenceException(nameof(row)));
+            if (!(btn.Tag is (Tasks.AsyncTask asyncTask, TaskEventArgs<TaskRecordSet, TaskList> args)))
+                throw new NullReferenceException();
 
-            var index = row.GetIndex();
+            _dispatcher.Invoke(() =>
+            {
+                var index = args.TaskInfo.GridRow.GetIndex();
+                lblStatusBar.Text = $"Button clicked: (Row: {index + 1}, Action: {btn.Content})";
 
-            var rst = ListView1.Items[index] as TaskRecordSet;
-
-            if (!(rst?.Tag is TaskService st))
-                return;
-
-            lblStatusBar.Text = $"Button clicked: (Row: {index + 1}, Action: {btn.Content})";
-
-            if (btn.IsEnabled && rst.Status == TaskStatus.Running)
-                try
-                {
-                    st.Task.Cancel();
-                    btn.IsEnabled = false;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            else
-                lock (ListView1.Items)
-                {
+                if (btn.IsEnabled && args.Task.Status == TaskStatus.Running)
+                    try
+                    {
+                        asyncTask.Cancel();
+                        btn.IsEnabled = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                else
                     ListView1.Items.RemoveAt(index);
-                }
+            });
         }
 
 
@@ -102,115 +99,91 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            try
+            var task = new Tasks.AsyncTask
             {
-                var rst = new Tasks.AsyncTask
+                TaskInfo = new TaskRecordSet
                 {
-                    TaskInfo = new TaskRecordSet
+                    Owner = this
+                },
+                Delegate = (asyncTask, args) =>
+                {
+                    while (!asyncTask.IsCancellationRequested)
                     {
-                        ID = new Random().Next(),
-                        Name = ToString()
-                    },
-                    Delegate = async (asyncTask, args) =>
+                        args.TaskInfo.Progress += 1;
+
+                        // Pulse
+                        Thread.Sleep(100);
+                    }
+                },
+                OnAdd = (asyncTask, args) =>
+                {
+                    _dispatcher.Invoke(() =>
                     {
-                        double current;
-                        var ts = args.TaskInfo;
-                        var targetTime = DateTime.Now.AddSeconds(3);
-                        var currentTime = DateTime.Now;
-                        var diffTime = targetTime.Subtract(currentTime).TotalMilliseconds;
-                        var service = ts.Tag as TaskService;
-
-                        service?.Owner.Dispatcher.Invoke(() =>
-                        {
-                            ts.Action.Content = "Stop";
-                            ts.Status = TaskStatus.Running;
-                        });
-
-                        while ((current = targetTime.Subtract(currentTime).TotalMilliseconds) > 0)
-                        {
-                            if (args.CancellationTokenSource.IsCancellationRequested)
-                                return;
-
-                            var val = 1 - current / diffTime;
-
-                            service?.Owner.Dispatcher.Invoke(() => { ts.Progress = (ushort)(val * 100); });
-
-                            // Pulse 10x per second.
-                            await Task.Delay(200);
-
-                            currentTime = DateTime.Now;
-                        }
-
-                        service?.Owner.Dispatcher.Invoke(() => { ts.Progress = 100; });
-                    },
-                    OnAdd = (asyncTask, args) =>
-                    {
-                        lblStatusBar.InvokeIfRequired(xx => lblStatusBar.Text = $"Starting task \"{args.TaskInfo.Name}\".", DispatcherPriority.Normal, sender, args);
-
-                        var idx = ListView1.Items.Add(args);
+                        var rst = args.TaskInfo;
+                        
+                        lblStatusBar.Text = $"Starting task \"{rst.Name}\".";
+                        var index = ListView1.Items.Add(rst);
                         ListView1.UpdateLayout();
 
-                        var dgr = ListView1.ItemContainerGenerator.ContainerFromIndex(idx) as DataGridRow;
-                        var st = new TaskService
-                        {
-                            Owner = this,
-                            TaskInfo = args.TaskInfo,
-                            GridRow = dgr,
-                            Task = asyncTask
-                        };
-                        args.TaskInfo.Tag = st;
+                        if (!(ListView1.ItemContainerGenerator.ContainerFromIndex(index) is DataGridRow rowContainer))
+                            throw new NullReferenceException();
 
-                        var a = Extensions.Extensions.FindFirstChild<DataGridCellsPanel>(dgr);
+                        rst.GridRow = rowContainer;
+
+                        var a = Extensions.Extensions.FindFirstChild<DataGridCellsPanel>(rowContainer);
                         foreach (DataGridCell b in a.Children)
                         {
                             b.Name = b.Column.Header.ToString();
                             if (b.Name != "Action")
                                 continue;
                             var btn = Extensions.Extensions.FindFirstChild<Button>(b.Content as FrameworkElement);
+                            btn.Content = "Stop";
+                            btn.Tag = (asyncTask, args);
+                            btn.Click += RemoveButton_Click;
+                            btn.MouseDown += MyButton_MouseDown;
+                            btn.MouseEnter += MyButton_MouseEnter;
+                            btn.MouseLeave += MyButton_MouseLeave;
                             args.TaskInfo.Action = btn;
+                            break;
                         }
-                    },
-                    OnComplete = (asyncTask, args) =>
-                    {
-                        var ts = args.TaskInfo;
-                        var service = ts.Tag as TaskService;
-                        service?.Owner.Dispatcher.Invoke(() =>
-                        {
-                            ts.Action.Content = "Remove";
-                            ts.Progress = 100;
-                            ts.Status = TaskStatus.RanToCompletion;
-                        });
-                    },
-                    OnTimeout = (asyncTask, args) =>
-                    {
-                        var ts = args.TaskInfo;
-                        var service = ts.Tag as TaskService;
-                        service?.Owner.Dispatcher.Invoke(() =>
-                        {
-                            ts.Action.IsEnabled = true;
-                            ts.Action.Content = "Remove";
-                            ts.Status = TaskStatus.Faulted;
-                        });
-                    },
-                    OnCanceled = (asyncTask, args) =>
-                    {
-                        var service = args.TaskInfo.Tag as TaskService;
-                        service?.Owner.Dispatcher.Invoke(() =>
-                        {
-                            args.TaskInfo.Status = TaskStatus.Canceled;
-                            args.TaskInfo.Action.IsEnabled = true;
-                            args.TaskInfo.Action.Content = "Remove";
-                        });
-                    }
-                };
+                    });
+                },
+                //OnComplete = (asyncTask, args) =>
+                //{
+                //    var ts = args.TaskInfo;
+                //    var service = ts.Tag as TaskService;
+                //    service?.Owner.Dispatcher.Invoke(() =>
+                //    {
+                //        ts.Action.Content = "Remove";
+                //        ts.Progress = 100;
+                //        ts.Status = TaskStatus.RanToCompletion;
+                //    });
+                //},
+                //OnTimeout = (asyncTask, args) =>
+                //{
+                //    var ts = args.TaskInfo;
+                //    var service = ts.Tag as TaskService;
+                //    service?.Owner.Dispatcher.Invoke(() =>
+                //    {
+                //        ts.Action.IsEnabled = true;
+                //        ts.Action.Content = "Remove";
+                //        ts.Status = TaskStatus.Faulted;
+                //    });
+                //},
+                //OnCanceled = (asyncTask, args) =>
+                //{
+                //    var service = args.TaskInfo.Tag as TaskService;
+                //    service?.Owner.Dispatcher.Invoke(() =>
+                //    {
+                //        args.TaskInfo.Status = TaskStatus.Canceled;
+                //        args.TaskInfo.Action.IsEnabled = true;
+                //        args.TaskInfo.Action.Content = "Remove";
+                //    });
+                //}
+            };
 
-                // Run the task asynchronously wrapped with the monitor.
-                rst.Start();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
+            // Run the task asynchronously wrapped with the monitor.
+            task.Start();
         }
 
 
@@ -221,10 +194,11 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Tasks.AsyncTask task))
-                throw new NullReferenceException();
-
-            task.Cancel();
+            Parallel.ForEach(ListView1.Items.Cast<TaskRecordSet>(), rst => {
+                if (!(rst.Action.Tag is (Tasks.AsyncTask asyncTask, TaskEventArgs<TaskRecordSet, TaskList> _)))
+                    throw new NullReferenceException();
+                asyncTask.Cancel();
+            });
         }
 
 
@@ -238,15 +212,10 @@ namespace ORM_Monitor.Views
             if (ListView1.Items.Count > 1)
             {
                 lblStatusBar.Text = @"Clearing task list.";
-                lock (ListView1.Items)
-                {
-                    ListView1.Items.Clear();
-                }
+                ListView1.Items.Clear();
             }
             else
-            {
                 lblStatusBar.Text = @"Task list has already been cleared.";
-            }
         }
 
 
@@ -272,37 +241,20 @@ namespace ORM_Monitor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        internal void ListView1_MouseEnter(object sender, MouseEventArgs e)
+        private void ListView1_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (ListView1.Items.Count <= 0)
+            if (ListView1.Items.Count == 0)
                 return;
 
-            // Callback to return the result of the hit test.
-            // ReSharper disable once ConvertToLocalFunction
-            HitTestResultCallback myHitTestResult = result =>
+            var cell = sender switch
             {
-                var hit = result.VisualHit;
-
-                if (hit is Border)
-                    hit = Extensions.Extensions.FindAncestorOrSelf<Button>(hit);
-
-                if (!(hit is TextBlock || hit is Button))
-                    return HitTestResultBehavior.Stop;
-
-                // Traverse up the VisualTree and find the DataGridCell.
-                var col = Extensions.Extensions.FindAncestorOrSelf<DataGridCell>(hit);
-
-                // Traverse up the VisualTree and find the DataGridRow.
-                var row = Extensions.Extensions.FindAncestorOrSelf<DataGridRow>(hit);
-
-                lblCursorPosition.Text = $"Over {col.Column.Header} at (Row: {row.GetIndex() + 1}, Col: {col.Column.DisplayIndex + 1})";
-
-                // Set the behavior to return visuals at all z-order levels.
-                return HitTestResultBehavior.Continue;
+                DataGridCell dgc => dgc,
+                TextBlock tb => tb.Parent as DataGridCell,
+                Button button => button.Parent as DataGridCell,
+                _ => throw new ArgumentOutOfRangeException()
             };
-
-            // Set up a callback to receive the hit test result enumeration.
-            VisualTreeHelper.HitTest((Visual) sender, null, myHitTestResult, new PointHitTestParameters(e.GetPosition((UIElement) sender)));
+            if (cell != null)
+                lblCursorPosition.Text = $"Over {cell.Column.Header} at (Row: {Grid.GetRow(cell) + 1}, Col: {cell.Column.DisplayIndex + 1})";
         }
 
 
@@ -319,23 +271,16 @@ namespace ORM_Monitor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MyButton_MouseEnter(object sender, MouseEventArgs e)
+        private static void MyButton_MouseEnter(object sender, MouseEventArgs e)
         {
             if (!(sender is Button btn))
                 return;
 
-            ListView1_MouseEnter(sender, e);
-
-            try
+            Mouse.OverrideCursor = Cursors.Hand;
+            btn.Background = new ImageBrush
             {
-                Mouse.OverrideCursor = Cursors.Hand;
-                btn.Background = new ImageBrush
-                {
-                    ImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Button-Hover.bmp"))
-                };
-            }
-            catch (FileNotFoundException)
-            { }
+                ImageSource = (ImageSource)Application.Current.Resources["Button-Hover"]
+            };
         }
 
 
@@ -344,23 +289,16 @@ namespace ORM_Monitor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MyButton_MouseLeave(object sender, MouseEventArgs e)
+        private static void MyButton_MouseLeave(object sender, MouseEventArgs e)
         {
             if (!(sender is Button btn))
                 return;
 
-            ListView1_MouseLeave(sender, e);
-
-            try
+            Mouse.OverrideCursor = Cursors.Arrow;
+            btn.Background = new ImageBrush
             {
-                Mouse.OverrideCursor = Cursors.Arrow;
-                btn.Background = new ImageBrush
-                {
-                    ImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Button-Normal.bmp"))
-                };
-            }
-            catch (FileNotFoundException)
-            { }
+                ImageSource = (ImageSource)Application.Current.Resources["Button-Normal"]
+            };
         }
 
 
@@ -369,20 +307,15 @@ namespace ORM_Monitor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MyButton_MouseDown(object sender, MouseButtonEventArgs e)
+        private static void MyButton_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!(sender is Button btn))
+            if (!(sender is DataGridCell cell))
                 return;
 
-            try
+            cell.Background = new ImageBrush
             {
-                btn.Background = new ImageBrush
-                {
-                    ImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Button-Pressed.bmp"))
-                };
-            }
-            catch (FileNotFoundException)
-            { }
+                ImageSource = (ImageSource)Application.Current.Resources["Button-Pressed"]
+            };
         }
     }
 }

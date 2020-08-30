@@ -4,91 +4,54 @@
 // Author:   Latency McLaughlin
 // Date:     08/28/2020
 // ****************************************************************************
+// ReSharper disable InconsistentNaming
 
 using System;
-using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using AsyncTask.DTO;
 using ORM_Monitor.Interfaces;
 
 namespace ORM_Monitor.Models
 {
-    public class TaskRecordSet : TaskRecordSetBase, ITaskRecordSet
+    public sealed class TaskRecordSet : TaskInfo, ITaskRecordSet
     {
-        /// <inheritdoc />
-        [GridColumn(Header = "ID", Name = "ColID", Width = 30, IsReadOnly = true)]
-        public int ID
+        public TaskRecordSet()
         {
-            get => Get<int>(MethodBase.GetCurrentMethod().Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
+            Name = ToString();
         }
 
-        /// <inheritdoc />
-        [GridColumn(Header = "TaskName", Name = "ColTask", Width = 80, IsReadOnly = true)]
-        public string Name
+        [GridColumn(Width = 80, IsReadOnly = true)]
+        public int ID { get; set; } = new Random().Next();
+
+        [GridColumn(Width = 80, IsReadOnly = true, Visibility = Visibility.Collapsed)]
+        public override string Name
         {
-            get => Get<string>(MethodBase.GetCurrentMethod().Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
+            get => base.Name;
+            set => base.Name = value;
         }
 
-        /// <inheritdoc />
-        [GridColumn(Name = "ColDescription", Width = 280, IsReadOnly = true, Visibility = Visibility.Collapsed)]
-        public string Description
-        {
-            get => Get<string>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
+        [GridColumn(Width = 280, IsReadOnly = true, Visibility = Visibility.Collapsed)]
+        public string Description { get; set; }
 
-        /// <inheritdoc />
-        [GridColumn(Name = "ColPriority", Width = 50, IsReadOnly = true)]
-        public int Priority
-        {
-            get => Get<int>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
+        [GridColumn(Width = 50, IsReadOnly = true)]
+        public int Priority { get; set; }
 
-        /// <inheritdoc />
-        [GridColumn(Name = "ColProgress", Width = 60, IsReadOnly = true)]
-        public ushort Progress
-        {
-            get => Get<ushort>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
+        [GridColumn(Width = 60, IsReadOnly = true)]
+        public ushort Progress { get; set; }
 
-        /// <inheritdoc />
-        [GridColumn(Name = "ColStatus", Width = 100, IsReadOnly = true)]
-        public TaskStatus Status
-        {
-            get => Get<TaskStatus>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
+        [GridColumn(Width = 100, IsReadOnly = true)]
+        public Button Action { get; set; }
 
-        /// <inheritdoc />
-        [GridColumn(Name = "ColAction", Width = 100, IsReadOnly = true)]
-        public Button Action
-        {
-            get => Get<Button>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
+        [GridColumn(Width = 120, IsReadOnly = true)]
+        public DateTime? Date { get; set; } = DateTime.Now;
 
-        /// <inheritdoc />
-        [GridColumn(Name = "ColDate", Width = 120, IsReadOnly = true)]
-        public DateTime? Date
-        {
-            get => Get<DateTime?>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
-
-        /// <inheritdoc />
         [GridColumn(IsReadOnly = true, Visibility = Visibility.Collapsed)]
-        public object Tag
-        {
-            get => Get<object>(MethodBase.GetCurrentMethod()?.Name.Substring(4));
-            set => Set(MethodBase.GetCurrentMethod()?.Name.Substring(4), value);
-        }
+        public Window Owner { get; set; }
 
-        /// <inheritdoc />
+        [GridColumn(IsReadOnly = true, Visibility = Visibility.Collapsed)]
+        public DataGridRow GridRow { get; set; }
+
         public override string ToString() => $"Task Scheduler #{ID}";
     }
 }

@@ -8,8 +8,7 @@
         Height="389"
         Width="705"
         WindowStyle="ThreeDBorderWindow"
-        Closed="Window_Closed"
-        Icon="pack://application:,,,../Resources/project.ico">
+        Closed="Window_Closed">
     <Window.Resources>
         <ControlTemplate x:Key="ButtonControlTemplate1" TargetType="{x:Type Button}">
             <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" Height="20" CornerRadius="5"

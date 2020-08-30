@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
+    <TargetFrameworks>net48</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Properties\snKey.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
@@ -13,6 +14,7 @@
     <RootNamespace>ORM_Monitor</RootNamespace>
     <AssemblyName>AsyncTaskViewer</AssemblyName>
     <StartupObject>ORM_Monitor.Views.App</StartupObject>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +23,27 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DLL\AsyncTask.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Add.bmp" />
+    <Resource Include="Resources\Button-Hover.bmp" />
+    <Resource Include="Resources\Button-Normal.bmp" />
+    <Resource Include="Resources\Button-Pressed.bmp" />
+    <Resource Include="Resources\Cancel.bmp" />
+    <Resource Include="Resources\Checked.bmp" />
+    <Resource Include="Resources\Heart.bmp" />
+    <Resource Include="Resources\Image-0.bmp" />
+    <Resource Include="Resources\Image-1.bmp" />
+    <Resource Include="Resources\Image-2.bmp" />
+    <Resource Include="Resources\Image-3.bmp" />
+    <Resource Include="Resources\Image-4.bmp" />
+    <Resource Include="Resources\Image-5.bmp" />
+    <Resource Include="Resources\Image-6.bmp" />
+    <Resource Include="Resources\Image-7.bmp" />
+    <Resource Include="Resources\Lamp.bmp" />
+    <Resource Include="Resources\project.ico" />
+    <Resource Include="Resources\Token.bmp" />
   </ItemGroup>
 
 </Project>

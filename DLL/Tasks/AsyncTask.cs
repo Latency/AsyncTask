@@ -6,17 +6,18 @@
 // ****************************************************************************
 
 using System;
-using System.Threading.Tasks;
 using AsyncTask.DTO;
+using AsyncTask.EventArgs;
 
 namespace AsyncTask.Tasks
 {
-    public sealed class AsyncTask : TaskBase<Action<AsyncTask>, AsyncTask, TaskInfo, TaskList, Task>
+    public sealed class AsyncTask : TaskBase<AsyncTask, TaskInfo, TaskList, Action<AsyncTask, TaskEventArgs<TaskInfo, TaskList>>>
     {
         public AsyncTask()
         {
             Parent = this;
-            Wrap();
         }
+
+        protected override AsyncTask Parent { get; }
     }
 }

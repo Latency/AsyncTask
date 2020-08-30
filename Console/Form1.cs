@@ -17,10 +17,15 @@ namespace ConsoleApp1
 {
     public partial class Form1 : Form
     {
+        private event EventHandler OnButtonChanged;
         private readonly ILogger _logger;
         private ButtonType _buttonType;
         private AsyncTask.Tasks.AsyncTask _t2;
 
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
         public Form1()
         {
             InitializeComponent();
@@ -28,20 +33,6 @@ namespace ConsoleApp1
             ButtonDisable.Enabled = false;
             _logger = new Logger(TextBoxMessageLog);
         }
-
-        public ButtonType State
-        {
-            get => _buttonType;
-            set
-            {
-                if (_buttonType == value)
-                    return;
-                _buttonType = value;
-                OnButtonChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        private event EventHandler OnButtonChanged;
 
 
         private void TextBoxMessageLog_TextChanged(object sender, EventArgs e)
@@ -71,7 +62,13 @@ namespace ConsoleApp1
         }
 
 
-        private void ChangeState(ButtonType type) => State = type;
+        private void ChangeState(ButtonType type)
+        {
+            if (_buttonType == type)
+                return;
+            _buttonType = type;
+            OnButtonChanged?.Invoke(this, EventArgs.Empty);
+        }
 
 
         private void ButtonEnable_Click(object sender, EventArgs e)
@@ -87,10 +84,7 @@ namespace ConsoleApp1
                 Timeout = timeout < 0 ? (TimeSpan?) null : TimeSpan.FromSeconds(timeout),
                 Logger = _logger,
                 TaskList = new TaskList(),
-                Delegate = (asyncTask, args) =>
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(blockTime));
-                },
+                Delegate = (asyncTask, args) => Thread.Sleep(TimeSpan.FromSeconds(blockTime)),
                 OnAdd = (asyncTask, args) =>
                 {
                     _logger.Warning($"Executing **** t2 **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
@@ -104,6 +98,7 @@ namespace ConsoleApp1
             _t2.Start();
         }
 
+
         private void ButtonDisable_Click(object sender, EventArgs e)
         {
             if (_t2 == null)
@@ -112,6 +107,7 @@ namespace ConsoleApp1
             ButtonDisable.InvokeIfRequired(() => ButtonDisable.Enabled = false, new EventHandler(ButtonDisable_Click), sender, e);
             _t2.Cancel();
         }
+
 
         private void ButtonClear_Click(object sender, EventArgs e)
         {

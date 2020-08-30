@@ -8,8 +8,10 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using AsyncTask.Interfaces;
+using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Interfaces
 {
@@ -39,11 +41,6 @@ namespace ORM_Monitor.Interfaces
         ushort Progress { get; set; }
 
         /// <summary>
-        ///     Status
-        /// </summary>
-        TaskStatus Status { get; set; }
-
-        /// <summary>
         ///     Action
         /// </summary>
         Button Action { get; set; }
@@ -54,8 +51,13 @@ namespace ORM_Monitor.Interfaces
         DateTime? Date { get; set; }
 
         /// <summary>
-        ///     Tag
+        ///     Owner
         /// </summary>
-        object Tag { get; set; }
+        Window Owner { get; set; }
+
+        /// <summary>
+        ///     View
+        /// </summary>
+        DataGridRow GridRow { get; set; }
     }
 }

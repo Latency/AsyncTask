@@ -6,19 +6,20 @@
 // ****************************************************************************
 
 using System;
-using System.Threading.Tasks;
 using AsyncTask.DTO;
+using AsyncTask.EventArgs;
 using AsyncTask.Tasks;
 using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Tasks
 {
-    public sealed class AsyncTask : TaskBase<Action<AsyncTask>, AsyncTask, TaskRecordSet, TaskList, Task>
+    public sealed class AsyncTask : TaskBase<AsyncTask, TaskRecordSet, TaskList, Action<AsyncTask, TaskEventArgs<TaskRecordSet, TaskList>>>
     {
         public AsyncTask()
         {
             Parent = this;
-            Wrap();
         }
+
+        protected override AsyncTask Parent { get; }
     }
 }

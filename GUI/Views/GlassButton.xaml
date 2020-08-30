@@ -1,5 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <BitmapImage x:Key="Button-Hover" UriSource="../Resources/Button-Hover.bmp" />
+    <BitmapImage x:Key="Button-Normal" UriSource="../Resources/Button-Normal.bmp" />
+    <BitmapImage x:Key="Button-Pressed" UriSource="../Resources/Button-Pressed.bmp" />
     <Style x:Key="GlassButton" TargetType="{x:Type Button}">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="Black" />

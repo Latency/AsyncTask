@@ -6,6 +6,8 @@
 // ****************************************************************************
 
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace ORM_Monitor.Extensions

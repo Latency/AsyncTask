@@ -7,7 +7,7 @@
 ## Task-based Asynchronous Pattern ([TAP])
 
 * CREATED BY:   [Latency McLaughlin]
-* FRAMEWORK:    [.NET] v4.5 - v5.0, Standard 2.1, & Core v[3.1](https://www.microsoft.com/net/download/windows)
+* FRAMEWORK:    [.NET] v4.5 - v5.0, & Core v[3.1](https://www.microsoft.com/net/download/windows)
 * LANGUAGE:     [C#] (v8.0)
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2019, 2017, 2015, 2013, 2012, 2010, 2008
