@@ -80,6 +80,7 @@ namespace ORM_Monitor.Views
                     try
                     {
                         asyncTask.Cancel();
+                        MyButton_MouseDown(sender, null);
                         btn.IsEnabled = false;
                     }
                     catch (Exception ex)
@@ -107,20 +108,23 @@ namespace ORM_Monitor.Views
                 },
                 Delegate = (asyncTask, args) =>
                 {
-                    while (!asyncTask.IsCancellationRequested)
+                    while (!asyncTask.IsCancellationRequested && args.TaskInfo.Progress < 100)
                     {
                         args.TaskInfo.Progress += 1;
 
                         // Pulse
                         Thread.Sleep(100);
                     }
+                    if (!asyncTask.IsCancellationRequested)
+                        asyncTask.Cancel();
                 },
                 OnAdd = (asyncTask, args) =>
                 {
                     _dispatcher.Invoke(() =>
                     {
                         var rst = args.TaskInfo;
-                        
+                        rst.Tag = (asyncTask, args);
+
                         lblStatusBar.Text = $"Starting task \"{rst.Name}\".";
                         var index = ListView1.Items.Add(rst);
                         ListView1.UpdateLayout();
@@ -134,52 +138,55 @@ namespace ORM_Monitor.Views
                         foreach (DataGridCell b in a.Children)
                         {
                             b.Name = b.Column.Header.ToString();
-                            if (b.Name != "Action")
-                                continue;
-                            var btn = Extensions.Extensions.FindFirstChild<Button>(b.Content as FrameworkElement);
-                            btn.Content = "Stop";
-                            btn.Tag = (asyncTask, args);
-                            btn.Click += RemoveButton_Click;
-                            btn.MouseDown += MyButton_MouseDown;
-                            btn.MouseEnter += MyButton_MouseEnter;
-                            btn.MouseLeave += MyButton_MouseLeave;
-                            args.TaskInfo.Action = btn;
-                            break;
+                            switch (b.Name)
+                            {
+                                case "Action":
+                                    var btn = Extensions.Extensions.FindFirstChild<Button>(b.Content as FrameworkElement);
+                                    btn.Content = "Stop";
+                                    btn.Tag = (asyncTask, args);
+                                    btn.Click += RemoveButton_Click;
+                                    btn.MouseDown += MyButton_MouseDown;
+                                    btn.MouseEnter += MyButton_MouseEnter;
+                                    btn.MouseLeave += MyButton_MouseLeave;
+                                    args.TaskInfo.Action = btn;
+                                    break;
+                                case "ID":
+                                    rst.ID = new Random().Next();
+                                    break;
+                                case "Priority":
+                                    rst.Priority = new Random().Next(0, 5);
+                                    break;
+                                case "Date":
+                                    rst.Date = DateTime.Now;
+                                    break;
+                            }
                         }
                     });
                 },
-                //OnComplete = (asyncTask, args) =>
-                //{
-                //    var ts = args.TaskInfo;
-                //    var service = ts.Tag as TaskService;
-                //    service?.Owner.Dispatcher.Invoke(() =>
-                //    {
-                //        ts.Action.Content = "Remove";
-                //        ts.Progress = 100;
-                //        ts.Status = TaskStatus.RanToCompletion;
-                //    });
-                //},
-                //OnTimeout = (asyncTask, args) =>
-                //{
-                //    var ts = args.TaskInfo;
-                //    var service = ts.Tag as TaskService;
-                //    service?.Owner.Dispatcher.Invoke(() =>
-                //    {
-                //        ts.Action.IsEnabled = true;
-                //        ts.Action.Content = "Remove";
-                //        ts.Status = TaskStatus.Faulted;
-                //    });
-                //},
-                //OnCanceled = (asyncTask, args) =>
-                //{
-                //    var service = args.TaskInfo.Tag as TaskService;
-                //    service?.Owner.Dispatcher.Invoke(() =>
-                //    {
-                //        args.TaskInfo.Status = TaskStatus.Canceled;
-                //        args.TaskInfo.Action.IsEnabled = true;
-                //        args.TaskInfo.Action.Content = "Remove";
-                //    });
-                //}
+                OnComplete = (asyncTask, args) =>
+                {
+                    _dispatcher.Invoke(() =>
+                    {
+                        args.TaskInfo.Action.IsEnabled = true;
+                        args.TaskInfo.Action.Content = "Remove";
+                    });
+                },
+                OnTimeout = (asyncTask, args) =>
+                {
+                    _dispatcher.Invoke(() =>
+                    {
+                        args.TaskInfo.Action.IsEnabled = true;
+                        args.TaskInfo.Action.Content = "Remove";
+                    });
+                },
+                OnCanceled = (asyncTask, args) =>
+                {
+                    _dispatcher.Invoke(() =>
+                    {
+                        args.TaskInfo.Action.IsEnabled = true;
+                        args.TaskInfo.Action.Content = "Remove";
+                    });
+                }
             };
 
             // Run the task asynchronously wrapped with the monitor.
@@ -194,11 +201,12 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            Parallel.ForEach(ListView1.Items.Cast<TaskRecordSet>(), rst => {
-                if (!(rst.Action.Tag is (Tasks.AsyncTask asyncTask, TaskEventArgs<TaskRecordSet, TaskList> _)))
+            foreach (var rst in ListView1.Items.Cast<TaskRecordSet>()) {
+                if (!(rst.Tag is (Tasks.AsyncTask asyncTask, TaskEventArgs<TaskRecordSet, TaskList> _)))
                     throw new NullReferenceException();
-                asyncTask.Cancel();
-            });
+                if (!asyncTask.Task.IsCompleted)
+                    RemoveButton_Click(rst.Action, null);
+            }
         }
 
 
@@ -209,7 +217,9 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ListView1.Items.Count > 1)
+            StopButton_Click(this, null);
+
+            if (ListView1.Items.Count > 0)
             {
                 lblStatusBar.Text = @"Clearing task list.";
                 ListView1.Items.Clear();
@@ -309,13 +319,12 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private static void MyButton_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!(sender is DataGridCell cell))
+            if (!(sender is Button btn))
                 return;
 
-            cell.Background = new ImageBrush
-            {
-                ImageSource = (ImageSource)Application.Current.Resources["Button-Pressed"]
-            };
+            btn.MouseEnter -= MyButton_MouseEnter;
+            btn.MouseLeave -= MyButton_MouseLeave;
+            btn.SetValue(BackgroundProperty, new ImageBrush((ImageSource)Application.Current.Resources["Button-Pressed"]));
         }
     }
 }

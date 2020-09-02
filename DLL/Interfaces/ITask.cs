@@ -16,5 +16,6 @@ namespace AsyncTask.Interfaces
         Task Task { get; }
         ILogger Logger { get; set; }
         void Start();
+        void Cancel(bool throwOnFirstException = false);
     }
 }

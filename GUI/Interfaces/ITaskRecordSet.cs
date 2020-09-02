@@ -7,11 +7,9 @@
 // ReSharper disable InconsistentNaming
 
 using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using AsyncTask.Interfaces;
-using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Interfaces
 {
@@ -59,5 +57,10 @@ namespace ORM_Monitor.Interfaces
         ///     View
         /// </summary>
         DataGridRow GridRow { get; set; }
+
+        /// <summary>
+        ///     Tag
+        /// </summary>
+        object Tag { get; set; }
     }
 }

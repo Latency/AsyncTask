@@ -9,7 +9,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using AsyncTask.DTO;
 using AsyncTask.Enums;
 using AsyncTask.EventArgs;
 using AsyncTask.Interfaces;
@@ -27,7 +26,7 @@ namespace AsyncTask.Tasks
     ///     null.
     ///     Note that although collisions are very rare, task identifiers are not guaranteed to be unique.
     /// </remarks>
-    public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask where TTaskInfo : TaskInfo where TTaskList : TaskList where TParent : new()
+    public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask where TTaskInfo : ITaskInfo where TTaskList : ITaskList where TParent : new()
     {
         private TTaskInfo _taskInfo;
         private TTaskList _taskList;
