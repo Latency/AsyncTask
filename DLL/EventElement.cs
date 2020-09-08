@@ -24,6 +24,7 @@ namespace AsyncTask
         public EventElement(params EventHandler<T>[] kDelegateCollection)
         {
             foreach (var kDelegate in kDelegateCollection)
+                // ReSharper disable once VirtualMemberCallInConstructor
                 Eventdelegate += kDelegate;
         }
 
@@ -39,7 +40,7 @@ namespace AsyncTask
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public EventHandler<T> this[int index]
+        public virtual EventHandler<T> this[int index]
         {
             get => (EventHandler<T>) Eventdelegate?.GetInvocationList()[index];
             set
@@ -53,7 +54,7 @@ namespace AsyncTask
         /// <summary>
         ///     Dispose
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (Eventdelegate == null)
                 return;
@@ -61,7 +62,7 @@ namespace AsyncTask
                 Eventdelegate -= (EventHandler<T>) @delegate;
         }
 
-        protected event EventHandler<T> Eventdelegate;
+        protected virtual event EventHandler<T> Eventdelegate;
 
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace AsyncTask
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="message"></param>
-        public void Dispatch(object sender, T message)
+        public virtual void Dispatch(object sender, T message)
         {
             if (Eventdelegate == null)
                 return;
