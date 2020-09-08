@@ -76,8 +76,8 @@ namespace AsyncTask
                 return;
             foreach (var @delegate in Eventdelegate.GetInvocationList())
             {
-                var kDelegate = (EventHandler<T>) @delegate;
-                kDelegate.Invoke(sender, message);
+                var kDelegate = @delegate as EventHandler<T>;
+                kDelegate?.Invoke(sender, message);
             }
         }
 
