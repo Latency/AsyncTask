@@ -1,8 +1,8 @@
 ﻿## Data Model
 
-### Explaination
+### Explanation
 
-  The data model is a set of data structures that lay the base for the businnes logic of an application. In typical object-oriented application, the data model is built of client-side classes and collections. Typically, it is somehow stored into a Database Management System, however how the data is exactly stored is not a concern of [MVC].  In fact, other than speed in it's performance, models stored within the DBMS is not as efficient as an ORM based one.
+  The data model is a set of data structures that lay the base for the business logic of an application. In typical object-oriented application, the data model is built of client-side classes and collections. Typically, it is somehow stored into a Database Management System, however how the data is exactly stored is not a concern of [MVC].  In fact, other than speed in it's performance, models stored within the DBMS is not as efficient as an ORM based one.
   
   There are many references for this and it only makes sense.   Injection efforts and security risks are not of a concern as old myths die hard dictate.   Dynamic and parametric polymorphic efforts show that RT constructs perform with much better flexibility and tightly coupled integration within a projects design.
   
