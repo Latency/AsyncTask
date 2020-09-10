@@ -6,16 +6,20 @@
 // ****************************************************************************
 
 using System;
+using AsyncTask.Interfaces;
 
 namespace AsyncTask
 {
-    public class EventElement<T> : IDisposable
+    public sealed class EventElement<T> : IEventElement<T>
     {
+
+
         /// <summary>
         ///     Constructor (default)
         /// </summary>
         public EventElement()
         { }
+
 
         /// <summary>
         ///     Constructor (overload + 1)
@@ -25,14 +29,20 @@ namespace AsyncTask
         {
             foreach (var kDelegate in kDelegateCollection)
                 // ReSharper disable once VirtualMemberCallInConstructor
-                Eventdelegate += kDelegate;
+                EventDelegate += kDelegate;
         }
+
+
+        /// <summary>
+        ///     EventDelegate
+        /// </summary>
+        public event EventHandler<T> EventDelegate;
 
 
         /// <summary>
         ///     Count
         /// </summary>
-        public int Count => Eventdelegate?.GetInvocationList().Length ?? 0;
+        public int Count => EventDelegate?.GetInvocationList().Length ?? 0;
 
 
         /// <summary>
@@ -40,13 +50,13 @@ namespace AsyncTask
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public virtual EventHandler<T> this[int index]
+        public EventHandler<T> this[int index]
         {
-            get => (EventHandler<T>) Eventdelegate?.GetInvocationList()[index];
+            get => (EventHandler<T>) EventDelegate?.GetInvocationList()[index];
             set
             {
-                if (Eventdelegate != null)
-                    Eventdelegate.GetInvocationList()[index] = value;
+                if (EventDelegate != null)
+                    EventDelegate.GetInvocationList()[index] = value;
             }
         }
 
@@ -54,15 +64,13 @@ namespace AsyncTask
         /// <summary>
         ///     Dispose
         /// </summary>
-        public virtual void Dispose()
+        public void Dispose()
         {
-            if (Eventdelegate == null)
+            if (EventDelegate == null)
                 return;
-            foreach (var @delegate in Eventdelegate.GetInvocationList())
-                Eventdelegate -= (EventHandler<T>) @delegate;
+            foreach (var @delegate in EventDelegate.GetInvocationList())
+                EventDelegate -= (EventHandler<T>) @delegate;
         }
-
-        protected virtual event EventHandler<T> Eventdelegate;
 
 
         /// <summary>
@@ -70,11 +78,11 @@ namespace AsyncTask
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="message"></param>
-        public virtual void Dispatch(object sender, T message)
+        public void Dispatch(object sender, T message)
         {
-            if (Eventdelegate == null)
+            if (EventDelegate == null)
                 return;
-            foreach (var @delegate in Eventdelegate.GetInvocationList())
+            foreach (var @delegate in EventDelegate.GetInvocationList())
             {
                 var kDelegate = @delegate as EventHandler<T>;
                 kDelegate?.Invoke(sender, message);
@@ -83,28 +91,16 @@ namespace AsyncTask
 
 
         /// <summary>
-        ///     Operator +
+        ///     Add
         /// </summary>
-        /// <param name="kElement"></param>
         /// <param name="kDelegate"></param>
-        /// <returns>kElement</returns>
-        public static EventElement<T> operator +(EventElement<T> kElement, EventHandler<T> kDelegate)
-        {
-            kElement.Eventdelegate += kDelegate;
-            return kElement;
-        }
+        public void Add(EventHandler<T> kDelegate) => EventDelegate += kDelegate;
 
 
         /// <summary>
-        ///     Operator -
+        ///     Remove
         /// </summary>
-        /// <param name="kElement"></param>
         /// <param name="kDelegate"></param>
-        /// <returns>kElement</returns>
-        public static EventElement<T> operator -(EventElement<T> kElement, EventHandler<T> kDelegate)
-        {
-            kElement.Eventdelegate -= kDelegate;
-            return kElement;
-        }
+        public void Remove(EventHandler<T> kDelegate) => EventDelegate -= kDelegate;
     }
 }
