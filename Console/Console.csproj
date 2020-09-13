@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Properties\snKey.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
-    <Description>Asynchronous Task Extension Application</Description>
+    <TargetFrameworks>net48</TargetFrameworks>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2020</Copyright>
     <Authors>Latency McLaughlin</Authors>
     <UseWindowsForms>true</UseWindowsForms>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ConsoleApp1</RootNamespace>
-    <AssemblyName>ConsoleApp</AssemblyName>
     <StartupObject>ConsoleApp1.Program</StartupObject>
   </PropertyGroup>
 

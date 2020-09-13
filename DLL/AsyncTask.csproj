@@ -5,10 +5,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Properties\snKey.snk</AssemblyOriginatorKeyFile>
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
-    <PackageIcon>..\Properties\project.ico</PackageIcon>
+    <PackageIcon>Properties\project.png</PackageIcon>
     <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
     <Version>3.0.0</Version>
-    <Description>Object Relational Mapped Monitor Extension Library</Description>
+    <Description>Asynchronous Task Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2020</Copyright>
     <Authors>Latency McLaughlin</Authors>
@@ -21,14 +21,22 @@
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
     <SignTool>C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe</SignTool>
     <AllowPrAeview>true</AllowPrAeview>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' And '$(TargetFramework)' != 'netcoreapp3.1' ">
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  <ItemGroup>
+    <None Include="Properties\project.png">
+      <Pack>True</Pack>
+      <PackagePath>Properties</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

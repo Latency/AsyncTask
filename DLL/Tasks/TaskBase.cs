@@ -206,7 +206,6 @@ namespace AsyncTask.Tasks
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
-                throw new TaskCanceledException();
             }
         }, Token);
     }
