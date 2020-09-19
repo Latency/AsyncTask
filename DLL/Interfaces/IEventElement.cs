@@ -6,13 +6,14 @@
 // ****************************************************************************
 
 using System;
+using System.Collections.Generic;
 
 namespace AsyncTask.Interfaces
 {
-    public interface IEventElement<T> : IDisposable
+    public interface IEventElement<T> : IEvent, IDisposable
     {
+        List<EventHandler<T>> Delegates { get; }
         event EventHandler<T> EventDelegate;
-        int Count { get; }
         EventHandler<T> this[int index] { get; set; }
         void Dispatch(object sender, T message);
         void Add(EventHandler<T> kDelegate);

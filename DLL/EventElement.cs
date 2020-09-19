@@ -6,14 +6,18 @@
 // ****************************************************************************
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using AsyncTask.Interfaces;
 
 namespace AsyncTask
 {
     public sealed class EventElement<T> : IEventElement<T>
     {
+        public static implicit operator List<MethodInfo>(EventElement<T> eventElement) => eventElement.Delegates.Select(d => d.Method).ToList();
 
-
+ 
         /// <summary>
         ///     Constructor (default)
         /// </summary>
@@ -28,8 +32,7 @@ namespace AsyncTask
         public EventElement(params EventHandler<T>[] kDelegateCollection)
         {
             foreach (var kDelegate in kDelegateCollection)
-                // ReSharper disable once VirtualMemberCallInConstructor
-                EventDelegate += kDelegate;
+                Delegates.Add(kDelegate);
         }
 
 
@@ -37,6 +40,12 @@ namespace AsyncTask
         ///     EventDelegate
         /// </summary>
         public event EventHandler<T> EventDelegate;
+
+
+        /// <summary>
+        ///     Delegates
+        /// </summary>
+        public List<EventHandler<T>> Delegates { get; } = new List<EventHandler<T>>();
 
 
         /// <summary>
@@ -68,8 +77,9 @@ namespace AsyncTask
         {
             if (EventDelegate == null)
                 return;
+            Delegates.Clear();
             foreach (var @delegate in EventDelegate.GetInvocationList())
-                EventDelegate -= (EventHandler<T>) @delegate;
+                Remove((EventHandler<T>) @delegate);
         }
 
 
@@ -87,6 +97,26 @@ namespace AsyncTask
                 var kDelegate = @delegate as EventHandler<T>;
                 kDelegate?.Invoke(sender, message);
             }
+        }
+
+
+        /// <summary>
+        ///     Register
+        /// </summary>
+        public void Register(EventInfo evt)
+        {
+            foreach (var @delegate in Delegates)
+                evt.AddEventHandler(this, @delegate);
+        }
+
+
+        /// <summary>
+        ///     UnRegister
+        /// </summary>
+        public void UnRegister(EventInfo evt)
+        {
+            foreach (var @delegate in Delegates)
+                evt.RemoveEventHandler(this, @delegate);
         }
 
 

@@ -7,7 +7,7 @@
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
     <PackageIcon>Properties\project.png</PackageIcon>
     <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <Description>Asynchronous Task Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2020</Copyright>
