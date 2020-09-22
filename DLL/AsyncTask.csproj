@@ -7,13 +7,13 @@
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
     <PackageIcon>Properties\project.png</PackageIcon>
     <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
-    <Version>3.0.1</Version>
+    <Version>3.0.2</Version>
     <Description>Asynchronous Task Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2020</Copyright>
     <Authors>Latency McLaughlin</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageReleaseNotes>Added target support for .NET 5.0, .NET Core 3.1</PackageReleaseNotes>
+    <PackageReleaseNotes>Curries parent context into Reflected AddEventHandler().</PackageReleaseNotes>
     <RepositoryType>GIT</RepositoryType>
     <License>MIT</License>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>

@@ -12,7 +12,7 @@ namespace AsyncTask.Interfaces
     public interface IEvent
     {
         int Count { get; }
-        void Register(EventInfo evt);
-        void UnRegister(EventInfo evt);
+        void Register(object sender, EventInfo evt);
+        void UnRegister(object sender, EventInfo evt);
     }
 }

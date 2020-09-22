@@ -103,20 +103,20 @@ namespace AsyncTask
         /// <summary>
         ///     Register
         /// </summary>
-        public void Register(EventInfo evt)
+        public void Register(object sender, EventInfo evt)
         {
             foreach (var @delegate in Delegates)
-                evt.AddEventHandler(this, @delegate);
+                evt.AddEventHandler(sender, @delegate);
         }
 
 
         /// <summary>
         ///     UnRegister
         /// </summary>
-        public void UnRegister(EventInfo evt)
+        public void UnRegister(object sender, EventInfo evt)
         {
             foreach (var @delegate in Delegates)
-                evt.RemoveEventHandler(this, @delegate);
+                evt.RemoveEventHandler(sender, @delegate);
         }
 
 
