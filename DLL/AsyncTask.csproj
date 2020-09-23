@@ -7,13 +7,13 @@
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
     <PackageIcon>Properties\project.png</PackageIcon>
     <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
-    <Version>3.0.2</Version>
+    <Version>3.0.3</Version>
     <Description>Asynchronous Task Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2020</Copyright>
     <Authors>Latency McLaughlin</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageReleaseNotes>Curries parent context into Reflected AddEventHandler().</PackageReleaseNotes>
+    <PackageReleaseNotes>Added EventCustomElement and operator overloads for registering delegates.</PackageReleaseNotes>
     <RepositoryType>GIT</RepositoryType>
     <License>MIT</License>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>

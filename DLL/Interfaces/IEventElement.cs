@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace AsyncTask.Interfaces
 {
-    public interface IEventElement<T> : IEvent, IDisposable
+    public interface IEventElement<T> : IEvent
     {
         List<EventHandler<T>> Delegates { get; }
         event EventHandler<T> EventDelegate;

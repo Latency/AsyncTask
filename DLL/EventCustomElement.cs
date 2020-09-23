@@ -13,15 +13,15 @@ using AsyncTask.Interfaces;
 
 namespace AsyncTask
 {
-    public sealed class EventElement<T> : IEventElement<T>
+    public class EventCustomElement<TSender, TEventArgs> : IEventCustomElement<TSender, TEventArgs>
     {
-        public static implicit operator List<MethodInfo>(EventElement<T> eventElement) => eventElement.Delegates.Select(d => d.Method).ToList();
+        public static implicit operator List<MethodInfo>(EventCustomElement<TSender, TEventArgs> eventElement) => eventElement.Delegates.Select(d => d.Method).ToList();
 
- 
+
         /// <summary>
         ///     Constructor (default)
         /// </summary>
-        public EventElement()
+        public EventCustomElement()
         { }
 
 
@@ -29,23 +29,28 @@ namespace AsyncTask
         ///     Constructor (overload + 1)
         /// </summary>
         /// <param name="kDelegateCollection"></param>
-        public EventElement(params EventHandler<T>[] kDelegateCollection)
+        public EventCustomElement(params Action<TSender, TEventArgs>[] kDelegateCollection)
         {
             foreach (var kDelegate in kDelegateCollection)
-                Delegates.Add(kDelegate);
+                EventDelegate += kDelegate;
         }
-
+        
 
         /// <summary>
         ///     EventDelegate
         /// </summary>
-        public event EventHandler<T> EventDelegate;
+        protected event Action<TSender, TEventArgs> EventDelegate;
+        event Action<TSender, TEventArgs> IEventCustomElement<TSender, TEventArgs>.EventDelegate
+        {
+            add => EventDelegate += value;
+            remove => EventDelegate -= value;
+        }
 
 
         /// <summary>
         ///     Delegates
         /// </summary>
-        public List<EventHandler<T>> Delegates { get; } = new List<EventHandler<T>>();
+        public List<Action<TSender, TEventArgs>> Delegates { get; } = new List<Action<TSender, TEventArgs>>();
 
 
         /// <summary>
@@ -59,9 +64,9 @@ namespace AsyncTask
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public EventHandler<T> this[int index]
+        public Action<TSender, TEventArgs> this[int index]
         {
-            get => (EventHandler<T>) EventDelegate?.GetInvocationList()[index];
+            get => (Action<TSender, TEventArgs>) EventDelegate?.GetInvocationList()[index];
             set
             {
                 if (EventDelegate != null)
@@ -77,9 +82,8 @@ namespace AsyncTask
         {
             if (EventDelegate == null)
                 return;
-            Delegates.Clear();
             foreach (var @delegate in EventDelegate.GetInvocationList())
-                Remove((EventHandler<T>) @delegate);
+                EventDelegate -= (Action<TSender, TEventArgs>) @delegate;
         }
 
 
@@ -88,13 +92,13 @@ namespace AsyncTask
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="message"></param>
-        public void Dispatch(object sender, T message)
+        public void Dispatch(TSender sender, TEventArgs message)
         {
             if (EventDelegate == null)
                 return;
             foreach (var @delegate in EventDelegate.GetInvocationList())
             {
-                var kDelegate = @delegate as EventHandler<T>;
+                var kDelegate = @delegate as Action<TSender, TEventArgs>;
                 kDelegate?.Invoke(sender, message);
             }
         }
@@ -106,7 +110,7 @@ namespace AsyncTask
         /// <param name="kElement"></param>
         /// <param name="kDelegate"></param>
         /// <returns>kElement</returns>
-        public static EventElement<T> operator +(EventElement<T> kElement, EventHandler<T> kDelegate)
+        public static EventCustomElement<TSender, TEventArgs> operator +(EventCustomElement<TSender, TEventArgs> kElement, Action<TSender, TEventArgs> kDelegate)
         {
             kElement.EventDelegate += kDelegate;
             return kElement;
@@ -119,7 +123,7 @@ namespace AsyncTask
         /// <param name="kElement"></param>
         /// <param name="kDelegate"></param>
         /// <returns>kElement</returns>
-        public static EventElement<T> operator -(EventElement<T> kElement, EventHandler<T> kDelegate)
+        public static EventCustomElement<TSender, TEventArgs> operator -(EventCustomElement<TSender, TEventArgs> kElement, Action<TSender, TEventArgs> kDelegate)
         {
             kElement.EventDelegate -= kDelegate;
             return kElement;
@@ -150,13 +154,13 @@ namespace AsyncTask
         ///     Add
         /// </summary>
         /// <param name="kDelegate"></param>
-        public void Add(EventHandler<T> kDelegate) => EventDelegate += kDelegate;
+        public void Add(Action<TSender, TEventArgs> kDelegate) => EventDelegate += kDelegate;
 
 
         /// <summary>
         ///     Remove
         /// </summary>
         /// <param name="kDelegate"></param>
-        public void Remove(EventHandler<T> kDelegate) => EventDelegate -= kDelegate;
+        public void Remove(Action<TSender, TEventArgs> kDelegate) => EventDelegate -= kDelegate;
     }
 }
