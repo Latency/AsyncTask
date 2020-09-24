@@ -26,7 +26,10 @@ namespace AsyncTask.Tasks
     ///     null.
     ///     Note that although collisions are very rare, task identifiers are not guaranteed to be unique.
     /// </remarks>
-    public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask where TTaskInfo : ITaskInfo where TTaskList : ITaskList where TParent : new()
+    public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask
+        where TTaskInfo : ITaskInfo
+        where TTaskList : ITaskList
+        where TParent : new()
     {
         private TTaskInfo _taskInfo;
         private TTaskList _taskList;
@@ -78,7 +81,7 @@ namespace AsyncTask.Tasks
         public TTaskList TaskList
         {
             get => _eventArgs.TaskList;
-            set =>_taskList = value;
+            set => _taskList = value;
         }
 
         
@@ -143,7 +146,7 @@ namespace AsyncTask.Tasks
                 try
                 {
                     DebugStatus(TaskType.Task, "Adding task");
-                    var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
+                    var taskList = TaskList as ConcurrentDictionary<ITaskInfo, ITask>;
                     taskList?.TryAdd(TaskInfo, this);
                     OnAdd?.Invoke(Parent, _eventArgs);
 
