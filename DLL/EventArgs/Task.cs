@@ -15,19 +15,17 @@ namespace AsyncTask.EventArgs
 {
     public class TaskEventArgs<TTaskInfo, TTaskList> : System.EventArgs where TTaskInfo : ITaskInfo where TTaskList : ITaskList
     {
-        public TaskEventArgs(Task task, TTaskInfo taskInfo, TTaskList taskList, ILogger logger)
+        public TaskEventArgs(Task task, ILogger logger)
         {
             Task = task;
-            TaskInfo = taskInfo;
-            TaskList = taskList;
             Logger = logger ?? new DefaultLogger();
         }
 
         public Task Task { get; }
 
-        public TTaskInfo TaskInfo { get; }
+        public TTaskInfo TaskInfo { get; set; }
 
-        public TTaskList TaskList { get; }
+        public TTaskList TaskList { get; set; }
 
         public ILogger Logger { get; }
 

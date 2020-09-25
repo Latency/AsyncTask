@@ -31,10 +31,8 @@ namespace AsyncTask.Tasks
         where TTaskList : ITaskList
         where TParent : new()
     {
-        private TTaskInfo _taskInfo;
-        private TTaskList _taskList;
         private ILogger _logger;
-        private TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
+        private readonly TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
         private bool TimeOut => Timeout != null && DateTime.Now >= _eventArgs.TaskStartTime.Add((TimeSpan)Timeout);
         private void DebugStatus(TaskType type, string msg) => Logger.Debug($"{type} '{TaskInfo.Name}':  {msg}");
 
@@ -45,6 +43,15 @@ namespace AsyncTask.Tasks
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError { get; set; }
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnCanceled { get; set; }
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout { get; set; }
+
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        protected TaskBase()
+        {
+            _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList>(Wrap(), _logger);
+        }
 
 
         /// <summary>
@@ -71,7 +78,7 @@ namespace AsyncTask.Tasks
         public TTaskInfo TaskInfo
         {
             get => _eventArgs.TaskInfo;
-            set => _taskInfo = value;
+            set => _eventArgs.TaskInfo = value;
         }
 
 
@@ -81,7 +88,7 @@ namespace AsyncTask.Tasks
         public TTaskList TaskList
         {
             get => _eventArgs.TaskList;
-            set => _taskList = value;
+            set => _eventArgs.TaskList = value;
         }
 
         
@@ -107,8 +114,6 @@ namespace AsyncTask.Tasks
         /// </summary>
         public void Start()
         {
-            _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList>(Wrap(), _taskInfo, _taskList, _logger);
-
             var isCompleted = false;
 
             Task.Run(async () =>
@@ -146,8 +151,15 @@ namespace AsyncTask.Tasks
                 try
                 {
                     DebugStatus(TaskType.Task, "Adding task");
-                    var taskList = TaskList as ConcurrentDictionary<ITaskInfo, ITask>;
-                    taskList?.TryAdd(TaskInfo, this);
+
+                    if (TaskList != null)
+                    {
+                        if (!(TaskList is ConcurrentDictionary<ITaskInfo, ITask> taskList))
+                            throw new NullReferenceException();
+
+                        taskList.TryAdd(TaskInfo, this);
+                    }
+
                     OnAdd?.Invoke(Parent, _eventArgs);
 
                     var po = new ParallelOptions
@@ -181,8 +193,15 @@ namespace AsyncTask.Tasks
                 Dispose(); // Cancellation token
                 _eventArgs.Task.Dispose();
                 DebugStatus(TaskType.Task, "Removing task");
-                var taskList = TaskList as ConcurrentDictionary<TTaskInfo, ITask>;
-                taskList?.TryRemove(TaskInfo, out _);
+
+                if (TaskList != null)
+                {
+                    if (!(TaskList is ConcurrentDictionary<ITaskInfo, ITask> taskList))
+                        throw new NullReferenceException();
+
+                    taskList.TryRemove(TaskInfo, out _);
+                }
+
                 OnRemove?.Invoke(Parent, _eventArgs);
             });
         }
