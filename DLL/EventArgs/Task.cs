@@ -9,16 +9,14 @@ using System;
 using System.Threading.Tasks;
 using AsyncTask.Extensions;
 using AsyncTask.Interfaces;
-using AsyncTask.Logging;
 
 namespace AsyncTask.EventArgs
 {
     public class TaskEventArgs<TTaskInfo, TTaskList> : System.EventArgs where TTaskInfo : ITaskInfo where TTaskList : ITaskList
     {
-        public TaskEventArgs(Task task, ILogger logger)
+        public TaskEventArgs(Task task)
         {
             Task = task;
-            Logger = logger ?? new DefaultLogger();
         }
 
         public Task Task { get; }
@@ -27,7 +25,7 @@ namespace AsyncTask.EventArgs
 
         public TTaskList TaskList { get; set; }
 
-        public ILogger Logger { get; }
+        public ILogger Logger { get; set; }
 
         public Exception Exception { get; set; }
 

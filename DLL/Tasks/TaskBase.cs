@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using AsyncTask.Enums;
 using AsyncTask.EventArgs;
 using AsyncTask.Interfaces;
+using AsyncTask.Logging;
 
 namespace AsyncTask.Tasks
 {
@@ -29,9 +30,8 @@ namespace AsyncTask.Tasks
     public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask
         where TTaskInfo : ITaskInfo
         where TTaskList : ITaskList
-        where TParent : new()
+        where TParent : class, new()
     {
-        private ILogger _logger;
         private readonly TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
         private bool TimeOut => Timeout != null && DateTime.Now >= _eventArgs.TaskStartTime.Add((TimeSpan)Timeout);
         private void DebugStatus(TaskType type, string msg) => Logger.Debug($"{type} '{TaskInfo.Name}':  {msg}");
@@ -50,7 +50,7 @@ namespace AsyncTask.Tasks
         /// </summary>
         protected TaskBase()
         {
-            _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList>(Wrap(), _logger);
+            _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList>(Wrap());
         }
 
 
@@ -98,7 +98,7 @@ namespace AsyncTask.Tasks
         public ILogger Logger
         {
             get => _eventArgs.Logger;
-            set => _logger = value;
+            set => _eventArgs.Logger = value;
         }
 
 
@@ -151,6 +151,11 @@ namespace AsyncTask.Tasks
                 try
                 {
                     DebugStatus(TaskType.Task, "Adding task");
+
+                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                    // .Net v4.5 (C#7.3) does not support null Coalecing assignments.
+                    if (Logger == null)
+                        Logger = new DefaultLogger();
 
                     if (TaskList != null)
                     {

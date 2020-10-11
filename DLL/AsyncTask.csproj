@@ -7,13 +7,16 @@
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
     <PackageIcon>Properties\project.png</PackageIcon>
     <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
-    <Version>3.0.5</Version>
+    <Version>3.0.6</Version>
     <Description>Asynchronous Task Extension Library</Description>
     <Company>Bio-Hazard Industries</Company>
     <Copyright>Copyright ©  1998-2020</Copyright>
     <Authors>Latency McLaughlin</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageReleaseNotes>Moved TaskEventArgs into constructor as it fixes late binded property assignments prior to memory being allocated for object.</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      Moves initialization of logger out of contstructor.
+      Allows for late binding for Logger as proper.
+    </PackageReleaseNotes>
     <RepositoryType>GIT</RepositoryType>
     <License>MIT</License>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
