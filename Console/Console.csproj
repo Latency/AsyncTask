@@ -2,11 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>net48</TargetFrameworks>
-    <Company>Bio-Hazard Industries</Company>
-    <Copyright>Copyright ©  1998-2020</Copyright>
-    <Authors>Latency McLaughlin</Authors>
     <UseWindowsForms>true</UseWindowsForms>
     <OutputType>WinExe</OutputType>
+    <AssemblyOriginatorKeyFile>..\..\..\snKey.snk</AssemblyOriginatorKeyFile>
+    <ApplicationIcon>..\..\..\project.ico</ApplicationIcon>
     <StartupObject>ConsoleApp1.Program</StartupObject>
   </PropertyGroup>
 

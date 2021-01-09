@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <SignAssembly>false</SignAssembly>
     <IsPackable>false</IsPackable>
     <OutputType>Library</OutputType>
   </PropertyGroup>

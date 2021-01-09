@@ -3,12 +3,9 @@
   <PropertyGroup>
     <TargetFrameworks>net48</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Properties\snKey.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
+    <AssemblyOriginatorKeyFile>..\..\..\snKey.snk</AssemblyOriginatorKeyFile>
+    <ApplicationIcon>..\..\..\project.ico</ApplicationIcon>
     <Description>Asynchronous Task Extension Application</Description>
-    <Company>Bio-Hazard Industries</Company>
-    <Copyright>Copyright ©  1998-2020</Copyright>
-    <Authors>Latency McLaughlin</Authors>
     <UseWPF>true</UseWPF>
     <OutputType>WinExe</OutputType>
     <RootNamespace>ORM_Monitor</RootNamespace>

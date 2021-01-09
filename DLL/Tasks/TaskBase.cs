@@ -150,12 +150,12 @@ namespace AsyncTask.Tasks
             {
                 try
                 {
-                    DebugStatus(TaskType.Task, "Adding task");
-
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                     // .Net v4.5 (C#7.3) does not support null Coalecing assignments.
                     if (Logger == null)
                         Logger = new DefaultLogger();
+
+                    DebugStatus(TaskType.Task, "Adding task");
 
                     if (TaskList != null)
                     {

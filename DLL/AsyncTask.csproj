@@ -3,28 +3,15 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net45;net472;net48;net5.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Properties\snKey.snk</AssemblyOriginatorKeyFile>
-    <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
+    <AssemblyOriginatorKeyFile>..\..\..\snKey.snk</AssemblyOriginatorKeyFile>
+    <ApplicationIcon>..\..\..\project.ico</ApplicationIcon>
     <PackageIcon>Properties\project.png</PackageIcon>
-    <ApplicationIcon>..\Properties\project.ico</ApplicationIcon>
-    <Version>3.0.6</Version>
+    <Version>3.0.7</Version>
     <Description>Asynchronous Task Extension Library</Description>
-    <Company>Bio-Hazard Industries</Company>
-    <Copyright>Copyright ©  1998-2020</Copyright>
-    <Authors>Latency McLaughlin</Authors>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageReleaseNotes>
-      Moves initialization of logger out of contstructor.
-      Allows for late binding for Logger as proper.
-    </PackageReleaseNotes>
-    <RepositoryType>GIT</RepositoryType>
-    <License>MIT</License>
+    <PackageReleaseNotes>Fixed issue with Logger not getting initialized early enough causing an NRE.</PackageReleaseNotes>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
-    <SignTool>C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe</SignTool>
-    <AllowPrAeview>true</AllowPrAeview>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
