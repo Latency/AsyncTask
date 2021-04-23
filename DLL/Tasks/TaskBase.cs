@@ -9,7 +9,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using AsyncTask.Enums;
 using AsyncTask.EventArgs;
 using AsyncTask.Interfaces;
 using AsyncTask.Logging;
@@ -34,15 +33,15 @@ namespace AsyncTask.Tasks
     {
         private readonly TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
         private bool TimeOut => Timeout != null && DateTime.Now >= _eventArgs.TaskStartTime.Add((TimeSpan)Timeout);
-        private void DebugStatus(TaskType type, string msg) => Logger.Debug($"{type} '{TaskInfo.Name}':  {msg}");
 
-        public TDelegate Delegate { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnAdd { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnRemove { get; set; }
+        public TDelegate                                            Delegate   { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnAdd      { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnRemove   { get; set; }
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnComplete { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError    { get; set; }
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnCanceled { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTick     { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout  { get; set; }
 
 
         /// <summary>
@@ -118,17 +117,13 @@ namespace AsyncTask.Tasks
 
             Task.Run(async () =>
             {
-#if DEBUG
-                var i = -1;
-#endif
                 while (!TimeOut)
                 {
                     if (isCompleted)
                         return;
-#if DEBUG
-                    if (++i > 0)
-                        DebugStatus(TaskType.Monitor, $"Tick #{i}");
-#endif
+
+                    OnTick?.Invoke(Parent, _eventArgs);
+
                     try
                     {
                         // Poll every 1 second.
@@ -155,11 +150,9 @@ namespace AsyncTask.Tasks
                     if (Logger == null)
                         Logger = new DefaultLogger();
 
-                    DebugStatus(TaskType.Task, "Adding task");
-
                     if (TaskList != null)
                     {
-                        if (!(TaskList is ConcurrentDictionary<ITaskInfo, ITask> taskList))
+                        if (TaskList is not ConcurrentDictionary<ITaskInfo, ITask> taskList)
                             throw new NullReferenceException();
 
                         taskList.TryAdd(TaskInfo, this);
@@ -172,7 +165,7 @@ namespace AsyncTask.Tasks
                         CancellationToken = Token,
                         MaxDegreeOfParallelism = Environment.ProcessorCount
                     };
-                    Parallel.ForEach(new[] { _eventArgs.Task }, po, (task, loopState) =>
+                    Parallel.ForEach(new[] { _eventArgs.Task }, po, (task, _) =>
                     {
                         using (Token.Register(Thread.CurrentThread.Abort))
                         {
@@ -197,11 +190,10 @@ namespace AsyncTask.Tasks
             {
                 Dispose(); // Cancellation token
                 _eventArgs.Task.Dispose();
-                DebugStatus(TaskType.Task, "Removing task");
 
                 if (TaskList != null)
                 {
-                    if (!(TaskList is ConcurrentDictionary<ITaskInfo, ITask> taskList))
+                    if (TaskList is not ConcurrentDictionary<ITaskInfo, ITask> taskList)
                         throw new NullReferenceException();
 
                     taskList.TryRemove(TaskInfo, out _);
@@ -215,7 +207,7 @@ namespace AsyncTask.Tasks
         /// <summary>
         ///     Wrap
         /// </summary>
-        private Task Wrap() => new Task(() =>
+        private Task Wrap() => new(() =>
         {
             try
             {

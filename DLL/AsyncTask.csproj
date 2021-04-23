@@ -3,12 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net45;net472;net48;net5.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\snKey.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>..\..\..\project.ico</ApplicationIcon>
+    <AssemblyOriginatorKeyFile>..\..\..\..\aaec.snk</AssemblyOriginatorKeyFile>
     <PackageIcon>Properties\project.png</PackageIcon>
-    <Version>3.0.7</Version>
+    <Version>3.0.8</Version>
     <Description>Asynchronous Task Extension Library</Description>
-    <PackageReleaseNotes>Fixed issue with Logger not getting initialized early enough causing an NRE.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added OnTick event and removed internal logging.</PackageReleaseNotes>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
