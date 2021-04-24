@@ -5,9 +5,11 @@
 // Date:     08/24/2020
 // ****************************************************************************
 
+using System.Collections;
+
 namespace AsyncTask.Interfaces
 {
-    public interface ITaskList
+    public interface ITaskList : IDictionary
     {
     }
 }

@@ -12,10 +12,13 @@ namespace AsyncTask.Interfaces
 {
     public interface ITask
     {
-        TimeSpan? Timeout { get; set; }
-        Task Task { get; }
-        ILogger Logger { get; set; }
-        void Start();
-        void Cancel(bool throwOnFirstException = false);
+        TimeSpan  PollInterval { get; set; }
+        TimeSpan? Timeout      { get; set; }
+        Task      Task         { get; }
+        ILogger   Logger       { get; set; }
+        ITaskInfo TaskInfo     { get; set; }
+        ITaskList TaskList     { get; set; }
+        void      Start();
+        void      Cancel(bool throwOnFirstException = false);
     }
 }
