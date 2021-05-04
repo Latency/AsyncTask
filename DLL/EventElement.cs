@@ -45,7 +45,7 @@ namespace AsyncTask
         /// <summary>
         ///     Delegates
         /// </summary>
-        public List<EventHandler<T>> Delegates { get; } = new List<EventHandler<T>>();
+        public List<EventHandler<T>> Delegates { get; } = new();
 
 
         /// <summary>

@@ -40,13 +40,13 @@ This API has several benefits, such as:
 * Reduce boilerplate code.
 
 -- *Flexible delegate injection for any situation.*
-* Dependancy injection:<br>
+* Dependancy injection:
   Design patterns that implement inversion of control for resolving dependencies.
-* Labmda expressions:<br>
+* Labmda expressions:
   An anonymous function that you can use to create delegates or expression tree types and supersede anonymous methods for writing inline code.
-* Anonymous methods:<br>
+* Anonymous methods:
   Constructs a way to pass a code block as a delegate parameter used in building up the *TaskEvent* class.
-* Generic types:<br>
+* Generic types:
   Independant type parameters act as a placeholder for a specific type that a client specifies when they instantiate a variable of the generic type.
 
 

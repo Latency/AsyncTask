@@ -11,6 +11,6 @@ namespace AsyncTask.DTO
 {
     public class TaskInfo : ITaskInfo
     {
-        public virtual string Name { get; set; }
+        public string Name { get; set; }
     }
 }

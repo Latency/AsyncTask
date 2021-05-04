@@ -9,7 +9,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using AsyncTask.Enums;
 using AsyncTask.EventArgs;
 using AsyncTask.Interfaces;
 using AsyncTask.Logging;
@@ -20,29 +19,27 @@ namespace AsyncTask.Tasks
     ///     AsyncTask
     /// </summary>
     /// <remarks>
-    ///     CurrentId is a static property that is used to get the identifier of the currently executing task from the code
-    ///     that the task is executing.
+    ///     CurrentId is a static property that is used to get the identifier of the currently executing task from the code that the task is executing.
     ///     It differs from the Id property, which returns the identifier of a particular Task instance.
-    ///     If you attempt to retrieve the CurrentId value from outside the code that a task is executing, the property returns
-    ///     null.
+    ///     If you attempt to retrieve the CurrentId value from outside the code that a task is executing, the property returns null.
     ///     Note that although collisions are very rare, task identifiers are not guaranteed to be unique.
     /// </remarks>
     public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask
-        where TTaskInfo : ITaskInfo
-        where TTaskList : ITaskList
-        where TParent : class, new()
+        where TTaskInfo : class, ITaskInfo
+        where TTaskList : class, ITaskList
+        where TParent   : class, new()
     {
         private readonly TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
         private bool TimeOut => Timeout != null && DateTime.Now >= _eventArgs.TaskStartTime.Add((TimeSpan)Timeout);
-        private void DebugStatus(TaskType type, string msg) => Logger.Debug($"{type} '{TaskInfo.Name}':  {msg}");
 
-        public TDelegate Delegate { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnAdd { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnRemove { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnAdd      { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnRemove   { get; set; }
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnComplete { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError    { get; set; }
         public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnCanceled { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTick     { get; set; }
+        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout  { get; set; }
+        public TDelegate                                            Delegate   { get; set; }
 
 
         /// <summary>
@@ -66,6 +63,13 @@ namespace AsyncTask.Tasks
         public TimeSpan? Timeout { get; set; }
 
 
+
+        /// <summary>
+        ///     Poll Interval
+        /// </summary>
+        public TimeSpan PollInterval { get; set; } = new(0, 0, 1);
+
+
         /// <summary>
         ///     Task
         /// </summary>
@@ -75,20 +79,20 @@ namespace AsyncTask.Tasks
         /// <summary>
         ///     TaskInfo
         /// </summary>
-        public TTaskInfo TaskInfo
+        public ITaskInfo TaskInfo
         {
             get => _eventArgs.TaskInfo;
-            set => _eventArgs.TaskInfo = value;
+            set => _eventArgs.TaskInfo = (TTaskInfo) value;
         }
 
 
         /// <summary>
         ///     TaskList
         /// </summary>
-        public TTaskList TaskList
+        public ITaskList TaskList
         {
             get => _eventArgs.TaskList;
-            set => _eventArgs.TaskList = value;
+            set => _eventArgs.TaskList = (TTaskList) value;
         }
 
         
@@ -118,21 +122,16 @@ namespace AsyncTask.Tasks
 
             Task.Run(async () =>
             {
-#if DEBUG
-                var i = -1;
-#endif
                 while (!TimeOut)
                 {
                     if (isCompleted)
                         return;
-#if DEBUG
-                    if (++i > 0)
-                        DebugStatus(TaskType.Monitor, $"Tick #{i}");
-#endif
+
                     try
                     {
                         // Poll every 1 second.
-                        await Task.Delay(TimeSpan.FromSeconds(1), Token);
+                        await Task.Delay((int) PollInterval.TotalMilliseconds, Token);
+                        OnTick?.Invoke(Parent, _eventArgs);
                     }
                     catch (TaskCanceledException)
                     {
@@ -155,11 +154,9 @@ namespace AsyncTask.Tasks
                     if (Logger == null)
                         Logger = new DefaultLogger();
 
-                    DebugStatus(TaskType.Task, "Adding task");
-
                     if (TaskList != null)
                     {
-                        if (!(TaskList is ConcurrentDictionary<ITaskInfo, ITask> taskList))
+                        if (TaskList is not ConcurrentDictionary<ITaskInfo, ITask> taskList)
                             throw new NullReferenceException();
 
                         taskList.TryAdd(TaskInfo, this);
@@ -172,7 +169,7 @@ namespace AsyncTask.Tasks
                         CancellationToken = Token,
                         MaxDegreeOfParallelism = Environment.ProcessorCount
                     };
-                    Parallel.ForEach(new[] { _eventArgs.Task }, po, (task, loopState) =>
+                    Parallel.ForEach(new[] { _eventArgs.Task }, po, (task, _) =>
                     {
                         using (Token.Register(Thread.CurrentThread.Abort))
                         {
@@ -197,11 +194,10 @@ namespace AsyncTask.Tasks
             {
                 Dispose(); // Cancellation token
                 _eventArgs.Task.Dispose();
-                DebugStatus(TaskType.Task, "Removing task");
 
                 if (TaskList != null)
                 {
-                    if (!(TaskList is ConcurrentDictionary<ITaskInfo, ITask> taskList))
+                    if (TaskList is not ConcurrentDictionary<ITaskInfo, ITask> taskList)
                         throw new NullReferenceException();
 
                     taskList.TryRemove(TaskInfo, out _);
@@ -215,7 +211,7 @@ namespace AsyncTask.Tasks
         /// <summary>
         ///     Wrap
         /// </summary>
-        private Task Wrap() => new Task(() =>
+        private Task Wrap() => new(() =>
         {
             try
             {
