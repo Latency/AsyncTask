@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Properties\project.png">
+    <None Include="..\..\..\project.png">
       <Pack>True</Pack>
       <PackagePath>Properties</PackagePath>
     </None>
