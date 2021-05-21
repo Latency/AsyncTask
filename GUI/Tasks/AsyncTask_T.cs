@@ -6,14 +6,12 @@
 // ****************************************************************************
 
 using System;
-using AsyncTask.DTO;
-using AsyncTask.EventArgs;
+using AsyncTask.Interfaces;
 using AsyncTask.Tasks;
-using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Tasks
 {
-    public sealed class AsyncTask<T> : TaskBase<AsyncTask<T>, TaskRecordSet, TaskList, Func<AsyncTask<T>, TaskEventArgs<TaskRecordSet, TaskList>, T>>
+    public sealed class AsyncTask<T> : TaskBase<AsyncTask<T>, Func<AsyncTask<T>, ITaskEventArgs, T>>
     {
         public AsyncTask()
         {

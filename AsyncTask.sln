@@ -12,10 +12,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9B7DA3DF-4D94-4363-9504-8969DB578C1C}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		Properties\AsyncTask.png = Properties\AsyncTask.png
 		DataModel.md = DataModel.md
 		Flow-Chart.png = Flow-Chart.png
 		LICENSE.txt = LICENSE.txt
+		Properties\mvc.png = Properties\mvc.png
 		Output.png = Output.png
+		Properties\project.png = Properties\project.png
+		README-Short.md = README-Short.md
 		README.md = README.md
 	EndProjectSection
 EndProject

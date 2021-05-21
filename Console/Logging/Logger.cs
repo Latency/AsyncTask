@@ -7,11 +7,11 @@
 
 using System;
 using System.Windows.Forms;
-using AsyncTask.EventArgs;
+using AsyncTask.DTO;
 using AsyncTask.Logging;
 using ConsoleApp1.Extensions;
 
-namespace ConsoleApp1.Logging
+namespace Console.Logging
 {
     /// <summary>
     ///     Logger

@@ -25,7 +25,7 @@ namespace ORM_Monitor.Extensions
             {
                 p = VisualTreeHelper.GetParent(p);
             }
-            while (p != null && !(p is T));
+            while (p != null && p is not T);
 
             return p as T;
         }

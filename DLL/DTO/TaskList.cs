@@ -10,5 +10,5 @@ using AsyncTask.Interfaces;
 
 namespace AsyncTask.DTO
 {
-    public class TaskList : ConcurrentDictionary<ITaskInfo, ITask>, ITaskList { }
+    public class TaskList : ConcurrentDictionary<ITaskInfo, ITask>, ITaskList<ITaskInfo, ITask> { }
 }

@@ -17,8 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using AsyncTask.DTO;
-using AsyncTask.EventArgs;
+using AsyncTask.Interfaces;
 using ORM_Monitor.Models;
 
 namespace ORM_Monitor.Views
@@ -65,15 +64,18 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button btn))
+            if (sender is not Button btn)
                 throw new NullReferenceException();
 
-            if (!(btn.Tag is (Tasks.AsyncTask asyncTask, TaskEventArgs<TaskRecordSet, TaskList> args)))
+            if (btn.Tag is not (Tasks.AsyncTask asyncTask, ITaskEventArgs args))
                 throw new NullReferenceException();
 
             _dispatcher.Invoke(() =>
             {
-                var index = args.TaskInfo.GridRow.GetIndex();
+                if (args.TaskInfo is not TaskRecordSet rst)
+                    throw new NullReferenceException();
+
+                var index = rst.GridRow.GetIndex();
                 lblStatusBar.Text = $"Button clicked: (Row: {index + 1}, Action: {btn.Content})";
 
                 if (btn.IsEnabled && args.Task.Status == TaskStatus.Running)
@@ -108,9 +110,12 @@ namespace ORM_Monitor.Views
                 },
                 Delegate = (asyncTask, args) =>
                 {
-                    while (!asyncTask.IsCancellationRequested && args.TaskInfo.Progress < 100)
+                    if (args.TaskInfo is not TaskRecordSet rst)
+                        throw new NullReferenceException();
+
+                    while (!asyncTask.IsCancellationRequested && rst.Progress < 100)
                     {
-                        args.TaskInfo.Progress += 1;
+                        rst.Progress += 1;
 
                         // Pulse
                         Thread.Sleep(100);
@@ -122,14 +127,16 @@ namespace ORM_Monitor.Views
                 {
                     _dispatcher.Invoke(() =>
                     {
-                        var rst = args.TaskInfo;
+                        if (args.TaskInfo is not TaskRecordSet rst)
+                            throw new NullReferenceException();
+
                         rst.Tag = (asyncTask, args);
 
                         lblStatusBar.Text = $"Starting task \"{rst.Name}\".";
                         var index = ListView1.Items.Add(rst);
                         ListView1.UpdateLayout();
 
-                        if (!(ListView1.ItemContainerGenerator.ContainerFromIndex(index) is DataGridRow rowContainer))
+                        if (ListView1.ItemContainerGenerator.ContainerFromIndex(index) is not DataGridRow rowContainer)
                             throw new NullReferenceException();
 
                         rst.GridRow = rowContainer;
@@ -148,7 +155,7 @@ namespace ORM_Monitor.Views
                                     btn.MouseDown += MyButton_MouseDown;
                                     btn.MouseEnter += MyButton_MouseEnter;
                                     btn.MouseLeave += MyButton_MouseLeave;
-                                    args.TaskInfo.Action = btn;
+                                    rst.Action = btn;
                                     break;
                                 case "ID":
                                     rst.ID = new Random().Next();
@@ -163,28 +170,37 @@ namespace ORM_Monitor.Views
                         }
                     });
                 },
-                OnComplete = (asyncTask, args) =>
+                OnComplete = (_, args) =>
                 {
                     _dispatcher.Invoke(() =>
                     {
-                        args.TaskInfo.Action.IsEnabled = true;
-                        args.TaskInfo.Action.Content = "Remove";
+                        if (args.TaskInfo is not TaskRecordSet rst)
+                            throw new NullReferenceException();
+
+                        rst.Action.IsEnabled = true;
+                        rst.Action.Content = "Remove";
                     });
                 },
-                OnTimeout = (asyncTask, args) =>
+                OnTimeout = (_, args) =>
                 {
                     _dispatcher.Invoke(() =>
                     {
-                        args.TaskInfo.Action.IsEnabled = true;
-                        args.TaskInfo.Action.Content = "Remove";
+                        if (args.TaskInfo is not TaskRecordSet rst)
+                            throw new NullReferenceException();
+
+                        rst.Action.IsEnabled = true;
+                        rst.Action.Content = "Remove";
                     });
                 },
-                OnCanceled = (asyncTask, args) =>
+                OnCanceled = (_, args) =>
                 {
                     _dispatcher.Invoke(() =>
                     {
-                        args.TaskInfo.Action.IsEnabled = true;
-                        args.TaskInfo.Action.Content = "Remove";
+                        if (args.TaskInfo is not TaskRecordSet rst)
+                            throw new NullReferenceException();
+
+                        rst.Action.IsEnabled = true;
+                        rst.Action.Content = "Remove";
                     });
                 }
             };
@@ -202,7 +218,7 @@ namespace ORM_Monitor.Views
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
             foreach (var rst in ListView1.Items.Cast<TaskRecordSet>()) {
-                if (!(rst.Tag is (Tasks.AsyncTask asyncTask, TaskEventArgs<TaskRecordSet, TaskList> _)))
+                if (rst.Tag is not (Tasks.AsyncTask asyncTask, ITaskEventArgs))
                     throw new NullReferenceException();
                 if (!asyncTask.Task.IsCompleted)
                     RemoveButton_Click(rst.Action, null);
@@ -251,6 +267,7 @@ namespace ORM_Monitor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         private void ListView1_MouseEnter(object sender, MouseEventArgs e)
         {
             if (ListView1.Items.Count == 0)
@@ -283,7 +300,7 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private static void MyButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (!(sender is Button btn))
+            if (sender is not Button btn)
                 return;
 
             Mouse.OverrideCursor = Cursors.Hand;
@@ -301,7 +318,7 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private static void MyButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!(sender is Button btn))
+            if (sender is not Button btn)
                 return;
 
             Mouse.OverrideCursor = Cursors.Arrow;
@@ -319,7 +336,7 @@ namespace ORM_Monitor.Views
         /// <param name="e"></param>
         private static void MyButton_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!(sender is Button btn))
+            if (sender is not Button btn)
                 return;
 
             btn.MouseEnter -= MyButton_MouseEnter;

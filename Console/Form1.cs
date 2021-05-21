@@ -10,10 +10,11 @@ using System.Threading;
 using System.Windows.Forms;
 using AsyncTask.DTO;
 using AsyncTask.Interfaces;
+using ConsoleApp1;
 using ConsoleApp1.Extensions;
-using Logger = ConsoleApp1.Logging.Logger;
+using Logger = Console.Logging.Logger;
 
-namespace ConsoleApp1
+namespace Console
 {
     public partial class Form1 : Form
     {

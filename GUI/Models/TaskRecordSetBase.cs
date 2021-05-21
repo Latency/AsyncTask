@@ -16,19 +16,19 @@ using ORM_Monitor.Extensions;
 namespace ORM_Monitor.Models {
   // ReSharper disable once InconsistentNaming
   public abstract class TaskRecordSetBase : DependencyObject
-    {
+  {
     #region Fields
     // -----------------------------------------------------------------------
 
     /// <summary>
     ///  DependancyCollection
     /// </summary>
-    private static readonly Dictionary<string, DependencyProperty> DependancyCollection = new Dictionary<string, DependencyProperty>();
+    private static readonly Dictionary<string, DependencyProperty> DependancyCollection = new();
 
     /// <summary>
     ///  Mutex
     /// </summary>
-    private static readonly object Mutex = new object();
+    private static readonly object Mutex = new();
 
     // -----------------------------------------------------------------------
     #endregion Fields
@@ -89,7 +89,7 @@ namespace ORM_Monitor.Models {
       this.InvokeIfRequired(
         objs => {
           lock (Mutex) {
-            if (!(objs[0] is string key))
+            if (objs[0] is not string key)
               return;
             var v = objs[1] is T variable ? variable : default(T);
             SetValue(DependancyCollection[key], v);

@@ -6,12 +6,11 @@
 // ****************************************************************************
 
 using System;
-using AsyncTask.DTO;
-using AsyncTask.EventArgs;
+using AsyncTask.Interfaces;
 
 namespace AsyncTask.Tasks
 {
-    public sealed class AsyncTask : TaskBase<AsyncTask, TaskInfo, TaskList, Action<AsyncTask, TaskEventArgs<TaskInfo, TaskList>>>
+    public sealed class AsyncTask : TaskBase<AsyncTask, Action<AsyncTask, ITaskEventArgs>>
     {
         public AsyncTask()
         {

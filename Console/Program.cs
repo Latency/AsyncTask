@@ -8,7 +8,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace ConsoleApp1
+namespace Console
 {
     internal static class Program
     {

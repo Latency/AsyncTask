@@ -6,10 +6,10 @@
 // ****************************************************************************
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
-using AsyncTask.EventArgs;
+using AsyncTask.DTO;
 using AsyncTask.Interfaces;
 using AsyncTask.Logging;
 
@@ -24,22 +24,20 @@ namespace AsyncTask.Tasks
     ///     If you attempt to retrieve the CurrentId value from outside the code that a task is executing, the property returns null.
     ///     Note that although collisions are very rare, task identifiers are not guaranteed to be unique.
     /// </remarks>
-    public abstract class TaskBase<TParent, TTaskInfo, TTaskList, TDelegate> : CancellationTokenSource, ITask
-        where TTaskInfo : class, ITaskInfo
-        where TTaskList : class, ITaskList
+    public abstract class TaskBase<TParent, TDelegate> : CancellationTokenSource, ITask
         where TParent   : class, new()
     {
-        private readonly TaskEventArgs<TTaskInfo, TTaskList> _eventArgs;
+        private readonly ITaskEventArgs _eventArgs;
         private bool TimeOut => Timeout != null && DateTime.Now >= _eventArgs.TaskStartTime.Add((TimeSpan)Timeout);
 
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnAdd      { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnRemove   { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnComplete { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnError    { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnCanceled { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTick     { get; set; }
-        public Action<TParent, TaskEventArgs<TTaskInfo, TTaskList>> OnTimeout  { get; set; }
-        public TDelegate                                            Delegate   { get; set; }
+        public Action<TParent, ITaskEventArgs> OnAdd      { get; set; }
+        public Action<TParent, ITaskEventArgs> OnRemove   { get; set; }
+        public Action<TParent, ITaskEventArgs> OnComplete { get; set; }
+        public Action<TParent, ITaskEventArgs> OnError    { get; set; }
+        public Action<TParent, ITaskEventArgs> OnCanceled { get; set; }
+        public Action<TParent, ITaskEventArgs> OnTick     { get; set; }
+        public Action<TParent, ITaskEventArgs> OnTimeout  { get; set; }
+        public TDelegate                       Delegate   { get; set; }
 
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace AsyncTask.Tasks
         /// </summary>
         protected TaskBase()
         {
-            _eventArgs = new TaskEventArgs<TTaskInfo, TTaskList>(Wrap());
+            _eventArgs = new TaskEventArgs(Wrap());
         }
 
 
@@ -82,7 +80,7 @@ namespace AsyncTask.Tasks
         public ITaskInfo TaskInfo
         {
             get => _eventArgs.TaskInfo;
-            set => _eventArgs.TaskInfo = (TTaskInfo) value;
+            set => _eventArgs.TaskInfo = value;
         }
 
 
@@ -92,7 +90,7 @@ namespace AsyncTask.Tasks
         public ITaskList TaskList
         {
             get => _eventArgs.TaskList;
-            set => _eventArgs.TaskList = (TTaskList) value;
+            set => _eventArgs.TaskList = value;
         }
 
         
@@ -156,10 +154,10 @@ namespace AsyncTask.Tasks
 
                     if (TaskList != null)
                     {
-                        if (TaskList is not ConcurrentDictionary<ITaskInfo, ITask> taskList)
+                        if (TaskList is not IDictionary taskList)
                             throw new NullReferenceException();
 
-                        taskList.TryAdd(TaskInfo, this);
+                        taskList.Add(TaskInfo, this);
                     }
 
                     OnAdd?.Invoke(Parent, _eventArgs);
@@ -190,17 +188,17 @@ namespace AsyncTask.Tasks
                 {
                     isCompleted = true;
                 }
-            }).ContinueWith(t => // Cleanup
+            }).ContinueWith(_ => // Cleanup
             {
                 Dispose(); // Cancellation token
                 _eventArgs.Task.Dispose();
 
                 if (TaskList != null)
                 {
-                    if (TaskList is not ConcurrentDictionary<ITaskInfo, ITask> taskList)
+                    if (TaskList is not IDictionary taskList)
                         throw new NullReferenceException();
 
-                    taskList.TryRemove(TaskInfo, out _);
+                    taskList.Remove(TaskInfo);
                 }
 
                 OnRemove?.Invoke(Parent, _eventArgs);

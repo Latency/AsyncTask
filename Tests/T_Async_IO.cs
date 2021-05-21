@@ -167,6 +167,7 @@ namespace Tests
                 }
                 catch
                 {
+                    // ignored
                 }
 
                 TestContext.Progress.WriteLine(@"All Tasks Completed");

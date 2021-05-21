@@ -11,6 +11,7 @@ namespace AsyncTask.Interfaces
 {
     public interface IMessageEventArgs
     {
+        // ReSharper disable once UnusedMember.Global
         string Message { get; set; }
         Exception Exception { get; set; }
     }
