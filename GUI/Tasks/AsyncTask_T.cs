@@ -11,7 +11,7 @@ using AsyncTask.Tasks;
 
 namespace ORM_Monitor.Tasks
 {
-    public sealed class AsyncTask<T> : TaskBase<AsyncTask<T>, Func<AsyncTask<T>, ITaskEventArgs, T>>
+    public sealed class AsyncTask<T> : AsyncTask<AsyncTask<T>, Func<AsyncTask<T>, ITaskEventArgs, T>>
     {
         public AsyncTask()
         {

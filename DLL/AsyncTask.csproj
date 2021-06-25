@@ -5,9 +5,9 @@
     <LangVersion>preview</LangVersion>
     <SignAssembly>true</SignAssembly>
     <PackageIcon>Properties\project.png</PackageIcon>
-    <Version>3.0.9</Version>
+    <Version>3.0.10</Version>
     <Description>Asynchronous Task Extension Library</Description>
-    <PackageReleaseNotes>Added support for .NET 6.0 and changed task parameters to be interfaces.</PackageReleaseNotes>
+    <PackageReleaseNotes>Replaces obsolete threading and Thread.Abort in favor of TPL.</PackageReleaseNotes>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>

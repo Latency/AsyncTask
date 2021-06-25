@@ -6,7 +6,6 @@
 // ****************************************************************************
 
 using System;
-using System.Threading.Tasks;
 
 namespace AsyncTask.Interfaces
 {
@@ -14,7 +13,6 @@ namespace AsyncTask.Interfaces
     {
         TimeSpan  PollInterval { get; set; }
         TimeSpan? Timeout      { get; set; }
-        Task      Task         { get; }
         ILogger   Logger       { get; set; }
         ITaskInfo TaskInfo     { get; set; }
         ITaskList TaskList     { get; set; }

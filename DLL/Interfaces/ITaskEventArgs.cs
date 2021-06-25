@@ -6,19 +6,13 @@
 // ****************************************************************************
 
 using System;
-using System.Threading.Tasks;
 
 namespace AsyncTask.Interfaces
 {
     public interface ITaskEventArgs
     {
-        Task      Task          { get; }
-        ITaskInfo TaskInfo      { get; set; }
-        ITaskList TaskList      { get; set; }
-        ILogger   Logger        { get; set; }
-        Exception Exception     { get; set; }
-        dynamic   Result        { get; set; }
-        string    Duration      { get; }
-        DateTime  TaskStartTime { get; }
+        Exception Exception { get; internal set; }
+        DateTime  StartTime { get; internal set; }
+        TimeSpan  Duration  { get; internal set; }
     }
 }

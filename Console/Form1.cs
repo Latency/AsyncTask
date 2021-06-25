@@ -6,7 +6,6 @@
 // ****************************************************************************
 
 using System;
-using System.Threading;
 using System.Windows.Forms;
 using AsyncTask.DTO;
 using AsyncTask.Interfaces;
@@ -21,7 +20,7 @@ namespace Console
         private event EventHandler OnButtonChanged;
         private readonly ILogger _logger;
         private ButtonType _buttonType;
-        private AsyncTask.Tasks.AsyncTask _t2;
+        private AsyncTask.AsyncTask _t2;
 
 
         /// <summary>
@@ -74,27 +73,39 @@ namespace Console
 
         private void ButtonEnable_Click(object sender, EventArgs e)
         {
+            ButtonEnable.Enabled  = false;
+            ButtonDisable.Enabled = true;
+
             var blockTime = (int) numericUpDownBlockTime.Value;
-            var timeout = (int) numericUpDownTimeout.Value;
-            _t2 = new AsyncTask.Tasks.AsyncTask
+            var timeout   = (int) numericUpDownTimeout.Value;
+            _t2 = new AsyncTask.AsyncTask(token =>
+            {
+                var startTime = DateTime.Now;
+                while (!token.IsCancellationRequested && DateTime.Now < startTime.Add(TimeSpan.FromSeconds(blockTime)))
+                {
+                    if (!token.IsCancellationRequested)
+                        token.ThrowIfCancellationRequested();
+                }
+            })
             {
                 TaskInfo = new TaskInfo
                 {
                     Name = "t2"
                 },
-                Timeout = timeout < 0 ? (TimeSpan?) null : TimeSpan.FromSeconds(timeout),
-                Logger = _logger,
+                Timeout  = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
+                Logger   = _logger,
                 TaskList = new TaskList(),
-                Delegate = (asyncTask, args) => Thread.Sleep(TimeSpan.FromSeconds(blockTime)),
-                OnAdd = (asyncTask, args) =>
+                OnAdd    = (_, _) =>
                 {
                     _logger.Warning($"Executing **** t2 **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
-                    this.InvokeIfRequired(ChangeState, ButtonType.Disabled, new Action<ButtonType>(ChangeState), ButtonType.Disabled);
+                    ChangeState(ButtonType.Disabled);
                 },
-                OnRemove = (asyncTask, args) => { this.InvokeIfRequired(ChangeState, ButtonType.Enabled, new Action<ButtonType>(ChangeState), ButtonType.Enabled); },
-                OnComplete = (asyncTask, args) => _logger.Info($"Completing task for '{args.TaskInfo.Name}'."),
-                OnTimeout = (asyncTask, args) => _logger.Info($"Timeout expired!  Aborting task for '{args.TaskInfo.Name}'."),
-                OnCanceled = (asyncTask, args) => _logger.Info($"Canceling task for '{args.TaskInfo.Name}'.")
+                OnRemove   = (_,         _) => this.InvokeIfRequired(ChangeState, ButtonType.Enabled, new Action<ButtonType>(ChangeState), ButtonType.Enabled),
+                OnComplete = (asyncTask, _) => _logger.Info($"Completing task for '{asyncTask.TaskInfo?.Name}'."),
+                OnTick     = (_,         args) => _logger.Info($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
+                OnTimeout  = (asyncTask, _) => _logger.Info($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo?.Name}'."),
+                OnCanceled = (asyncTask, _) => _logger.Info($"Canceling task for '{asyncTask.TaskInfo?.Name}'."),
+                OnError    = (asyncTask, args) => _logger.Error($"Error occured for '{asyncTask.TaskInfo?.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
             };
             _t2.Start();
         }
@@ -102,11 +113,9 @@ namespace Console
 
         private void ButtonDisable_Click(object sender, EventArgs e)
         {
-            if (_t2 == null)
-                return;
+            ChangeState(ButtonType.Enabled);
 
-            ButtonDisable.InvokeIfRequired(() => ButtonDisable.Enabled = false, new EventHandler(ButtonDisable_Click), sender, e);
-            _t2.Cancel();
+            _t2?.Cancel();
         }
 
 
