@@ -17,7 +17,9 @@ namespace AsyncTask.Logging
     /// </summary>
     public class DefaultLogger : ILogger
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly TraceListenerCollection _listeners;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _isEnabled;
 
 
@@ -37,19 +39,15 @@ namespace AsyncTask.Logging
                     return;
                 _isEnabled = value;
                 if (!_isEnabled)
-                {
                     _listeners.Clear();
-                }
                 else
-                {
                     _listeners.AddRange(Listeners);
-                }
             }
         }
 
         public virtual void Debug(string msg) => WriteLine(msg);
 
-        public virtual void Info(string msg) => TraceInformation(msg);
+        public virtual void Information(string msg) => TraceInformation(msg);
 
         public virtual void Warning(string msg) => TraceWarning(msg);
 

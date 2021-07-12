@@ -198,3 +198,5 @@ NuGet/
 .gitignore
 .gitattributes
 
+# LFS
+.lfsconfig

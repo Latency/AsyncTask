@@ -6,8 +6,8 @@
 // ****************************************************************************
 
 using System;
-using System.Collections;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AsyncTask.DTO;
@@ -30,10 +30,11 @@ namespace AsyncTask
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly ITaskEventArgs _eventArgs = new TaskEventArgs();
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly CancellationTokenSource[] _cts = { new(), new() };
+        private readonly CancellationTokenSource[] _cts;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly Action<CancellationToken> _delegate;
-
+        private bool _canceled;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Action<ITask, ITaskEventArgs> _delegate;
 
         public Action<ITask, ITaskEventArgs> OnAdd      { private get; set; }
         public Action<ITask, ITaskEventArgs> OnRemove   { private get; set; }
@@ -48,24 +49,27 @@ namespace AsyncTask
         ///     Timeout
         /// </summary>
         public TimeSpan? Timeout { get; set; }
-        
+
 
         /// <summary>
         ///     Poll Interval
         /// </summary>
+        /// <remarks>
+        ///     Poll every 1 second by default.
+        /// </remarks>
         public TimeSpan PollInterval { get; set; } = new(0, 0, 1);
 
 
         /// <summary>
         ///     TaskInfo
         /// </summary>
-        public ITaskInfo TaskInfo { get; set; }
+        public ITaskInfo TaskInfo { get; set; } = null;
 
 
         /// <summary>
         ///     TaskList
         /// </summary>
-        public ITaskList TaskList { get; set; }
+        public ITaskList TaskList { get; set; } = null;
 
         
         /// <summary>
@@ -81,101 +85,137 @@ namespace AsyncTask
         public override string ToString() => TaskInfo?.Name ?? nameof(AsyncTask);
 
 
+        public new TaskStatus Status { get; private set; }
+
+
         /// <summary>
         ///     Start
         /// </summary>
         public new async void Start()
         {
-            Logger ??= new DefaultLogger();
+            Status    =   TaskStatus.Running;
 
-            if (TaskList is not null && TaskInfo is not null)
-            {
-                if (TaskList is not IDictionary taskList)
-                    throw new NullReferenceException();
-                taskList.Add(TaskInfo, this);
-            }
+            Logger    ??= new DefaultLogger();
+            _canceled =   false;
+
+            var ctx = new TaskFactory(TaskScheduler.FromCurrentSynchronizationContext());
+
+            if (TaskInfo is TaskInfo taskInfo)
+                taskInfo.Token = _cts[1].Token;
+            else
+                taskInfo = null;
+
+            if (TaskList is not null && taskInfo is not null)
+                TaskList.Add(taskInfo, this);
 
             OnAdd?.Invoke(this, _eventArgs);
 
-            var monitor = new Task(async () =>
+            #region Monitor
+            //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+            var monitor = new Task(() =>
             {
-                DateTime? startTime = DateTime.Now;
+                Thread.CurrentThread.Name = $"{taskInfo?.Name ?? nameof(AsyncTask)}:  Monitor";
+                var startTime = DateTime.Now;
+                var endTime   = ((DateTime?)startTime).Value.Add(Timeout ?? new TimeSpan(0));
 
-                while (true)
+                try
                 {
-                    if (Timeout is not null && DateTime.Now >= startTime.Value.Add((TimeSpan)Timeout))
-                        break;
-
-                    try
+                    while (!_cts[0].IsCancellationRequested)
                     {
-                        // Poll every 1 second.
-                        await Delay((int)(PollInterval).TotalMilliseconds, _cts[0].Token);
-
-                        _eventArgs.Duration = DateTime.Now.Subtract(startTime.Value);
-
-                        OnTick?.Invoke(this, _eventArgs);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        _cts[1].Cancel();
-                        return;
-                    }
-                }
-
-                OnTimeout?.Invoke(this, _eventArgs);
-
-                _cts[1].Cancel();
-            });
-            monitor.Start();
-
-
-            try
-            {
-                _eventArgs.StartTime = DateTime.Now;
-
-                await Run(async () =>
-                {
-                    try
-                    {
-                        _delegate.DynamicInvoke(_cts[1].Token);
-                    }
-                    catch (Exception ex)
-                    {
-                        _cts[0].Cancel();
-
-                        switch (ex)
+                        try
                         {
-                            case OperationCanceledException:
-                                break;
-                            default:
-                                await Delay(TimeSpan.FromMilliseconds(100));
-                                _eventArgs.Exception = ex;
-                                OnError?.Invoke(this, _eventArgs);
-                                break;
+                            Delay((int) (PollInterval).TotalMilliseconds).ContinueWith(t =>
+                            {
+                                if (t.IsCanceled)
+                                    return;
+                                 
+                                var time = DateTime.Now;
+
+                                _eventArgs.Duration = time.Subtract(startTime);
+                                ctx.StartNew(() => OnTick?.Invoke(this, _eventArgs));
+
+                                if (Timeout is null || time < endTime)
+                                    return;
+
+                                ctx.StartNew(() => OnTimeout?.Invoke(this, _eventArgs));
+                                _cts[0].Cancel();
+                            }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        }
+                        catch (Exception)
+                        {
+                            break;
                         }
                     }
-                }).ContinueWith(async _ =>
+                }
+                finally
                 {
-                    if (!_cts[1].IsCancellationRequested)
-                    {
-                        await Delay(TimeSpan.FromMilliseconds(100));
-                        _cts[0].Cancel();
-                        monitor.Wait();
-                        OnComplete?.Invoke(this, _eventArgs);
-                    }
-                });
+                    _cts[1].Cancel();
+                }
+            });
+            monitor.Start();
+            //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+            #endregion Monitor
+
+
+            #region Main Delegate
+            //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+            var are = new AutoResetEvent(false);
+            try
+            {
+
+                _eventArgs.StartTime = DateTime.Now;
+
+                await Factory.StartNew(() =>
+                {
+                    Thread.CurrentThread.Name = $"{taskInfo?.Name ?? nameof(AsyncTask)}:  Main Delegate";
+                    _delegate.Invoke(this, _eventArgs);
+                }, _cts[1].Token).ContinueWith(_ =>
+                {
+                    Synchronize();
+                    Status = TaskStatus.RanToCompletion;
+                    ctx.StartNew(() => OnComplete?.Invoke(this, _eventArgs));
+                    are.Set();
+                }, _cts[1].Token);
+            }
+            catch (Exception ex)
+            {                
+                Synchronize();
+                switch (ex)
+                {
+                    case OperationCanceledException:
+                        if (_canceled)
+                        {
+                            Status = TaskStatus.Canceled;
+                            OnCanceled?.Invoke(this, _eventArgs);
+                        }
+                        break;
+                    default:
+                        Status = TaskStatus.Faulted;
+                        _eventArgs.Exception = ex;
+                        OnError?.Invoke(this, _eventArgs);
+                        break;
+                }
+                are.Set();
             }
             finally
             {
-                if (TaskList is not null && TaskInfo is not null)
-                {
-                    if (TaskList is not IDictionary taskList)
-                        throw new NullReferenceException();
-                    taskList.Remove(TaskInfo);
-                }
+                are.WaitOne();
 
-                await Delay(TimeSpan.FromMilliseconds(100));
+                if (TaskList is not null && TaskInfo is not null)
+                    TaskList.Remove(TaskInfo);
+
                 OnRemove?.Invoke(this, _eventArgs);
+            }
+            //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+            #endregion Main Delegate
+
+            // Local method
+            void Synchronize()
+            {
+                if (!_cts[0].IsCancellationRequested)
+                    _cts[0].Cancel();
+
+                monitor.Wait();
             }
         }
 
@@ -186,17 +226,37 @@ namespace AsyncTask
         /// <param name="throwOnFirstException"></param>
         public void Cancel(bool throwOnFirstException = false)
         {
+            _canceled = true;
             _cts[0].Cancel(throwOnFirstException);
-            OnCanceled?.Invoke(this, _eventArgs);
         }
 
 
         #region Constructors
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-        public AsyncTask(Action<CancellationToken> action) : this(action, new CancellationToken()) { }
-        public AsyncTask(Action<CancellationToken> action, CancellationToken   cancellationToken) : this(action, cancellationToken, TaskCreationOptions.None) { }
-        public AsyncTask(Action<CancellationToken> action, TaskCreationOptions creationOptions) : this(action, new CancellationToken(), creationOptions) { }
-        public AsyncTask(Action<CancellationToken> action, CancellationToken   cancellationToken, TaskCreationOptions creationOptions) : base(() => action(cancellationToken), cancellationToken, creationOptions) => _delegate = action;
+        public AsyncTask(Action<ITask, ITaskEventArgs> action) : base(() => {}, new CancellationToken())
+        {
+            _delegate = action;
+            _cts      = new CancellationTokenSource[] { new(), new() };
+
+            #region Reflection
+            var type = GetType().BaseType;
+            if (type == null)
+                throw new NullReferenceException();
+
+            var field = type.GetField("m_action", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field is null)
+                throw new NullReferenceException();
+            
+            // Set the 1st argument of the base ctor via reflection since we require late binding here.
+            field.SetValue(this, new Action(() => _delegate?.Invoke(this, _eventArgs)));
+            
+            var method = type.GetMethod("AssignCancellationToken", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (method is null)
+                throw new NullReferenceException();
+
+            method.Invoke(this, new object[] { _cts[1].Token, null, null });
+            #endregion Reflection
+        }
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
         #endregion Constructors

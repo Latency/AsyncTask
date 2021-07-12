@@ -9,8 +9,9 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using AsyncTask.Interfaces;
+using ConsoleApp1.Extensions;
 
-namespace ConsoleApp1.Extensions
+namespace Console.Extensions
 {
     public static class Logger
     {
@@ -21,11 +22,11 @@ namespace ConsoleApp1.Extensions
         }, messageEventArgs, new Action<RichTextBox, object, T>(Message), control, sender, messageEventArgs);
 
 
-        public static void Info<T>(this RichTextBox control, object sender, T messageEventArgs) where T : IMessageEventArgs => control.InvokeIfRequired(a =>
+        public static void Information<T>(this RichTextBox control, object sender, T messageEventArgs) where T : IMessageEventArgs => control.InvokeIfRequired(a =>
         {
             control.SelectionColor = Color.DodgerBlue;
             control.AppendText(a.Message + Environment.NewLine);
-        }, messageEventArgs, new Action<RichTextBox, object, T>(Info), control, sender, messageEventArgs);
+        }, messageEventArgs, new Action<RichTextBox, object, T>(Information), control, sender, messageEventArgs);
 
 
         public static void Warning<T>(this RichTextBox control, object sender, T messageEventArgs) where T : IMessageEventArgs => control.InvokeIfRequired(a =>

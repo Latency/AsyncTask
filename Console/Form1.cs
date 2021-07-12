@@ -6,6 +6,7 @@
 // ****************************************************************************
 
 using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using AsyncTask.DTO;
 using AsyncTask.Interfaces;
@@ -78,13 +79,14 @@ namespace Console
 
             var blockTime = (int) numericUpDownBlockTime.Value;
             var timeout   = (int) numericUpDownTimeout.Value;
-            _t2 = new AsyncTask.AsyncTask(token =>
+            _t2 = new AsyncTask.AsyncTask((task, args) =>
             {
-                var startTime = DateTime.Now;
-                while (!token.IsCancellationRequested && DateTime.Now < startTime.Add(TimeSpan.FromSeconds(blockTime)))
+                try
                 {
-                    if (!token.IsCancellationRequested)
-                        token.ThrowIfCancellationRequested();
+                    Task.Delay(TimeSpan.FromSeconds(blockTime), task.TaskInfo.Token).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                catch (TaskCanceledException)
+                {
                 }
             })
             {
@@ -95,16 +97,21 @@ namespace Console
                 Timeout  = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
                 Logger   = _logger,
                 TaskList = new TaskList(),
-                OnAdd    = (_, _) =>
+                OnAdd    = (asyncTask, _) =>
                 {
+                    _logger.Warning($"Adding task for {asyncTask.TaskInfo.Name}");
                     _logger.Warning($"Executing **** t2 **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
                     ChangeState(ButtonType.Disabled);
                 },
-                OnRemove   = (_,         _) => this.InvokeIfRequired(ChangeState, ButtonType.Enabled, new Action<ButtonType>(ChangeState), ButtonType.Enabled),
-                OnComplete = (asyncTask, _) => _logger.Info($"Completing task for '{asyncTask.TaskInfo?.Name}'."),
-                OnTick     = (_,         args) => _logger.Info($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
-                OnTimeout  = (asyncTask, _) => _logger.Info($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo?.Name}'."),
-                OnCanceled = (asyncTask, _) => _logger.Info($"Canceling task for '{asyncTask.TaskInfo?.Name}'."),
+                OnRemove   = (asyncTask, _) =>
+                {
+                    _logger.Warning($"Removing task for {asyncTask.TaskInfo.Name}");
+                    ChangeState(ButtonType.Enabled);
+                },
+                OnComplete = (asyncTask, _)    => _logger.Information($"Completing task for '{asyncTask.TaskInfo?.Name}'."),
+                OnTick     = (_,         args) => _logger.Information($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
+                OnTimeout  = (asyncTask, _)    => _logger.Information($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo?.Name}'."),
+                OnCanceled = (asyncTask, _)    => _logger.Information($"Canceling task for '{asyncTask.TaskInfo?.Name}'."),
                 OnError    = (asyncTask, args) => _logger.Error($"Error occured for '{asyncTask.TaskInfo?.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
             };
             _t2.Start();

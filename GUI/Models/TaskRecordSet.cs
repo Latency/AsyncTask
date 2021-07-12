@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using ORM_Monitor.Interfaces;
@@ -32,6 +33,13 @@ namespace ORM_Monitor.Models
         public string Name
         {
             get => Get<string>((MethodBase.GetCurrentMethod()?.Name)?[4..]);
+            set => Set((MethodBase.GetCurrentMethod()?.Name)?[4..], value);
+        }
+
+        [GridColumn(Name = "Token", Width = 80, IsReadOnly = true, Visibility = Visibility.Collapsed)]
+        public CancellationToken Token
+        {
+            get => Get<CancellationToken>((MethodBase.GetCurrentMethod()?.Name)?[4..]);
             set => Set((MethodBase.GetCurrentMethod()?.Name)?[4..], value);
         }
 

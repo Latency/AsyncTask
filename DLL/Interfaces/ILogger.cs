@@ -14,8 +14,8 @@ namespace AsyncTask.Interfaces
         bool IsEnabled { get; set; }
 
         void Debug(string msg);
-        void Info(string msg);
-        void Warning(string msg);
         void Error(string msg, Exception ex = null);
+        void Information(string msg);
+        void Warning(string msg);
     }
 }

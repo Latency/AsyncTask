@@ -62,7 +62,7 @@ namespace Tests
                 // #############################################################
                 TestContext.Progress.WriteLine($"Executing **** {test[0]} **** test.  Running for 2 seconds.  Timeout at {timeout} seconds.");
 
-                var t1 = new AsyncTask.AsyncTask(_ => Thread.Sleep(TimeSpan.FromSeconds(2)))
+                var t1 = new AsyncTask.AsyncTask((_,_) => Thread.Sleep(TimeSpan.FromSeconds(2)))
                 {
                     TaskInfo = new TaskInfo
                     {
@@ -91,7 +91,7 @@ namespace Tests
                 // #############################################################
                 TestContext.Progress.WriteLine($"Executing **** {test[1]} **** test.  Running for 10 seconds.  Timeout at {timeout} seconds.  Interrupt at 4 seconds.");
 
-                var t2 = new AsyncTask.AsyncTask(_ => Thread.Sleep(TimeSpan.FromSeconds(10)))
+                var t2 = new AsyncTask.AsyncTask((_, _) => Thread.Sleep(TimeSpan.FromSeconds(10)))
                 {
                     TaskInfo = new TaskInfo
                     {
@@ -132,7 +132,7 @@ namespace Tests
                 //// #############################################################
                 TestContext.Progress.WriteLine($"Executing **** {test[2]} **** test.  Running for 10 seconds.  Timeout at {timeout} seconds.");
 
-                var t3 = new AsyncTask.AsyncTask(_ => Thread.Sleep(TimeSpan.FromSeconds(10)))
+                var t3 = new AsyncTask.AsyncTask((_, _) => Thread.Sleep(TimeSpan.FromSeconds(10)))
                 {
                     TaskInfo = new TaskInfo()
                     {

@@ -10,5 +10,6 @@ using AsyncTask.Interfaces;
 
 namespace AsyncTask.DTO
 {
-    public class TaskList : ConcurrentDictionary<ITaskInfo, ITask>, ITaskList<ITaskInfo, ITask> { }
+    // ReSharper disable once UnusedMember.Global
+    public class TaskList : ConcurrentDictionary<ITaskInfo, ITask>, ITaskList { }
 }

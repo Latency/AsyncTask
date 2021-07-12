@@ -9,6 +9,7 @@ using System;
 using System.Windows.Forms;
 using AsyncTask.DTO;
 using AsyncTask.Logging;
+using Console.Extensions;
 using ConsoleApp1.Extensions;
 
 namespace Console.Logging
@@ -28,7 +29,7 @@ namespace Console.Logging
 
         public override void Debug(string msg) => _control.Debug(this, new MessageEventArgs { Message = msg });
 
-        public override void Info(string msg) => _control.Info(this, new MessageEventArgs { Message = msg });
+        public override void Information(string msg) => _control.Information(this, new MessageEventArgs { Message = msg });
 
         public override void Warning(string msg) => _control.Warning(this, new MessageEventArgs { Message = msg });
 
