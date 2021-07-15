@@ -79,13 +79,16 @@ namespace AsyncTask
 
 
         /// <summary>
+        ///     Status
+        /// </summary>
+        public new TaskStatus Status { get; private set; }
+
+
+        /// <summary>
         ///     ToString
         /// </summary>
         /// <returns></returns>
         public override string ToString() => TaskInfo?.Name ?? nameof(AsyncTask);
-
-
-        public new TaskStatus Status { get; private set; }
 
 
         /// <summary>

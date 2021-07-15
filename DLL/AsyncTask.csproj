@@ -5,9 +5,9 @@
     <LangVersion>latest</LangVersion>
     <SignAssembly>true</SignAssembly>
     <PackageIcon>Properties\project.png</PackageIcon>
-    <Version>3.0.11</Version>
+    <Version>3.0.12</Version>
     <Description>Asynchronous Task Extension Library</Description>
-    <PackageReleaseNotes>Replaces obsolete threading and Thread.Abort in favor of TPL for .NET 5.0+.</PackageReleaseNotes>
+    <PackageReleaseNotes>Update ITask prototypes for .NET 5.0+.</PackageReleaseNotes>
     <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
     <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02" PrivateAssets="All" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="..\Properties\project.png">
       <Pack>True</Pack>
       <PackagePath>Properties</PackagePath>
