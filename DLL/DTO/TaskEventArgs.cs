@@ -12,8 +12,9 @@ namespace AsyncTask.DTO
 {
     internal class TaskEventArgs : EventArgs, ITaskEventArgs
     {
-        Exception ITaskEventArgs.Exception { get; set; }
-        DateTime ITaskEventArgs. StartTime { get; set; }
-        TimeSpan ITaskEventArgs. Duration  { get; set; }
+        public Exception Exception { get; internal set; }
+        public DateTime  StartTime { get; internal set; }
+        public DateTime  EndTime   { get; internal set; }
+        public TimeSpan  Duration  { get; internal set; }
     }
 }

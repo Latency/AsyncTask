@@ -11,8 +11,9 @@ namespace AsyncTask.Interfaces
 {
     public interface ITaskEventArgs
     {
-        Exception Exception { get; internal set; }
-        DateTime  StartTime { get; internal set; }
-        TimeSpan  Duration  { get; internal set; }
+        Exception Exception { get; }
+        DateTime  StartTime { get; }
+        DateTime  EndTime   { get; }
+        TimeSpan  Duration  { get; }
     }
 }

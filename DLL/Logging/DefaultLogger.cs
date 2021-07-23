@@ -2,60 +2,289 @@
 // Project:  AsyncTask
 // File:     DefaultLogger.cs
 // Author:   Latency McLaughlin
-// Date:     08/24/2020
+// Date:     06/08/2021
 // ****************************************************************************
 
+#nullable enable
+
 using System;
-using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using AsyncTask.Interfaces;
+using Microsoft.Extensions.Logging;
+
+#if !NET5_0_OR_GREATER
 using static System.Diagnostics.Trace;
+#endif
 
 namespace AsyncTask.Logging
 {
     /// <summary>
-    ///     Logger
+    ///     SECS Connector Logger
     /// </summary>
-    public class DefaultLogger : ILogger
+    public partial class DefaultLogger
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly TraceListenerCollection _listeners;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool _isEnabled;
-
-
-        public DefaultLogger()
+        #region Constructors
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="synchronizationContext"></param>
+        public DefaultLogger(SynchronizationContext? synchronizationContext = null)
         {
+            SynchronizationContext.SetSynchronizationContext(synchronizationContext);
+            SynchronizationContext = synchronizationContext;
+
+            uiFactory                 = new TaskFactory(TaskScheduler.Current);
+
+            _isEnabled             = true;
+
+            #if NET5_0_OR_GREATER
+            _logger                = Initialize(LogLevel.Trace);
+            #else
             _listeners = Listeners;
+            #endif
+        }
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        #endregion Constructors
+
+
+
+        #region Methods
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        public void Enable()
+        {
+            if (_isEnabled)
+                return;
+
             _isEnabled = true;
+
+            #if NET5_0_OR_GREATER
+            _logger = Initialize(LogLevel.Trace);
+            #else
+            _listeners.AddRange(Listeners);
+            #endif
         }
 
 
-        public virtual bool IsEnabled
+        public void Disable()
         {
-            get => _isEnabled;
-            set
-            {
-                if (_isEnabled == value)
-                    return;
-                _isEnabled = value;
-                if (!_isEnabled)
-                    _listeners.Clear();
-                else
-                    _listeners.AddRange(Listeners);
-            }
+            if (!_isEnabled)
+                return;
+
+            _isEnabled = false;
+
+            #if NET5_0_OR_GREATER
+            _logger = Initialize(LogLevel.None);
+            #else
+            _listeners.Clear();
+            #endif
         }
 
-        public virtual void Debug(string msg) => WriteLine(msg);
 
-        public virtual void Information(string msg) => TraceInformation(msg);
-
-        public virtual void Warning(string msg) => TraceWarning(msg);
-
-        public virtual void Error(string msg, Exception ex = null)
+        public void Trace(string msg)
         {
+            if (!_isEnabled)
+                return;
+
+            #if NET5_0_OR_GREATER
+            _logger.LogTrace(msg);
+            #endif
+
+            OnTrace(msg);
+        }
+
+
+        public void Debug(string msg)
+        {
+            if (!_isEnabled)
+                return;
+
+            #if NET5_0_OR_GREATER
+            _logger.LogDebug(msg);
+            #else
+            WriteLine(msg);
+            #endif
+
+            OnDebug(msg);
+        }
+
+
+        public void Error(string msg, Exception? ex)
+        {
+            if (!_isEnabled)
+                return;
+
+            #if NET5_0_OR_GREATER
+            _logger.LogError(ex, msg);
+            #else
             if (ex != null)
                 msg += $"{Environment.NewLine}{ex}";
             TraceError(msg);
+            #endif
+
+            OnError(msg, ex);
         }
+
+
+        public void Information(string msg)
+        {
+            if (!_isEnabled)
+                return;
+
+            #if NET5_0_OR_GREATER
+            _logger.LogInformation(msg);
+            #else
+            TraceInformation(msg);
+            #endif
+
+            OnInformation(msg);
+        }
+
+
+        public void Warning(string msg)
+        {
+            if (!_isEnabled)
+                return;
+
+            #if NET5_0_OR_GREATER
+            _logger.LogWarning(msg);
+            #else
+            TraceWarning(msg);
+            #endif
+
+            OnWarning(msg);
+        }
+
+
+        public void Critical(string msg)
+        {
+            if (!_isEnabled)
+                return;
+
+            #if NET5_0_OR_GREATER
+            _logger.LogCritical(msg);
+            #endif
+
+            OnCritical(msg);
+        }
+
+
+        public void None(string msg)
+        {
+            if (!_isEnabled)
+                return;
+
+            OnNone(msg);
+        }
+
+
+        public void Add(LogLevel enm, Action<IMessageEventArgs> del)
+        {
+            switch (enm)
+            {
+                case LogLevel.None:
+                    NoneHandler += del;
+                    break;
+                case LogLevel.Debug:
+                    DebugHandler += del;
+                    break;
+                case LogLevel.Error:
+                    ErrorHandler += del;
+                    break;
+                case LogLevel.Critical:
+                    CriticalHandler += del;
+                    break;
+                case LogLevel.Information:
+                    InformationHandler += del;
+                    break;
+                case LogLevel.Trace:
+                    TraceHandler += del;
+                    break;
+                case LogLevel.Warning:
+                    WarningHandler += del;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(enm), enm, null);
+            }
+        }
+
+
+        public void Remove(LogLevel enm, Action<IMessageEventArgs> del)
+        {
+            switch (enm)
+            {
+                case LogLevel.None:
+                    NoneHandler -= del;
+                    break;
+                case LogLevel.Debug:
+                    DebugHandler -= del;
+                    break;
+                case LogLevel.Error:
+                    ErrorHandler -= del;
+                    break;
+                case LogLevel.Critical:
+                    CriticalHandler -= del;
+                    break;
+                case LogLevel.Information:
+                    InformationHandler -= del;
+                    break;
+                case LogLevel.Trace:
+                    TraceHandler -= del;
+                    break;
+                case LogLevel.Warning:
+                    WarningHandler -= del;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(enm), enm, null);
+            }
+        }
+
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            #if NET5_0_OR_GREATER
+            _logger.Log(logLevel, eventId, state, exception, formatter);
+            #else
+            throw new NotSupportedException();
+            #endif
+        }
+
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            #if NET5_0_OR_GREATER
+            return _logger.IsEnabled(logLevel);
+            #else
+            throw new NotSupportedException();
+            #endif
+        }
+
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            #if NET5_0_OR_GREATER
+            return _logger.BeginScope(state);
+            #else
+            throw new NotSupportedException();
+            #endif
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        protected virtual void Dispose(bool disposing) { }
+
+
+        #if NET5_0_OR_GREATER
+        private static Microsoft.Extensions.Logging.ILogger Initialize(LogLevel logLevel) => LoggerFactory.Create(builder => builder.SetMinimumLevel(logLevel)).CreateLogger(typeof(object));
+        #endif
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        #endregion Methods
     }
 }

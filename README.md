@@ -8,11 +8,11 @@
 
 * CREATED BY:   [Latency McLaughlin]
 * FRAMEWORK:    [.NET] v4.5 - v6.0, & Core v[3.1](https://www.microsoft.com/net/download/windows)
-* LANGUAGE:     [C#] (v9.0)
+* LANGUAGE:     [C#] (v10.0)
 * GFX SUBSYS:   [WPF]
-* SUPPORTS:     [Visual Studio] 2019, 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      07/14/2021
-* VERSION:      [3.0.12](https://www.nuget.org/packages/AsyncTask/3.0.12/)
+* SUPPORTS:     [Visual Studio] 2022, 2019, 2017, 2015, 2013, 2012, 2010, 2008
+* UPDATED:      07/27/2021
+* VERSION:      [3.0.13](https://www.nuget.org/packages/AsyncTask/3.0.12/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -60,6 +60,7 @@ Callback support for the following delegates:
 * OnComplete
 * OnError
 * OnCanceled
+* OnTick
 * OnTimeout
 
 
@@ -144,24 +145,33 @@ There are three essential steps to using this:
 
 ### Example #1
 ```csharp
-    var t2 = new AsyncTask.Tasks.AsyncTask
-    {
-        TaskInfo = new TaskInfo
-        {
-            Name = "t2"
-        },
-        Timeout = TimeSpan.FromSeconds(5),
-        Logger = new DefaultLogger(),
-        TaskList = new TaskList(),
-        Delegate = _ => Thread.Sleep(TimeSpan.FromSeconds(10)),
-        OnAdd = atask => Console.WriteLine($"Adding task for '{atask.TaskInfo.Name}'."),
-        OnRemove = atask => Console.WriteLine($"Removing task for '{atask.TaskInfo.Name}'."),
-        OnComplete = atask => Console.WriteLine($"Completed task for '{atask.TaskInfo.Name}'."),
-        OnTimeout = atask => Console.WriteLine($"Timeout for '{atask.TaskInfo.Name}'."),
-        OnError = atask => Console.WriteLine($"An error occured for '{atask.TaskInfo.Name}'."),
-        OnCanceled = atask => Console.WriteLine($"Canceled task for '{atask.TaskInfo.Name}'.")
-    };
-    t2.Register();
+            _t2 = new AsyncTask.AsyncTask((task, args) =>
+            {
+                do
+                {
+                    task.TaskInfo.Token.ThrowIfCancellationRequested();
+                    Task.Delay(250).GetAwaiter();
+                }
+                while (args.Duration < TimeSpan.FromSeconds(blockTime));
+            })
+            {
+                TaskInfo = new TaskInfo
+                {
+                    Name                   = "t2",
+                    Timeout                = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
+                    Logger                 = _logger,
+                    PollInterval           = new TimeSpan(0, 0, 1),
+                    SynchronizationContext = SynchronizationContext.Current
+                },
+                OnAdd      = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Trace($"Adding task for {asyncTask.TaskInfo.Name}"),
+                OnRemove   = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Trace($"Removing task for {asyncTask.TaskInfo.Name}"),
+                OnComplete = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Warning($"Completing task for '{asyncTask.TaskInfo.Name}'."),
+                OnTick     = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Information($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
+                OnTimeout  = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Critical($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo.Name}'."),
+                OnCanceled = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Critical($"Canceling task for '{asyncTask.TaskInfo.Name}'."),
+                OnError    = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Error($"Error occured for '{asyncTask.TaskInfo.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
+            };
+            _t2.Start();
 ```
 
 <h2><a name="output">Output</a></h2>

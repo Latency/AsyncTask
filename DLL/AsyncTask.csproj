@@ -1,42 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0;net452;net461;net472;net48;net5.0;net6.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <SignAssembly>true</SignAssembly>
-    <PackageIcon>Properties\project.png</PackageIcon>
-    <Version>3.0.12</Version>
-    <Description>Asynchronous Task Extension Library</Description>
-    <PackageReleaseNotes>Update ITask prototypes for .NET 5.0+.</PackageReleaseNotes>
-    <PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
-    <PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
-    <AssemblyOriginatorKeyFile>../../../Sign.pfx</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>../../../sBIO2.ico</ApplicationIcon>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net45;netcoreapp3.1;netstandard2.0;net472;net48;net6.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<SignAssembly>true</SignAssembly>
+		<PackageIcon>Properties\project.png</PackageIcon>
+		<Version>3.0.13</Version>
+		<Description>Asynchronous Task Extension Library</Description>
+		<PackageReleaseNotes>Update ITask prototypes for .NET 5.0+.</PackageReleaseNotes>
+		<PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
+		<PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
+	    <!--<AssemblyOriginatorKeyFile>../../../Sign.pfx</AssemblyOriginatorKeyFile>
+	    <ApplicationIcon>../../../sBIO2.ico</ApplicationIcon>-->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Logging\LoggerHandlers.cs">
+			<DependentUpon>DefaultLogger.cs</DependentUpon>
+		</Compile>
+		<Compile Update="Logging\LoggerHandlers.Designer.cs">
+			<DependentUpon>LoggerHandlers.cs</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02" PrivateAssets="All" />
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-    <None Include="..\Properties\project.png">
-      <Pack>True</Pack>
-      <PackagePath>Properties</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Condition="'$(TargetFramework)'=='net6.0'" Include="Microsoft.Extensions.Logging" Version="6.0.0-preview.5.21301.5" />
+		<PackageReference Condition="'$(TargetFramework)'!='net45'" Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02" PrivateAssets="All" />
+		<None Include="..\Properties\project.png">
+			<Pack>True</Pack>
+			<PackagePath>Properties</PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

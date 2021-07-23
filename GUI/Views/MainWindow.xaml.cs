@@ -7,9 +7,9 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -64,10 +64,14 @@ namespace ORM_Monitor.Views
             if (btn.Tag is not (AsyncTask.AsyncTask asyncTask, ITaskEventArgs))
                 throw new NullReferenceException();
 
-            if (asyncTask.TaskInfo is not TaskRecordSet rst)
+            if (asyncTask.TaskInfo is not ITaskRecordSet rst)
                 throw new NullReferenceException();
 
-            var index = rst.GridRow.GetIndex();
+            var recordSet = ListView1.Items.Cast<ITaskRecordSet>().FirstOrDefault(r => r.GridRow == rst.GridRow);
+            if (recordSet is null)
+                throw new NullReferenceException();
+
+            var index = recordSet.GridRow.GetIndex();
             lblStatusBar.Text = $"Button clicked: (Row: {index + 1}, Action: {btn.Content})";
 
             if (btn.IsEnabled && asyncTask.Status == TaskStatus.Running)
@@ -77,9 +81,9 @@ namespace ORM_Monitor.Views
                     MyButton_MouseDown(sender, null);
                     btn.IsEnabled = false;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Debug.WriteLine(ex.Message);
+                    // Handled
                 }
             else
                 ListView1.Items.RemoveAt(index);
@@ -95,77 +99,64 @@ namespace ORM_Monitor.Views
         {
             var task = new AsyncTask.AsyncTask((asyncTask, _) =>
             {
-                try
-                {
-                    while (!asyncTask.TaskInfo.Token.IsCancellationRequested)
-                        Task.Delay(asyncTask.PollInterval, asyncTask.TaskInfo.Token).ConfigureAwait(false).GetAwaiter().GetResult();
-                }
-                catch (TaskCanceledException)
-                {
-                }
+                WaitHandle.WaitAny(new[] { asyncTask.TaskInfo.Token.WaitHandle });
             })
             {
                 TaskInfo = new TaskRecordSet
                 {
-                    Owner = this
+                    Name                   = nameof(AsyncTask),
+                    PollInterval           = new TimeSpan(0, 0, 0, 0, 10),
+                    Owner                  = this,
+                    SynchronizationContext = SynchronizationContext.Current
                 },
-                PollInterval = new TimeSpan(0, 0, 0, 0, 50),
                 OnAdd = (asyncTask, args) =>
                 {
-                    if (asyncTask.TaskInfo is not TaskRecordSet rst)
+                    if (asyncTask.TaskInfo is not ITaskRecordSet rst)
                         throw new NullReferenceException();
 
-                    rst.Tag = (asyncTask, args);
+                    rst.ID                =  new Random().Next();
+                    rst.Priority          =  new Random().Next(0, 5);
+                    rst.Date              =  DateTime.Now;
+                    rst.Tag               =  (asyncTask, args);
 
-                    lblStatusBar.Text = $"Starting task \"{rst.Name}\".";
+                    lblStatusBar.Text = $"Starting task \"{rst.ID}\".";
+
                     var index = ListView1.Items.Add(rst);
                     ListView1.UpdateLayout();
+                    ListView1.ScrollIntoView(ListView1.Items[index]);
 
                     if (ListView1.ItemContainerGenerator.ContainerFromIndex(index) is not DataGridRow rowContainer)
                         throw new NullReferenceException();
 
                     rst.GridRow = rowContainer;
 
-                    var a = Extensions.Extensions.FindFirstChild<DataGridCellsPanel>(rowContainer);
-                    foreach (DataGridCell b in a.Children)
-                    {
-                        b.Name = b.Column.Header.ToString();
-                        switch (b.Name)
-                        {
-                            case "Action":
-                                var btn = Extensions.Extensions.FindFirstChild<Button>(
-                                    b.Content as FrameworkElement);
-                                btn.Content    =  "Stop";
-                                btn.Tag        =  (asyncTask, args);
-                                btn.Click      += RemoveButton_Click;
-                                btn.MouseDown  += MyButton_MouseDown;
-                                btn.MouseEnter += MyButton_MouseEnter;
-                                btn.MouseLeave += MyButton_MouseLeave;
-                                rst.Action     =  btn;
-                                break;
-                            case "ID":
-                                rst.ID = new Random().Next();
-                                break;
-                            case "Priority":
-                                rst.Priority = new Random().Next(0, 5);
-                                break;
-                            case "Date":
-                                rst.Date = DateTime.Now;
-                                break;
-                        }
-                    }
+                    var a   = Extensions.Extensions.FindFirstChild<DataGridCellsPanel>(rowContainer);
+                    if (a is null)
+                        return;
+
+                    var content = a.Children.Cast<DataGridCell>().FirstOrDefault(c => c.Column.Header.ToString() == "Action")?.Content;
+                    rst.Action            =  Extensions.Extensions.FindFirstChild<Button>(content as FrameworkElement);
+                    rst.Action.Content    =  "Stop";
+                    rst.Action.Tag        =  rst.Tag;
+                    rst.Action.Click      += RemoveButton_Click;
+                    rst.Action.MouseDown  += MyButton_MouseDown;
+                    rst.Action.MouseEnter += MyButton_MouseEnter;
+                    rst.Action.MouseLeave += MyButton_MouseLeave;
                 },
                 OnComplete = (asyncTask, _) =>
                 {
-                    if (asyncTask.TaskInfo is not TaskRecordSet rst)
+                    if (asyncTask.TaskInfo is not ITaskRecordSet rst)
                         throw new NullReferenceException();
 
-                    rst.Action.IsEnabled = true;
-                    rst.Action.Content   = "Remove";
+                    if (rst.Action is not null)
+                    {
+                        rst.Action.IsEnabled = true;
+                        rst.Action.Content   = "Remove";
+                    }
                 },
                 OnTick = (asyncTask, _) =>
                 {
-                    if (asyncTask.TaskInfo is not TaskRecordSet rst)
+                    if (asyncTask.TaskInfo is not ITaskRecordSet rst)
                         throw new NullReferenceException();
 
                     if (rst.Progress < 100)
@@ -178,16 +169,22 @@ namespace ORM_Monitor.Views
                     if (asyncTask.TaskInfo is not TaskRecordSet rst)
                         throw new NullReferenceException();
 
-                    rst.Action.IsEnabled = true;
-                    rst.Action.Content   = "Remove";
+                    if (rst.Action is not null)
+                    {
+                        rst.Action.IsEnabled = true;
+                        rst.Action.Content   = "Remove";
+                    }
                 },
                 OnCanceled = (asyncTask, _) =>
                 {
                     if (asyncTask.TaskInfo is not TaskRecordSet rst)
                         throw new NullReferenceException();
 
-                    rst.Action.IsEnabled = true;
-                    rst.Action.Content   = "Remove";
+                    if (rst.Action is not null)
+                    {
+                        rst.Action.IsEnabled = true;
+                        rst.Action.Content   = "Remove";
+                    }
                 }
             };
 
@@ -245,7 +242,7 @@ namespace ORM_Monitor.Views
             var msg = new StringBuilder();
 
             foreach (TaskRecordSet item in ListView1.SelectedItems)
-                msg.Append($"{(msg.Length > 0 ? ", " : string.Empty)}{item.Name}");
+                msg.Append($"{(msg.Length > 0 ? ", " : string.Empty)}{item.ID}");
             if (msg.Length <= 0)
                 return;
             lblStatusBar.Text = $"Selected '{msg}' of {ListView1.SelectedItems.Count} item{(ListView1.SelectedItems.Count != 1 ? "s" : string.Empty)}.";
@@ -268,10 +265,11 @@ namespace ORM_Monitor.Views
                 DataGridCell dgc => dgc,
                 TextBlock tb     => tb.Parent as DataGridCell,
                 Button button    => button.Parent as DataGridCell,
-                _                => throw new ArgumentOutOfRangeException()
+                _                => throw new ArgumentOutOfRangeException(nameof(sender))
             };
+
             if (cell != null)
-                lblCursorPosition.Text = $"Over {cell.Column.Header} at (Row: {Grid.GetRow(cell) + 1}, Col: {cell.Column.DisplayIndex + 1})";
+                lblCursorPosition.Text = $"Over {cell.Column.Header} at (Row: {(cell.DataContext as ITaskRecordSet)?.GridRow.GetIndex() + 1}, Col: {cell.Column.DisplayIndex + 1})";
         }
 
 
@@ -334,7 +332,10 @@ namespace ORM_Monitor.Views
 
             btn.MouseEnter -= MyButton_MouseEnter;
             btn.MouseLeave -= MyButton_MouseLeave;
-            btn.SetValue(BackgroundProperty, new ImageBrush((ImageSource) Application.Current.Resources["Button-Pressed"]));
+            btn.Background = new ImageBrush
+            {
+                ImageSource = (ImageSource)Application.Current.Resources["Button-Pressed"]
+            };
         }
     }
 }

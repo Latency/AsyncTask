@@ -6,22 +6,22 @@
 // ****************************************************************************
 
 using System;
+using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AsyncTask.DTO;
 using AsyncTask.Interfaces;
-using ConsoleApp1;
-using ConsoleApp1.Extensions;
-using Logger = Console.Logging.Logger;
+using AsyncTask.Logging;
+using Microsoft.Extensions.Logging;
+using ILogger = AsyncTask.Interfaces.ILogger;
 
 namespace Console
 {
     public partial class Form1 : Form
     {
-        private event EventHandler OnButtonChanged;
-        private readonly ILogger _logger;
-        private ButtonType _buttonType;
         private AsyncTask.AsyncTask _t2;
+        private ILogger             _logger;
 
 
         /// <summary>
@@ -30,9 +30,6 @@ namespace Console
         public Form1()
         {
             InitializeComponent();
-            OnButtonChanged += ButtonChanged_Event;
-            ButtonDisable.Enabled = false;
-            _logger = new Logger(TextBoxMessageLog);
         }
 
 
@@ -45,74 +42,118 @@ namespace Console
         }
 
 
-        private void ButtonChanged_Event(object sender, EventArgs e)
+        #region Callbacks
+        // =-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        private void Critical(IMessageEventArgs args)
         {
-            switch (_buttonType)
+            TextBoxMessageLog.SelectionColor = Color.HotPink;
+            TextBoxMessageLog.AppendText(args.Message);
+        }
+
+
+        private void Trace(IMessageEventArgs args)
+        {
+            TextBoxMessageLog.SelectionColor = Color.Green;
+            TextBoxMessageLog.AppendText(args.Message);
+        }
+
+
+        private void None(IMessageEventArgs args)
+        {
+            TextBoxMessageLog.SelectionColor = Color.White;
+            TextBoxMessageLog.AppendText(args.Message);
+        }
+
+
+        private void Information(IMessageEventArgs args)
+        {
+            TextBoxMessageLog.SelectionColor = Color.DodgerBlue;
+            TextBoxMessageLog.AppendText(args.Message);
+        }
+
+
+        private void Warning(IMessageEventArgs args)
+        {
+            TextBoxMessageLog.SelectionColor = Color.Yellow;
+            TextBoxMessageLog.AppendText(args.Message);
+        }
+
+
+        private void Error(IMessageEventArgs args)
+        {
+            TextBoxMessageLog.SelectionColor = Color.Red;
+            TextBoxMessageLog.AppendText(args.Message);
+            if (args.Exception != null)
             {
-                case ButtonType.Disabled:
-                    ButtonDisable.Enabled = true;
-                    ButtonEnable.Enabled = false;
-                    break;
-                case ButtonType.Enabled:
-                    ButtonDisable.Enabled = false;
-                    ButtonEnable.Enabled = true;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(ButtonChanged_Event));
+                TextBoxMessageLog.SelectionColor = Color.Gray;
+                TextBoxMessageLog.AppendText(args.Exception.Message);
             }
         }
 
 
-        private void ChangeState(ButtonType type)
+        private void Debug(IMessageEventArgs args)
         {
-            if (_buttonType == type)
-                return;
-            _buttonType = type;
-            OnButtonChanged?.Invoke(this, EventArgs.Empty);
+            TextBoxMessageLog.SelectionColor = Color.DarkOrange;
+            TextBoxMessageLog.AppendText(args.Message);
+        }
+        // =-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        #endregion Callbacks
+
+
+        private void OnButtonChanged(bool enabled)
+        {
+            switch (enabled)
+            {
+                case true:
+                    ButtonDisable.Enabled = true;
+                    ButtonEnable.Enabled = false;
+                    break;
+                case false:
+                    ButtonDisable.Enabled = false;
+                    ButtonEnable.Enabled = true;
+                    break;
+            }
         }
 
 
         private void ButtonEnable_Click(object sender, EventArgs e)
         {
-            ButtonEnable.Enabled  = false;
-            ButtonDisable.Enabled = true;
-
             var blockTime = (int) numericUpDownBlockTime.Value;
             var timeout   = (int) numericUpDownTimeout.Value;
             _t2 = new AsyncTask.AsyncTask((task, args) =>
             {
-                try
+                do
                 {
-                    Task.Delay(TimeSpan.FromSeconds(blockTime), task.TaskInfo.Token).ConfigureAwait(false).GetAwaiter().GetResult();
+                    task.TaskInfo.Token.ThrowIfCancellationRequested();
+                    Task.Delay(250).GetAwaiter().GetResult();
                 }
-                catch (TaskCanceledException)
-                {
-                }
+                while (args.Duration < TimeSpan.FromSeconds(blockTime));
             })
             {
                 TaskInfo = new TaskInfo
                 {
-                    Name = "t2"
+                    Name                   = "t2",
+                    Timeout                = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
+                    Logger                 = _logger,
+                    PollInterval           = new TimeSpan(0, 0, 1),
+                    SynchronizationContext = SynchronizationContext.Current
                 },
-                Timeout  = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
-                Logger   = _logger,
-                TaskList = new TaskList(),
                 OnAdd    = (asyncTask, _) =>
                 {
-                    _logger.Warning($"Adding task for {asyncTask.TaskInfo.Name}");
-                    _logger.Warning($"Executing **** t2 **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
-                    ChangeState(ButtonType.Disabled);
+                    asyncTask.TaskInfo.Logger?.Trace($"Adding task for {asyncTask.TaskInfo.Name}");
+                    asyncTask.TaskInfo.Logger?.Warning($"Executing **** t2 **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
+                    OnButtonChanged(true);
                 },
                 OnRemove   = (asyncTask, _) =>
                 {
-                    _logger.Warning($"Removing task for {asyncTask.TaskInfo.Name}");
-                    ChangeState(ButtonType.Enabled);
+                    asyncTask.TaskInfo.Logger?.Trace($"Removing task for {asyncTask.TaskInfo.Name}");
+                    OnButtonChanged(false);
                 },
-                OnComplete = (asyncTask, _)    => _logger.Information($"Completing task for '{asyncTask.TaskInfo?.Name}'."),
-                OnTick     = (_,         args) => _logger.Information($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
-                OnTimeout  = (asyncTask, _)    => _logger.Information($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo?.Name}'."),
-                OnCanceled = (asyncTask, _)    => _logger.Information($"Canceling task for '{asyncTask.TaskInfo?.Name}'."),
-                OnError    = (asyncTask, args) => _logger.Error($"Error occured for '{asyncTask.TaskInfo?.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
+                OnComplete = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Warning($"Completing task for '{asyncTask.TaskInfo.Name}'."),
+                OnTick     = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Information($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
+                OnTimeout  = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Critical($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo.Name}'."),
+                OnCanceled = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Critical($"Canceling task for '{asyncTask.TaskInfo.Name}'."),
+                OnError    = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Error($"Error occured for '{asyncTask.TaskInfo.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
             };
             _t2.Start();
         }
@@ -120,15 +161,26 @@ namespace Console
 
         private void ButtonDisable_Click(object sender, EventArgs e)
         {
-            ChangeState(ButtonType.Enabled);
-
+            OnButtonChanged(false);
             _t2?.Cancel();
         }
 
 
-        private void ButtonClear_Click(object sender, EventArgs e)
+        private void ButtonClear_Click(object sender, EventArgs e) => TextBoxMessageLog.Clear();
+
+
+        private void Form1_Load(object sender, EventArgs e)
         {
-            TextBoxMessageLog.InvokeIfRequired(() => TextBoxMessageLog.Clear(), new EventHandler(ButtonClear_Click), sender, e);
+            _logger = new DefaultLogger(SynchronizationContext.Current);
+            _logger.Add(LogLevel.Trace, Trace);
+            _logger.Add(LogLevel.Debug, Debug);
+            _logger.Add(LogLevel.Information, Information);
+            _logger.Add(LogLevel.Warning, Warning);
+            _logger.Add(LogLevel.Error, Error);
+            _logger.Add(LogLevel.Critical, Critical);
+            _logger.Add(LogLevel.None, None);
+
+            OnButtonChanged(false);
         }
     }
 }

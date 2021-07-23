@@ -4,8 +4,8 @@
 // Author:   Latency McLaughlin
 // Date:     08/24/2020
 // ****************************************************************************
-// ReSharper disable UnusedMemberInSuper.Global
-// ReSharper disable UnusedMember.Global
+
+#nullable enable
 
 using System;
 using System.Runtime.CompilerServices;
@@ -16,11 +16,7 @@ namespace AsyncTask.Interfaces
 {
     public interface ITask : IAsyncResult, IDisposable
     {
-        TimeSpan                PollInterval            { get; set; }
-        TimeSpan?               Timeout                 { get; set; }
-        ILogger                 Logger                  { get; set; }
         ITaskInfo               TaskInfo                { get; set; }
-        ITaskList               TaskList                { get; set; }
         int                     Id                      { get; }
         AggregateException?     Exception               { get; }
         TaskStatus              Status                  { get; }

@@ -8,11 +8,11 @@
 
 * CREATED BY:   [Latency McLaughlin]
 * FRAMEWORK:    [.NET] v4.5 - v6.0, & Core v[3.1](https://www.microsoft.com/net/download/windows)
-* LANGUAGE:     [C#] (v9.0)
+* LANGUAGE:     [C#] (v10.0)
 * GFX SUBSYS:   [WPF]
-* SUPPORTS:     [Visual Studio] 2019, 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      07/14/2021
-* VERSION:      [3.0.12](https://www.nuget.org/packages/AsyncTask/3.0.12/)
+* SUPPORTS:     [Visual Studio] 2022, 2019, 2017, 2015, 2013, 2012, 2010, 2008
+* UPDATED:      07/27/2021
+* VERSION:      [3.0.13](https://www.nuget.org/packages/AsyncTask/3.0.13/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ---
@@ -23,6 +23,7 @@ Callback support for the following delegates:
 * OnComplete
 * OnError
 * OnCanceled
+* OnTick
 * OnTimeout
 
 ---

@@ -9,14 +9,13 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using AsyncTask.Interfaces;
 
 namespace ORM_Monitor.Interfaces
 {
     /// <summary>
     ///     IServiceTask
     /// </summary>
-    public interface ITaskRecordSet : ITaskInfo
+    public interface ITaskRecordSet
     {
         /// <summary>
         ///     ID
