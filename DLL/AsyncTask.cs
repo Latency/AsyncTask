@@ -13,7 +13,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AsyncTask.DTO;
-using AsyncTask.Extensions;
 using AsyncTask.Interfaces;
 
 namespace AsyncTask
@@ -29,6 +28,12 @@ namespace AsyncTask
     /// </remarks>
     public class AsyncTask : Task<bool>, ITask
     {
+        // ReSharper disable InconsistentNaming
+        private const int TASK_STATE_FAULTED  = 0x200000;
+        private const int TASK_STATE_CANCELED = 0x400000;
+        // ReSharper restore InconsistentNaming
+
+
         #region Fields
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -64,9 +69,15 @@ namespace AsyncTask
             if (type == null)
                 throw new NullReferenceException();
 
+            var stateFlagsField = type.GetField("m_stateFlags", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (stateFlagsField is null)
+                throw new NullReferenceException("m_stateFlags");
+
+            _setTaskStatus = value => stateFlagsField.SetValue(this, value, BindingFlags.Instance | BindingFlags.NonPublic, null, CultureInfo.CurrentCulture);
+
             var field = type.GetField("m_action", BindingFlags.Instance | BindingFlags.NonPublic);
             if (field is null)
-                throw new NullReferenceException();
+                throw new NullReferenceException("m_action");
 
             // Set the 1st argument of the base ctor via reflection since we require late binding here.
             field.SetValue(this, new Func<bool>(() =>
@@ -82,7 +93,7 @@ namespace AsyncTask
                 }
                 catch (Exception ex)
                 {
-                    _setTaskStatus(0x200000);
+                    _setTaskStatus(TASK_STATE_FAULTED);
                     _exception = ex;
                 }
 
@@ -91,7 +102,7 @@ namespace AsyncTask
 
             var method = type.BaseType?.GetMethod("AssignCancellationToken", BindingFlags.Instance | BindingFlags.NonPublic);
             if (method is null)
-                throw new NullReferenceException();
+                throw new NullReferenceException("AssignCancellationToken");
 
             method.Invoke(this, new object[]
             {
@@ -100,11 +111,6 @@ namespace AsyncTask
                 null
             });
 
-            field = type.GetField("m_stateFlags", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field is null)
-                throw new NullReferenceException();
-
-            _setTaskStatus = value => field.SetValue(this, value, BindingFlags.Instance | BindingFlags.NonPublic, null, CultureInfo.CurrentCulture);
             // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
             #endregion Reflection
         }
@@ -136,9 +142,7 @@ namespace AsyncTask
             TaskInfo.TaskList ??= new TaskList();
             TaskInfo.TaskList.Add(this, TaskInfo);
 
-            UiDispatcher.Initialize(TaskInfo.SynchronizationContext);
-
-            await InvokeAsync(nameof(OnAdd), OnAdd);
+            Dispatch(nameof(OnAdd), OnAdd);
 
             #region Monitor
             //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -156,20 +160,20 @@ namespace AsyncTask
                         var thisTime = DateTime.Now;
                         if (TaskInfo.Timeout is not null && thisTime >= _eventArgs.EndTime)
                         {
-                            _setTaskStatus(0x400000);
-                            await InvokeAsync(nameof(OnTimeout), OnTimeout);
+                            _setTaskStatus(TASK_STATE_CANCELED);
+                            Dispatch(nameof(OnTimeout), OnTimeout);
                             break;
                         }
 
                         var pulse = thisTime.Subtract(lastTime).Add(TaskInfo.PollInterval);
-                        await Delay(pulse, _cts[0].Token).ContinueWith(async task =>
+                        await Delay(pulse, _cts[0].Token).ContinueWith(task =>
                         {
                             if (task.Status == TaskStatus.Canceled)
                                 return;
 
                             ((TaskEventArgs) _eventArgs).Duration = thisTime.Subtract(_eventArgs.StartTime).Add(pulse);
 
-                            await InvokeAsync(nameof(OnTick), OnTick);
+                            Dispatch(nameof(OnTick), OnTick);
                         });
 
                         lastTime = DateTime.Now;
@@ -216,7 +220,7 @@ namespace AsyncTask
             {
                 case TaskStatus.Faulted:
                     ((TaskEventArgs)_eventArgs).Exception = _exception;
-                    await InvokeAsync(nameof(OnError), OnError);
+                    Dispatch(nameof(OnError), OnError);
                     break;
                 case TaskStatus.Canceled:
                 case TaskStatus.Created:
@@ -226,13 +230,13 @@ namespace AsyncTask
                 case TaskStatus.WaitingForChildrenToComplete:
                     break;
                 case TaskStatus.RanToCompletion:
-                    await InvokeAsync(nameof(OnComplete), OnComplete);
+                    Dispatch(nameof(OnComplete), OnComplete);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            await InvokeAsync(nameof(OnRemove), OnRemove);
+            Dispatch(nameof(OnRemove), OnRemove);
 
             //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
             #endregion Main Delegate
@@ -243,11 +247,11 @@ namespace AsyncTask
         ///     Send cancellation request for token.
         /// </summary>
         /// <param name="throwOnFirstException"></param>
-        public async void Cancel(bool throwOnFirstException = false)
+        public void Cancel(bool throwOnFirstException = false)
         {
             _cts[0].Cancel(throwOnFirstException);
-            _setTaskStatus(0x400000);
-            await InvokeAsync(nameof(OnCanceled), OnCanceled);
+            _setTaskStatus(TASK_STATE_CANCELED);
+            Dispatch(nameof(OnCanceled), OnCanceled);
         }
         
 
@@ -258,22 +262,49 @@ namespace AsyncTask
         public override string ToString() => TaskInfo.Name;
 
 
-        #region Local Methods
-        //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-        private Task InvokeAsync(string name, Action<ITask, ITaskEventArgs> method) => UiDispatcher.InvokeAsync(() =>
+        /// <summary>
+        ///     Executes an action on the UI thread. If this method is called from the UI thread, the action is executed immendiately.
+        ///     If the method is called from another thread, the action will be enqueued on the UI thread's dispatcher and executed asynchronously.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="method">The action that will be executed on the UI thread.</param>
+        public void Dispatch(string name, Action<ITask, ITaskEventArgs> method)
         {
-            try
+            if (TaskInfo.SynchronizationContext == null)
+                throw new NullReferenceException("SynchronizationContext is null.");
+
+            if (TaskInfo.SynchronizationContext == SynchronizationContext.Current)
             {
-                method?.Invoke(this, _eventArgs);
+                try
+                {
+                    method?.Invoke(this, _eventArgs);
+                }
+                catch (Exception ex)
+                {
+                    _cts[0].Cancel();
+                    _setTaskStatus(TASK_STATE_FAULTED);
+                    _exception = Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex) as Exception;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                _cts[0].Cancel();
-                _setTaskStatus(0x200000);
-                _exception = Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex) as Exception;
+                var tcs = new TaskCompletionSource<bool>();
+                TaskInfo.SynchronizationContext.Post(_ =>
+                {
+                    try
+                    {
+                        method?.Invoke(this, _eventArgs);
+                        tcs.SetResult(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        _cts[0].Cancel();
+                        _setTaskStatus(TASK_STATE_FAULTED);
+                        _exception = (Exception)Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex);
+                        tcs.SetException(_exception);
+                    }
+                }, null);
             }
-        });
-        //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-        #endregion Local Methods
+        }
     }
 }

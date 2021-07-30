@@ -5,14 +5,14 @@
 		<LangVersion>latest</LangVersion>
 		<SignAssembly>true</SignAssembly>
 		<PackageIcon>Properties\project.png</PackageIcon>
-		<Version>3.0.13</Version>
+		<Version>3.0.14</Version>
 		<Description>Asynchronous Task Extension Library</Description>
-		<PackageReleaseNotes>Update ITask prototypes for .NET 5.0+.</PackageReleaseNotes>
+		<PackageReleaseNotes>Revamp of delegate dispatcher synchronization.</PackageReleaseNotes>
 		<PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
 		<PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
-	    <!--<AssemblyOriginatorKeyFile>../../../Sign.pfx</AssemblyOriginatorKeyFile>
-	    <ApplicationIcon>../../../sBIO2.ico</ApplicationIcon>-->
+	    <AssemblyOriginatorKeyFile>../../../Sign.pfx</AssemblyOriginatorKeyFile>
+	    <ApplicationIcon>../../../sBIO2.ico</ApplicationIcon>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

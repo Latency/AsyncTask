@@ -63,5 +63,6 @@ namespace AsyncTask.Interfaces
         Task                    WaitAsync(TimeSpan                                 timeout, CancellationToken cancellationToken);
 #endif
         void                    Cancel(bool                                        throwOnFirstException = false);
+        void                    Dispatch(string                                    name, Action<ITask, ITaskEventArgs>           method);
     }
 }
