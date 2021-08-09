@@ -288,20 +288,17 @@ namespace AsyncTask
             }
             else
             {
-                var tcs = new TaskCompletionSource<bool>();
-                TaskInfo.SynchronizationContext.Post(_ =>
+                TaskInfo.SynchronizationContext.Send(_ =>
                 {
                     try
                     {
                         method?.Invoke(this, _eventArgs);
-                        tcs.SetResult(true);
                     }
                     catch (Exception ex)
                     {
                         _cts[0].Cancel();
                         _setTaskStatus(TASK_STATE_FAULTED);
                         _exception = (Exception)Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex);
-                        tcs.SetException(_exception);
                     }
                 }, null);
             }

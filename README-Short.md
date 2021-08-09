@@ -11,8 +11,8 @@
 * LANGUAGE:     [C#] (v10.0)
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2022, 2019, 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      07/30/2021
-* VERSION:      [3.0.14](https://www.nuget.org/packages/AsyncTask/3.0.13/)
+* UPDATED:      08/06/2021
+* VERSION:      [3.0.15](https://www.nuget.org/packages/AsyncTask/3.0.13/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ---

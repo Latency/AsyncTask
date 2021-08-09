@@ -11,8 +11,8 @@
 * LANGUAGE:     [C#] (v10.0)
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2022, 2019, 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      07/30/2021
-* VERSION:      [3.0.14](https://www.nuget.org/packages/AsyncTask/3.0.12/)
+* UPDATED:      08/06/2021
+* VERSION:      [3.0.15](https://www.nuget.org/packages/AsyncTask/3.0.12/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -125,25 +125,19 @@ This library can be installed from [NuGet]:
 
 There are three essential steps to using this:
 
-&nbsp;1. Create an \`<i>AsyncTask</i>\` with an optional generic type parameter matching the return value from `Delegate`.<br>
-&nbsp;2. Specify the `Delegate` used to perform the work.  (<b>Required</b>)<br>
+&nbsp;1. Create an \`<i>AsyncTask</i>\` with a parameter containing the main delegate for invocation.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `On<...>` delegates similarly.<br>
-&nbsp;3. Register the `AsyncTask` instanciated.<br>
-&nbsp;4. Optional:<br>
+&nbsp;2. Arguments to modify/derive the `TaskInfo` object will setup properties specific to the internal properties needed to moderate control of the task.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Timeout` = A property specifing the maximum duration the task will run.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Logger` = Override the internal logging class containing callbacks specified from `AsyncTask.Interfaces.ILogger`.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`TaskList` = Reference to the container collection used to store AsyncTasks.   Handles asynchronous cleanup and disposition internally.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Name` = Name of the task associated.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`PollInterval` = Delay per cycle of the checkpointing used for the CancelationToken or high-precision CPU clock cycle calculating missed pulses for OnTick().<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`SynchronizationContext` = Thread context in which the callbacks will be invoked on.   NOTE:  The main delegate is on its own thread.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Token` = Reference only to the internal CancellationToken associated with the task.<br>
 
 ### Usage:
-```csharp
-    var t2 = new AsyncTask.Tasks.AsyncTask {
-      ...object initializers...
-    };
-    t2.Register();
-```
-
-### Example #1
 ```csharp
             _t2 = new AsyncTask.AsyncTask((task, args) =>
             {
@@ -161,6 +155,7 @@ There are three essential steps to using this:
                     Timeout                = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
                     Logger                 = _logger,
                     PollInterval           = new TimeSpan(0, 0, 1),
+                    TaskList               = new TaskList(),
                     SynchronizationContext = SynchronizationContext.Current
                 },
                 OnAdd      = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Trace($"Adding task for {asyncTask.TaskInfo.Name}"),

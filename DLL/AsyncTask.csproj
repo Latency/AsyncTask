@@ -5,9 +5,9 @@
 		<LangVersion>latest</LangVersion>
 		<SignAssembly>true</SignAssembly>
 		<PackageIcon>Properties\project.png</PackageIcon>
-		<Version>3.0.14</Version>
+		<Version>3.0.15</Version>
 		<Description>Asynchronous Task Extension Library</Description>
-		<PackageReleaseNotes>Revamp of delegate dispatcher synchronization.</PackageReleaseNotes>
+		<PackageReleaseNotes>Synchronization context change from async to sync.</PackageReleaseNotes>
 		<PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
 		<PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
