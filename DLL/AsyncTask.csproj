@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net45;netcoreapp3.1;netstandard2.0;net472;net48;net6.0</TargetFrameworks>
-		<LangVersion>latest</LangVersion>
+		<TargetFrameworks>net452;netstandard2.0;netstandard2.1</TargetFrameworks>
+		<LangVersion>preview</LangVersion>
 		<SignAssembly>true</SignAssembly>
 		<PackageIcon>Properties\project.png</PackageIcon>
 		<Version>3.0.15</Version>
@@ -11,8 +11,7 @@
 		<PackageProjectUrl>http://latency.github.io/AsyncTask</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Latency/AsyncTask</RepositoryUrl>
 		<PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
-	    <AssemblyOriginatorKeyFile>../../../Sign.pfx</AssemblyOriginatorKeyFile>
-	    <ApplicationIcon>../../../sBIO2.ico</ApplicationIcon>
+	    <ApplicationIcon>../GUI/Resources/project.ico</ApplicationIcon>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>

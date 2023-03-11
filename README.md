@@ -1,8 +1,12 @@
 # Asyncronous Task API
 
-### Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/A [DLL])
+### Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/[MVA] [DLL])
 
 ---
+Latest Package:<br>
+  [![NuGet Version](https://img.shields.io/badge/NuGet-v3.0.15-green?style=plastic)](https://www.nuget.org/packages/AsyncTask/)<br>
+Build Status:<br>
+  [![.NET Core Desktop](https://github.com/Latency/AsyncTask/actions/workflows/dotnet-desktop.yml/badge.svg)](https://github.com/Latency/AsyncTask/actions/workflows/dotnet-desktop.yml)<br>
 
 ## Task-based Asynchronous Pattern ([TAP])
 
@@ -12,7 +16,7 @@
 * GFX SUBSYS:   [WPF]
 * SUPPORTS:     [Visual Studio] 2022, 2019, 2017, 2015, 2013, 2012, 2010, 2008
 * UPDATED:      08/06/2021
-* VERSION:      [3.0.15](https://www.nuget.org/packages/AsyncTask/3.0.12/)
+* VERSION:      [3.0.15](https://www.nuget.org/packages/AsyncTask/3.0.15/)
 * TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
@@ -25,8 +29,7 @@
 * <a href="#introduction">Introduction</a>
 * <a href="#overview">Overview</a>
 * <a href="#installation">Installation</a>
-* <a href="#using">Using the code</a>
-* <a href="#other">Output</a>
+* <a href="#output">Output</a>
 * <a href="#other">Other features</a>
 * <a href="#references">References</a>
 * <a href="#license">License</a>
@@ -119,55 +122,7 @@ This API has several benefits, such as:
 
 <h2><a name="installation">Installation</a></h2>
 
-This library can be installed from [NuGet]:
-
-<h2><a name="using">Using The Code</a></h2>
-
-There are three essential steps to using this:
-
-&nbsp;1. Create an \`<i>AsyncTask</i>\` with a parameter containing the main delegate for invocation.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><b>Optional</b></i>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Construct the `On<...>` delegates similarly.<br>
-&nbsp;2. Arguments to modify/derive the `TaskInfo` object will setup properties specific to the internal properties needed to moderate control of the task.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Timeout` = A property specifing the maximum duration the task will run.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Logger` = Override the internal logging class containing callbacks specified from `AsyncTask.Interfaces.ILogger`.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`TaskList` = Reference to the container collection used to store AsyncTasks.   Handles asynchronous cleanup and disposition internally.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Name` = Name of the task associated.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`PollInterval` = Delay per cycle of the checkpointing used for the CancelationToken or high-precision CPU clock cycle calculating missed pulses for OnTick().<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`SynchronizationContext` = Thread context in which the callbacks will be invoked on.   NOTE:  The main delegate is on its own thread.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`Token` = Reference only to the internal CancellationToken associated with the task.<br>
-
-### Usage:
-```csharp
-            _t2 = new AsyncTask.AsyncTask((task, args) =>
-            {
-                do
-                {
-                    task.TaskInfo.Token.ThrowIfCancellationRequested();
-                    Task.Delay(250).GetAwaiter();
-                }
-                while (args.Duration < TimeSpan.FromSeconds(blockTime));
-            })
-            {
-                TaskInfo = new TaskInfo
-                {
-                    Name                   = "t2",
-                    Timeout                = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
-                    Logger                 = _logger,
-                    PollInterval           = new TimeSpan(0, 0, 1),
-                    TaskList               = new TaskList(),
-                    SynchronizationContext = SynchronizationContext.Current
-                },
-                OnAdd      = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Trace($"Adding task for {asyncTask.TaskInfo.Name}"),
-                OnRemove   = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Trace($"Removing task for {asyncTask.TaskInfo.Name}"),
-                OnComplete = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Warning($"Completing task for '{asyncTask.TaskInfo.Name}'."),
-                OnTick     = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Information($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
-                OnTimeout  = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Critical($"Timeout expired!  Aborting task for '{asyncTask.TaskInfo.Name}'."),
-                OnCanceled = (asyncTask, _)    => asyncTask.TaskInfo.Logger?.Critical($"Canceling task for '{asyncTask.TaskInfo.Name}'."),
-                OnError    = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Error($"Error occured for '{asyncTask.TaskInfo.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
-            };
-            _t2.Start();
-```
+This library can be installed from [NuGet].
 
 <h2><a name="output">Output</a></h2>
 
@@ -188,6 +143,16 @@ There are three essential steps to using this:
 
 [GNU LESSER GENERAL PUBLIC LICENSE] - Version 3, 29 June 2007
 
+# Issues
+If you have a patch to contribute, a feature to request, or a bug to report, please post to the [Issue Tracker](https://github.com/Latency/AsyncTask/issues).
+
+# Contribution
+Pull requests are welcome, but make sure you sign the Contributor License Agreement.
+
+# Donation
+If you want to donate to my efforts on this project, please use the following link,
+
+[![Donate via Paypal](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/Latency2?country.x=US&locale.x=en_US)
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job.)
 

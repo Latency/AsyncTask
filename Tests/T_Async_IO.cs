@@ -7,12 +7,10 @@
 // Copywrite:  Bio-Hazard Industries - 1998-2020
 // *****************************************************************************
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AsyncTask.DTO;
-using NUnit.Framework;
 
 namespace Tests
 {
@@ -23,14 +21,13 @@ namespace Tests
     }
 
 
-    [TestFixture]
     // ReSharper disable once InconsistentNaming
-    public class Async_IO
+    public partial class Tests
     {
         /// <summary>
         ///     Test
         /// </summary>
-        [Test]
+        [Fact]
         public async Task Monitor_Test()
         {
             try
@@ -39,7 +36,7 @@ namespace Tests
                 const int timeout                = 5;
                 string[]  test                   = {"NORMAL", "CANCELED", "TIMED OUT"};
 
-                static void Expr(string name, string msg) => TestContext.Progress.WriteLine($"@{name}:  {msg}");
+                void Expr(string name, string msg) => Console.WriteLine($"@{name}:  {msg}");
 
                 // #############################################################
                 var t1 = new AsyncTask.AsyncTask((task, args) =>
@@ -166,7 +163,7 @@ namespace Tests
                 // Wait for all the tasks to finish.
                 try
                 {
-                    await Task.WhenAll(taskList.Keys.Cast<Task>()).ContinueWith(async _ => await TestContext.Progress.WriteLineAsync(@"All Tasks Completed."));
+                    await Task.WhenAll(taskList.Keys.Cast<Task>()).ContinueWith(_ => Console.WriteLine(@"All Tasks Completed."));
                 }
                 catch
                 {
