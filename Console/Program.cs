@@ -1,26 +1,22 @@
 ﻿// ****************************************************************************
-// Project:  ConsoleApp1
+// Project:  Console
 // File:     Program.cs
 // Author:   Latency McLaughlin
-// Date:     08/28/2020
+// Date:     04/11/2024
 // ****************************************************************************
 
-using System;
-using System.Windows.Forms;
+namespace Console;
 
-namespace Console
+internal static class Program
 {
-    internal static class Program
+    /// <summary>
+    ///     The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    private static void Main(string[] args)
     {
-        /// <summary>
-        ///     The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        private static void Main(string[] args)
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-        }
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new Form1());
     }
 }

@@ -1,0 +1,13 @@
+{
+    "dependentFileProviders": {
+        "add": {
+            "addedExtension": {
+                "add": {
+                    ".xaml.Logic.cs": [
+                        ".xaml.cs"
+                    ]
+                }
+            }
+        }
+    }
+}

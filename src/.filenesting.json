@@ -1,0 +1,20 @@
+{
+    "dependentFileProviders": {
+        "add": {
+            "fileSuffixToExtension": {
+                "add": {
+                    ".Schema.cs": [
+                        ".cs"
+                    ]
+                }
+            },
+            "fileToFile": {
+                "add": {
+                    "LoggerHandlers.cs": [
+                        "DefaultLogger.cs"
+                    ]
+                }
+            }
+        }
+    }
+}

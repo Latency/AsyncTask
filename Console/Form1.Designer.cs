@@ -28,195 +28,184 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.ButtonEnable = new System.Windows.Forms.Button();
-            this.ButtonDisable = new System.Windows.Forms.Button();
-            this.TextBoxMessageLog = new System.Windows.Forms.RichTextBox();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.numericUpDownTimeout = new System.Windows.Forms.NumericUpDown();
-            this.lbSecondsTimeout = new System.Windows.Forms.Label();
-            this.numericUpDownBlockTime = new System.Windows.Forms.NumericUpDown();
-            this.lbSecondsBlockTime = new System.Windows.Forms.Label();
-            this.lbTimeout = new System.Windows.Forms.Label();
-            this.ButtonClear = new System.Windows.Forms.Button();
-            this.lbBlockTime = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBlockTime)).BeginInit();
-            this.SuspendLayout();
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            ButtonEnable = new Button();
+            ButtonDisable = new Button();
+            TextBoxMessageLog = new RichTextBox();
+            splitContainer1 = new SplitContainer();
+            numericUpDownTimeout = new NumericUpDown();
+            lbSecondsTimeout = new Label();
+            lbSecondsBlockTime = new Label();
+            numericUpDownBlockTime = new NumericUpDown();
+            lbBlockTime = new Label();
+            lbTimeout = new Label();
+            ButtonClear = new Button();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownTimeout).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownBlockTime).BeginInit();
+            SuspendLayout();
             // 
             // ButtonEnable
             // 
-            this.ButtonEnable.Location = new System.Drawing.Point(24, 28);
-            this.ButtonEnable.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.ButtonEnable.Name = "ButtonEnable";
-            this.ButtonEnable.Size = new System.Drawing.Size(150, 53);
-            this.ButtonEnable.TabIndex = 0;
-            this.ButtonEnable.Text = "Enable";
-            this.ButtonEnable.UseVisualStyleBackColor = true;
-            this.ButtonEnable.Click += new System.EventHandler(this.ButtonEnable_Click);
+            ButtonEnable.Location = new Point(17, 12);
+            ButtonEnable.Margin = new Padding(5, 6, 5, 6);
+            ButtonEnable.Name = "ButtonEnable";
+            ButtonEnable.Size = new Size(125, 44);
+            ButtonEnable.TabIndex = 0;
+            ButtonEnable.Text = "Enable";
+            ButtonEnable.UseVisualStyleBackColor = true;
+            ButtonEnable.Click += ButtonEnable_Click;
             // 
             // ButtonDisable
             // 
-            this.ButtonDisable.Location = new System.Drawing.Point(182, 23);
-            this.ButtonDisable.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.ButtonDisable.Name = "ButtonDisable";
-            this.ButtonDisable.Size = new System.Drawing.Size(150, 53);
-            this.ButtonDisable.TabIndex = 1;
-            this.ButtonDisable.Text = "Disable";
-            this.ButtonDisable.UseVisualStyleBackColor = true;
-            this.ButtonDisable.Click += new System.EventHandler(this.ButtonDisable_Click);
+            ButtonDisable.Location = new Point(152, 12);
+            ButtonDisable.Margin = new Padding(5, 6, 5, 6);
+            ButtonDisable.Name = "ButtonDisable";
+            ButtonDisable.Size = new Size(125, 44);
+            ButtonDisable.TabIndex = 1;
+            ButtonDisable.Text = "Disable";
+            ButtonDisable.UseVisualStyleBackColor = true;
+            ButtonDisable.Click += ButtonDisable_Click;
             // 
             // TextBoxMessageLog
             // 
-            this.TextBoxMessageLog.BackColor = System.Drawing.SystemColors.InfoText;
-            this.TextBoxMessageLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TextBoxMessageLog.Location = new System.Drawing.Point(0, 0);
-            this.TextBoxMessageLog.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.TextBoxMessageLog.Name = "TextBoxMessageLog";
-            this.TextBoxMessageLog.Size = new System.Drawing.Size(1986, 1263);
-            this.TextBoxMessageLog.TabIndex = 2;
-            this.TextBoxMessageLog.Text = "";
-            this.TextBoxMessageLog.TextChanged += new System.EventHandler(this.TextBoxMessageLog_TextChanged);
+            TextBoxMessageLog.BackColor = SystemColors.InfoText;
+            TextBoxMessageLog.Dock = DockStyle.Fill;
+            TextBoxMessageLog.Location = new Point(0, 0);
+            TextBoxMessageLog.Margin = new Padding(5, 6, 5, 6);
+            TextBoxMessageLog.Name = "TextBoxMessageLog";
+            TextBoxMessageLog.Size = new Size(1654, 1011);
+            TextBoxMessageLog.TabIndex = 2;
+            TextBoxMessageLog.Text = "";
+            TextBoxMessageLog.TextChanged += TextBoxMessageLog_TextChanged;
             // 
             // splitContainer1
             // 
-            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            splitContainer1.BorderStyle = BorderStyle.Fixed3D;
+            splitContainer1.Dock = DockStyle.Fill;
+            splitContainer1.FixedPanel = FixedPanel.Panel1;
+            splitContainer1.Location = new Point(0, 0);
+            splitContainer1.Margin = new Padding(5, 6, 5, 6);
+            splitContainer1.Name = "splitContainer1";
+            splitContainer1.Orientation = Orientation.Horizontal;
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.AutoScroll = true;
-            this.splitContainer1.Panel1.Controls.Add(this.numericUpDownTimeout);
-            this.splitContainer1.Panel1.Controls.Add(this.lbSecondsTimeout);
-            this.splitContainer1.Panel1.Controls.Add(this.numericUpDownBlockTime);
-            this.splitContainer1.Panel1.Controls.Add(this.lbSecondsBlockTime);
-            this.splitContainer1.Panel1.Controls.Add(this.lbTimeout);
-            this.splitContainer1.Panel1.Controls.Add(this.ButtonClear);
-            this.splitContainer1.Panel1.Controls.Add(this.ButtonDisable);
-            this.splitContainer1.Panel1.Controls.Add(this.lbBlockTime);
-            this.splitContainer1.Panel1MinSize = 60;
+            splitContainer1.Panel1.AutoScroll = true;
+            splitContainer1.Panel1.Controls.Add(numericUpDownTimeout);
+            splitContainer1.Panel1.Controls.Add(lbSecondsTimeout);
+            splitContainer1.Panel1.Controls.Add(ButtonEnable);
+            splitContainer1.Panel1.Controls.Add(lbSecondsBlockTime);
+            splitContainer1.Panel1.Controls.Add(ButtonDisable);
+            splitContainer1.Panel1.Controls.Add(numericUpDownBlockTime);
+            splitContainer1.Panel1.Controls.Add(lbBlockTime);
+            splitContainer1.Panel1.Controls.Add(lbTimeout);
+            splitContainer1.Panel1.Controls.Add(ButtonClear);
+            splitContainer1.Panel1MinSize = 90;
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.TextBoxMessageLog);
-            this.splitContainer1.Size = new System.Drawing.Size(1990, 1336);
-            this.splitContainer1.SplitterDistance = 60;
-            this.splitContainer1.SplitterWidth = 9;
-            this.splitContainer1.TabIndex = 3;
+            splitContainer1.Panel2.Controls.Add(TextBoxMessageLog);
+            splitContainer1.Size = new Size(1658, 1113);
+            splitContainer1.SplitterDistance = 90;
+            splitContainer1.SplitterWidth = 8;
+            splitContainer1.TabIndex = 3;
             // 
             // numericUpDownTimeout
             // 
-            this.numericUpDownTimeout.Location = new System.Drawing.Point(1370, 30);
-            this.numericUpDownTimeout.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.numericUpDownTimeout.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            -2147483648});
-            this.numericUpDownTimeout.Name = "numericUpDownTimeout";
-            this.numericUpDownTimeout.Size = new System.Drawing.Size(100, 35);
-            this.numericUpDownTimeout.TabIndex = 7;
-            this.numericUpDownTimeout.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
+            numericUpDownTimeout.Location = new Point(1025, 18);
+            numericUpDownTimeout.Margin = new Padding(5, 6, 5, 6);
+            numericUpDownTimeout.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            numericUpDownTimeout.Name = "numericUpDownTimeout";
+            numericUpDownTimeout.Size = new Size(83, 31);
+            numericUpDownTimeout.TabIndex = 3;
+            numericUpDownTimeout.Value = new decimal(new int[] { 5, 0, 0, 0 });
             // 
             // lbSecondsTimeout
             // 
-            this.lbSecondsTimeout.AutoSize = true;
-            this.lbSecondsTimeout.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lbSecondsTimeout.Location = new System.Drawing.Point(1246, 72);
-            this.lbSecondsTimeout.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lbSecondsTimeout.Name = "lbSecondsTimeout";
-            this.lbSecondsTimeout.Size = new System.Drawing.Size(104, 20);
-            this.lbSecondsTimeout.TabIndex = 8;
-            this.lbSecondsTimeout.Text = "(In Seconds)";
-            // 
-            // numericUpDownBlockTime
-            // 
-            this.numericUpDownBlockTime.Location = new System.Drawing.Point(980, 30);
-            this.numericUpDownBlockTime.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.numericUpDownBlockTime.Name = "numericUpDownBlockTime";
-            this.numericUpDownBlockTime.Size = new System.Drawing.Size(100, 35);
-            this.numericUpDownBlockTime.TabIndex = 6;
-            this.numericUpDownBlockTime.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
+            lbSecondsTimeout.AutoSize = true;
+            lbSecondsTimeout.Font = new Font("Microsoft Sans Serif", 7F);
+            lbSecondsTimeout.Location = new Point(1023, 59);
+            lbSecondsTimeout.Margin = new Padding(5, 0, 5, 0);
+            lbSecondsTimeout.Name = "lbSecondsTimeout";
+            lbSecondsTimeout.Size = new Size(88, 17);
+            lbSecondsTimeout.TabIndex = 6;
+            lbSecondsTimeout.Text = "(In Seconds)";
             // 
             // lbSecondsBlockTime
             // 
-            this.lbSecondsBlockTime.AutoSize = true;
-            this.lbSecondsBlockTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lbSecondsBlockTime.Location = new System.Drawing.Point(806, 72);
-            this.lbSecondsBlockTime.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lbSecondsBlockTime.Name = "lbSecondsBlockTime";
-            this.lbSecondsBlockTime.Size = new System.Drawing.Size(104, 20);
-            this.lbSecondsBlockTime.TabIndex = 5;
-            this.lbSecondsBlockTime.Text = "(In Seconds)";
+            lbSecondsBlockTime.AutoSize = true;
+            lbSecondsBlockTime.Font = new Font("Microsoft Sans Serif", 7F);
+            lbSecondsBlockTime.Location = new Point(657, 59);
+            lbSecondsBlockTime.Margin = new Padding(5, 0, 5, 0);
+            lbSecondsBlockTime.Name = "lbSecondsBlockTime";
+            lbSecondsBlockTime.Size = new Size(88, 17);
+            lbSecondsBlockTime.TabIndex = 5;
+            lbSecondsBlockTime.Text = "(In Seconds)";
             // 
-            // lbTimeout
+            // numericUpDownBlockTime
             // 
-            this.lbTimeout.AutoSize = true;
-            this.lbTimeout.Location = new System.Drawing.Point(1268, 35);
-            this.lbTimeout.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lbTimeout.Name = "lbTimeout";
-            this.lbTimeout.Size = new System.Drawing.Size(89, 30);
-            this.lbTimeout.TabIndex = 4;
-            this.lbTimeout.Text = "Timeout";
-            // 
-            // ButtonClear
-            // 
-            this.ButtonClear.Location = new System.Drawing.Point(1812, 23);
-            this.ButtonClear.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.ButtonClear.Name = "ButtonClear";
-            this.ButtonClear.Size = new System.Drawing.Size(150, 53);
-            this.ButtonClear.TabIndex = 2;
-            this.ButtonClear.Text = "Clear";
-            this.ButtonClear.UseVisualStyleBackColor = true;
-            this.ButtonClear.Click += new System.EventHandler(this.ButtonClear_Click);
+            numericUpDownBlockTime.Location = new Point(659, 18);
+            numericUpDownBlockTime.Margin = new Padding(5, 6, 5, 6);
+            numericUpDownBlockTime.Name = "numericUpDownBlockTime";
+            numericUpDownBlockTime.Size = new Size(83, 31);
+            numericUpDownBlockTime.TabIndex = 2;
+            numericUpDownBlockTime.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
             // lbBlockTime
             // 
-            this.lbBlockTime.AutoSize = true;
-            this.lbBlockTime.Location = new System.Drawing.Point(766, 35);
-            this.lbBlockTime.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lbBlockTime.Name = "lbBlockTime";
-            this.lbBlockTime.Size = new System.Drawing.Size(202, 30);
-            this.lbBlockTime.TabIndex = 4;
-            this.lbBlockTime.Text = "Delegate Block Time";
+            lbBlockTime.AutoSize = true;
+            lbBlockTime.Location = new Point(480, 22);
+            lbBlockTime.Margin = new Padding(5, 0, 5, 0);
+            lbBlockTime.Name = "lbBlockTime";
+            lbBlockTime.Size = new Size(172, 25);
+            lbBlockTime.TabIndex = 4;
+            lbBlockTime.Text = "Delegate Block Time";
+            // 
+            // lbTimeout
+            // 
+            lbTimeout.AutoSize = true;
+            lbTimeout.Location = new Point(940, 22);
+            lbTimeout.Margin = new Padding(5, 0, 5, 0);
+            lbTimeout.Name = "lbTimeout";
+            lbTimeout.Size = new Size(77, 25);
+            lbTimeout.TabIndex = 4;
+            lbTimeout.Text = "Timeout";
+            // 
+            // ButtonClear
+            // 
+            ButtonClear.Location = new Point(1503, 13);
+            ButtonClear.Margin = new Padding(5, 6, 5, 6);
+            ButtonClear.Name = "ButtonClear";
+            ButtonClear.Size = new Size(125, 44);
+            ButtonClear.TabIndex = 4;
+            ButtonClear.Text = "Clear";
+            ButtonClear.UseVisualStyleBackColor = true;
+            ButtonClear.Click += ButtonClear_Click;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1990, 1336);
-            this.Controls.Add(this.ButtonEnable);
-            this.Controls.Add(this.splitContainer1);
-            this.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.Name = "Form1";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "AsyncTask";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTimeout)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBlockTime)).EndInit();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1658, 1113);
+            Controls.Add(splitContainer1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(5, 6, 5, 6);
+            Name = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "AsyncTask";
+            Load += Form1_Load;
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel1.PerformLayout();
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)numericUpDownTimeout).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownBlockTime).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion

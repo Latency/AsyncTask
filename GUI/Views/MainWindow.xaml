@@ -75,8 +75,11 @@
             </Grid>
         </Expander>
 
-        <DataGrid Name="ListView1" DockPanel.Dock="Right" SelectionMode="Extended" BorderThickness="1,1,3,3"
-                  BorderBrush="Black" SelectionChanged="ListView_SelectionChanged" Height="Auto"
+        <DataGrid Name="ListView1" DockPanel.Dock="Right"
+                  SelectionMode="Extended"
+                  BorderThickness="1,1,3,3"
+                  BorderBrush="Black"
+                  SelectionChanged="ListView_SelectionChanged" Height="Auto"
                   VerticalAlignment="Top" />
     </DockPanel>
 </Window>

@@ -1,23 +1,29 @@
-# Asyncronous Task API
+﻿# AsyncTask
+### Asynchronous Task Extension Library
+
+
+---
+
+
+|              |   Description                                                  |
+|--------------|----------------------------------------------------------------|
+| CREATED BY:  | Latency McLaughlin                                                     |
+| UPDATED:     | 4/13/2024                          |
+| FRAMEWORK:   | [net452], [netstandard2.0], [netstandard2.1], [net9.0] ([Latest])                                |
+| LANGUAGE:    | [C#] preview                                            |
+| OUTPUT TYPE: | Library [API]                                            |
+| SUPPORTS:    | [Visual Studio]                                                |
+| GFX SUBSYS:  | [None]                                                     |
+| TAGS:        | [API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism]                                                |
+| STATUS       | [![.NET Core Desktop Build](https://github.com/Latency/AsyncTask/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Latency/AsyncTask/actions/workflows/dotnet.yml)                                                     |
+| LICENSE:     | [![License](https://img.shields.io/github/license/Latency/AsyncTask?style=plastic&logo=GitHub&logoColor=black&label=License&color=yellowgreen)](https://github.com/Latency/AsyncTask/blob/master/MIT-LICENSE.txt)                                                    |
+| VERSION:     | [![GitHub Release](https://img.shields.io/github/v/release/Latency/AsyncTask?include_prereleases&style=plastic&logo=GitHub&logoColor=black&label=Version&color=blue)](https://github.com/Latency/AsyncTask/releases)                                                    |
+<!-- VERSION: 3.1.0-preview.9 -->
+
 
 ### Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/[MVA] [DLL])
 
----
-Latest Package:<br>
-  [![NuGet Version](https://img.shields.io/badge/NuGet-v3.0.15-green?style=plastic)](https://www.nuget.org/packages/AsyncTask/)<br>
-Build Status:<br>
-  [![.NET Core Desktop](https://github.com/Latency/AsyncTask/actions/workflows/dotnet-desktop.yml/badge.svg)](https://github.com/Latency/AsyncTask/actions/workflows/dotnet-desktop.yml)<br>
-
 ## Task-based Asynchronous Pattern ([TAP])
-
-* CREATED BY:   [Latency McLaughlin]
-* FRAMEWORK:    [.NET] v4.5 - v6.0, & Core v[3.1](https://www.microsoft.com/net/download/windows)
-* LANGUAGE:     [C#] (v10.0)
-* GFX SUBSYS:   [WPF]
-* SUPPORTS:     [Visual Studio] 2022, 2019, 2017, 2015, 2013, 2012, 2010, 2008
-* UPDATED:      08/06/2021
-* VERSION:      [3.0.15](https://www.nuget.org/packages/AsyncTask/3.0.15/)
-* TAGS:         [API], [TAP], [TPL], [ORM], [MVC], [AMI], [.NET], [C#], [WPF], [Parametric Polymorphism]
 
 ### Screenshot
 ![AsyncTask](Properties/AsyncTask.png)
@@ -32,6 +38,8 @@ Build Status:<br>
 * <a href="#output">Output</a>
 * <a href="#other">Other features</a>
 * <a href="#references">References</a>
+* <a href="#issues">Report An Issue</a>
+* <a href="#donation">Donation</a>
 * <a href="#license">License</a>
 
 <hr>
@@ -139,20 +147,21 @@ This library can be installed from [NuGet].
 
  [TPL], [.NET], [ORM], [IoC], [DI], [Generics], [Delegates], [EventHandlers], [Parametric Polymorphism]
 
-<h2><a name="license">License</a></h2>
-
-[GNU LESSER GENERAL PUBLIC LICENSE] - Version 3, 29 June 2007
-
-# Issues
+<h2><a name="issues">Report An Issue</a></h2>
 If you have a patch to contribute, a feature to request, or a bug to report, please post to the [Issue Tracker](https://github.com/Latency/AsyncTask/issues).
 
-# Contribution
-Pull requests are welcome, but make sure you sign the Contributor License Agreement.
-
-# Donation
+<h2><a name="donation">Donation</a></h2>
 If you want to donate to my efforts on this project, please use the following link,
 
 [![Donate via Paypal](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/Latency2?country.x=US&locale.x=en_US)
+
+<h2><a name="license">License</a></h2>
+
+The source code for the site is licensed under the MIT license, which you can find in
+the [MIT-LICENSE].txt file.
+
+All graphical assets are licensed under the
+[Creative Commons Attribution 3.0 Unported License](https://creativecommons.org/licenses/by/3.0/).
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job.)
 

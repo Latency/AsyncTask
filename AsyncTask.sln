@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30404.54
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncTask", "DLL\AsyncTask.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncTask", "src\AsyncTask.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GUI", "GUI\GUI.csproj", "{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unit Tests", "Unit Tests\Unit Tests.csproj", "{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9B7DA3DF-4D94-4363-9504-8969DB578C1C}"
 	ProjectSection(SolutionItems) = preProject
@@ -15,16 +15,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Properties\AsyncTask.png = Properties\AsyncTask.png
 		DataModel.md = DataModel.md
+		Directory.Build.props = Directory.Build.props
 		Flow-Chart.png = Flow-Chart.png
-		LICENSE.txt = LICENSE.txt
 		Properties\mvc.png = Properties\mvc.png
 		Output.png = Output.png
 		Properties\project.png = Properties\project.png
-		README-Short.md = README-Short.md
 		README.md = README.md
+		src\README_BODY.md = src\README_BODY.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console", "Console\Console.csproj", "{336E6DA0-9F06-4A00-8603-382C594E7185}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventElements", "EventElements\EventElements.csproj", "{ED37761C-BBD6-4E91-9EA4-7556E486E548}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,7 @@ Global
 		{6ED688CD-50C6-45B2-8AE0-759D28E468AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6ED688CD-50C6-45B2-8AE0-759D28E468AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{228808B0-B5BA-4BCE-A322-18A55FAE1FC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E1A392E8-1ACC-4A13-AFE7-0A6122C056A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -48,6 +51,10 @@ Global
 		{336E6DA0-9F06-4A00-8603-382C594E7185}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{336E6DA0-9F06-4A00-8603-382C594E7185}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{336E6DA0-9F06-4A00-8603-382C594E7185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED37761C-BBD6-4E91-9EA4-7556E486E548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED37761C-BBD6-4E91-9EA4-7556E486E548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED37761C-BBD6-4E91-9EA4-7556E486E548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED37761C-BBD6-4E91-9EA4-7556E486E548}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
