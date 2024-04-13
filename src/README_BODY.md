@@ -1,8 +1,15 @@
-### Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/[MVA] [DLL])
+## Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/[MVA] [DLL])
 
-## Task-based Asynchronous Pattern ([TAP])
+### Task-based Asynchronous Pattern ([TAP])
 
-### Screenshot
+<hr>
+
+## Screenshots
+
+### WinForms
+![AsyncTask](Properties/Console.png)
+
+### WPF
 ![AsyncTask](Properties/AsyncTask.png)
 
 <hr>

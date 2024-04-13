@@ -5,7 +5,7 @@
 		<Version>3.1.0-preview.9</Version>
 		<Description>Asynchronous Task Extension Library</Description>
 		<PackageReleaseNotes>Synchronization context change from async to sync.</PackageReleaseNotes>
-		<PackageTags>API TAP TPL .NET Core ORM IoC DI Generics Delegates EventHandlers Parametric-Polymorphism</PackageTags>
+		<PackageTags>API; TAP; TPL; .NET; Core; ORM; IoC; DI; Generics; Delegates; EventHandlers; Parametric-Polymorphism</PackageTags>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
@@ -14,15 +14,7 @@
 		<NetStandard Include="$([System.Text.RegularExpressions.Regex]::Match($(TargetFramework),  `^netstandard([0-9][.][0-9])$`).Groups[1].Value)" />
 		<NetFramework Include="$([System.Text.RegularExpressions.Regex]::Match($(TargetFramework), `^net(\d{2})([\d{1}]?)$`).Groups[1].Value)" />
 
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0-preview.3.24172.9" Condition="
-			'$(TargetFrameworks' == '462'
-			Or
-			'@(NetCore)' != ''
-			Or
-			('@(NetStandard)' != '' And '@(NetStandard)' &gt;= '2.0')
-			Or
-			('@(NetFramework)' != '' And '@(NetFramework)' &gt;= '47')
-			" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0-preview.3.24172.9" Condition="&#xA;			'$(TargetFrameworks' == '462'&#xA;			Or&#xA;			'@(NetCore)' != ''&#xA;			Or&#xA;			('@(NetStandard)' != '' And '@(NetStandard)' &gt;= '2.0')&#xA;			Or&#xA;			('@(NetFramework)' != '' And '@(NetFramework)' &gt;= '47')&#xA;			" />
 	</ItemGroup>
 
 </Project>
