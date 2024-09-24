@@ -16,7 +16,7 @@ Asynchronous Task Extension Library
 </tr>
 <tr>
 <td>UPDATED:</td>
-<td>9/23/2024</td>
+<td>9/24/2024</td>
 </tr>
 <tr>
 <td>FRAMEWORK:</td>

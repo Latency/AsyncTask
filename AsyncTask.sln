@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
+# 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncTask", "src\AsyncTask.csproj", "{6ED688CD-50C6-45B2-8AE0-759D28E468AE}"
@@ -15,18 +15,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Properties\AsyncTask.png = Properties\AsyncTask.png
 		DataModel.md = DataModel.md
-		Directory.Build.props = Directory.Build.props
 		Flow-Chart.png = Flow-Chart.png
 		Properties\mvc.png = Properties\mvc.png
 		Output.png = Output.png
-		Properties\project.png = Properties\project.png
 		README.md = README.md
 		src\README_BODY.md = src\README_BODY.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console", "Console\Console.csproj", "{336E6DA0-9F06-4A00-8603-382C594E7185}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventElements", "EventElements\EventElements.csproj", "{ED37761C-BBD6-4E91-9EA4-7556E486E548}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventElements", "EventElements\EventElements.csproj", "{ED37761C-BBD6-4E91-9EA4-7556E486E548}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

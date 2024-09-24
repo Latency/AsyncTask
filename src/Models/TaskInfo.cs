@@ -74,7 +74,7 @@ public class TaskInfo : ITaskInfo
     ///     ToString
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Name ?? string.Empty;
+    public override string ToString() => Name;
 
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new(propertyName));

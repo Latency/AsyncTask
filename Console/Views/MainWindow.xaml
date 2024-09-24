@@ -1,0 +1,60 @@
+﻿<Window x:Class="Console.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Loaded="Form1_Load"
+        Title="MainWindow"
+        Height="450"
+        Width="800"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="80" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="80" />
+            <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" Grid.Column="0" Width="80" Height="25" Content="Enable"
+                Style="{DynamicResource GlassButton}" x:Name="ButtonEnable" Click="ButtonEnable_Click" />
+        <Button Grid.Row="0" Grid.Column="1" Width="80" Height="25" Content="Disable"
+                Style="{DynamicResource GlassButton}" x:Name="ButtonDisable" Click="ButtonDisable_Click" />
+        <Label Grid.Row="0" Grid.Column="2" Content="Delegate Block Time" VerticalAlignment="Top"
+               HorizontalAlignment="Right" FontSize="9" Margin="0,4,0,0" />
+        <Label Grid.Row="0" Grid.Column="2" Content="(In Seconds)" VerticalAlignment="Bottom"
+               HorizontalAlignment="Right" FontSize="7" />
+        <xctk:IntegerUpDown Name="NumericUpDownBlockTime" Grid.Row="0" Grid.Column="3" Width="70" Height="25"
+                            Maximum="100" Minimum="0" DisplayDefaultValueOnEmptyText="True" DefaultValue="10"
+                            ParsingNumberStyle="Integer" />
+        <Label Grid.Row="0" Grid.Column="4" Content="Timeout" VerticalAlignment="Top" HorizontalAlignment="Right"
+               FontSize="9" Margin="0,4,0,0" />
+        <Label Grid.Row="0" Grid.Column="4" Content="(In Seconds)" VerticalAlignment="Bottom"
+               HorizontalAlignment="Right" FontSize="7" />
+        <xctk:IntegerUpDown Name="NumericUpDownTimeout" Grid.Row="0" Grid.Column="5" Width="70" Height="25"
+                            Minimum="-4" Maximum="100" DisplayDefaultValueOnEmptyText="True" DefaultValue="5"
+                            ParsingNumberStyle="Integer" />
+        <Button Grid.Row="0" Grid.Column="6" Width="80" Height="25" Content="Clear"
+                Style="{DynamicResource GlassButton}" x:Name="ButtonClear" Click="ButtonClear_Click" />
+        <GridSplitter Grid.Row="1" Grid.Column="0" Width="5" VerticalAlignment="Stretch" />
+        <RichTextBox x:Name="TextBoxMessageLog"
+                     Grid.Row="2"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="7"
+                     Margin="5"
+                     VerticalScrollBarVisibility="Auto"
+                     VerticalAlignment="Stretch"
+                     HorizontalAlignment="Stretch"
+                     Background="Black" />
+
+    </Grid>
+</Window>

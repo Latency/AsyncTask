@@ -60,26 +60,24 @@ public class AsyncTask : Task<bool>, ITask
 
         // Set the 1st argument of the base ctor via reflection since we require late binding here.
         field.SetValue(this, new Func<bool>(() =>
-                           {
-                               try
-                               {
-                                   func.Invoke(this, _eventArgs);
-                                   return true;
-                               }
-                               catch (OperationCanceledException)
-                               {
-                                   // Handled
-                               }
-                               catch (Exception? ex)
-                               {
-                                   _setTaskStatus(TASK_STATE_FAULTED);
-                                   _exception = ex;
-                               }
+        {
+           try
+           {
+               func.Invoke(this, _eventArgs);
+               return true;
+           }
+           catch (OperationCanceledException)
+           {
+               // Handled
+           }
+           catch (Exception? ex)
+           {
+               _setTaskStatus(TASK_STATE_FAULTED);
+               _exception = ex;
+           }
 
-                               return false;
-                           }
-                       )
-        );
+           return false;
+        }));
 
         var method = type.BaseType?.GetMethod("AssignCancellationToken", BindingFlags.Instance | BindingFlags.NonPublic);
         if (method is null)
@@ -129,50 +127,47 @@ public class AsyncTask : Task<bool>, ITask
         #region Monitor
         //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         var monitor = Run(async () =>
+        {
+            Thread.CurrentThread.Name = $"{TaskInfo}:  Monitor";
+            var lastTime = ((TaskEventArgs)_eventArgs).StartTime = DateTime.Now;
+            ((TaskEventArgs)_eventArgs).EndTime  = _eventArgs.StartTime?.Add(TaskInfo.Timeout ?? new TimeSpan(0));
+            ((TaskEventArgs)_eventArgs).Duration = TimeSpan.Zero;
+
+            try
             {
-                Thread.CurrentThread.Name = $"{TaskInfo}:  Monitor";
-
-                var lastTime = ((TaskEventArgs)_eventArgs).StartTime = DateTime.Now;
-                ((TaskEventArgs)_eventArgs).EndTime = _eventArgs.StartTime?.Add(TaskInfo.Timeout ?? new TimeSpan(0));
-
-                try
+                while (!_cts[0].IsCancellationRequested)
                 {
-                    while (!_cts[0].IsCancellationRequested)
+                    var thisTime = DateTime.Now;
+                    if (TaskInfo.Timeout is not null && thisTime >= _eventArgs.EndTime)
                     {
-                        var thisTime = DateTime.Now;
-                        if (TaskInfo.Timeout is not null && thisTime >= _eventArgs.EndTime)
-                        {
-                            _setTaskStatus(TASK_STATE_CANCELED);
-                            Dispatch(nameof(OnTimeout), OnTimeout);
-                            break;
-                        }
-
-                        var pulse = thisTime.Subtract((DateTime)lastTime).Add(TaskInfo.PollInterval);
-                        await Delay(pulse, _cts[0].Token)
-                            .ContinueWith(task =>
-                                {
-                                    if (task.Status == TaskStatus.Canceled)
-                                        return;
-
-                                    ((TaskEventArgs)_eventArgs).Duration = thisTime.Subtract((DateTime)_eventArgs.StartTime!).Add(pulse);
-
-                                    Dispatch(nameof(OnTick), OnTick);
-                                }
-                            );
-
-                        lastTime = DateTime.Now;
+                        _setTaskStatus(TASK_STATE_CANCELED);
+                        Dispatch(nameof(OnTimeout), OnTimeout);
+                        break;
                     }
+
+                    var pulse = thisTime.Subtract((DateTime)lastTime).Add(TaskInfo.PollInterval);
+                    await Delay(pulse, _cts[0].Token).ContinueWith(task =>
+                    {
+                        if (task.Status == TaskStatus.Canceled)
+                            return;
+
+                        ((TaskEventArgs)_eventArgs).Duration = thisTime.Subtract((DateTime)_eventArgs.StartTime!).Add(pulse);
+
+                        Dispatch(nameof(OnTick), OnTick);
+                    });
+
+                    lastTime = DateTime.Now;
                 }
-                finally
-                {
-                    #if NET8_0_OR_GREATER
-                    await _cts[1].CancelAsync();
-                    #else
-                    _cts[1].Cancel();
-                    #endif
-                }
-            }, _cts[0].Token
-        );
+            }
+            finally
+            {
+                #if NET8_0_OR_GREATER
+                await _cts[1].CancelAsync();
+                #else
+                _cts[1].Cancel();
+                #endif
+            }
+        }, _cts[0].Token);
 
         //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         #endregion Monitor
@@ -183,18 +178,17 @@ public class AsyncTask : Task<bool>, ITask
         try
         {
             await Run(() =>
+            {
+                Thread.CurrentThread.Name = "Main Delegate";
+                try
                 {
-                    Thread.CurrentThread.Name = "Main Delegate";
-                    try
-                    {
-                        RunSynchronously();
-                    }
-                    catch (Exception)
-                    {
-                        // Handled
-                    }
-                }, _cts[1].Token
-            );
+                    RunSynchronously();
+                }
+                catch (Exception)
+                {
+                    // Handled
+                }
+            }, _cts[1].Token);
         }
         finally
         {
@@ -275,19 +269,18 @@ public class AsyncTask : Task<bool>, ITask
             }
         else
             TaskInfo.SynchronizationContext.Send(_ =>
+            {
+                try
                 {
-                    try
-                    {
-                        method?.Invoke(this, _eventArgs);
-                    }
-                    catch (Exception ex)
-                    {
-                        _cts[0].Cancel();
-                        _setTaskStatus(TASK_STATE_FAULTED);
-                        _exception = Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex) as Exception;
-                    }
-                }, null
-            );
+                    method?.Invoke(this, _eventArgs);
+                }
+                catch (Exception ex)
+                {
+                    _cts[0].Cancel();
+                    _setTaskStatus(TASK_STATE_FAULTED);
+                    _exception = Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex) as Exception;
+                }
+            }, null);
     }
 
 
@@ -295,7 +288,7 @@ public class AsyncTask : Task<bool>, ITask
     ///     ToString
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => TaskInfo.Name ?? string.Empty;
+    public override string ToString() => TaskInfo.Name;
 
     // ReSharper disable InconsistentNaming
     private const int TASK_STATE_FAULTED  = 0x200000;

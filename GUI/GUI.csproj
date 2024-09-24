@@ -11,6 +11,7 @@
 		<GenerateREADME>False</GenerateREADME>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

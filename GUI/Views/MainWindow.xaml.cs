@@ -93,15 +93,14 @@ public partial class MainWindow
     private void StartButton_Click(object? sender, RoutedEventArgs? e)
     {
         var task = new AsyncTask.AsyncTask((asyncTask, _) =>
-            {
-                WaitHandle.WaitAny([asyncTask.TaskInfo.Token.WaitHandle]);
-            }
-        )
+        {
+            WaitHandle.WaitAny([asyncTask.TaskInfo.Token.WaitHandle]);
+        })
         {
             TaskInfo = new TaskRecordSet
             {
                 Name                   = nameof(AsyncTask),
-                PollInterval           = new(0, 0, 0, 0, 10),
+                PollInterval           = new(0, 0, 0, 0, 100),
                 Owner                  = this,
                 SynchronizationContext = SynchronizationContext.Current
             },

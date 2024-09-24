@@ -5,6 +5,8 @@
 // Date:     04/13/2024
 // ****************************************************************************
 
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -135,7 +137,7 @@ public partial class MainWindow
                 }
             }
 
-            foreach (GridColumnAttribute attr in p.GetCustomAttributes(false).Where(_ => p.Name != "Dispatcher"))
+            foreach (GridColumnAttribute attr in p.GetCustomAttributes(false).Where(attr => p.Name != "Dispatcher" && attr is not NullableAttribute && attr is not RequiredAttribute))
             {
                 dgc.Header     = attr.Header ?? p.Name;
                 dgc.Width      = attr.Width;

@@ -11,7 +11,7 @@ namespace AsyncTask.Structs;
 
 public readonly struct SynchronizationContextAwaiter(SynchronizationContext context) : INotifyCompletion
 {
-    private static readonly SendOrPostCallback PostCallback = state => ((Action)state).Invoke();
+    private static readonly SendOrPostCallback PostCallback = static state => ((Action?)state)?.Invoke();
 
     /// <summary>
     ///     IsCompleted

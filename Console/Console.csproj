@@ -2,15 +2,21 @@
 
 	<PropertyGroup>
 		<TargetFramework>net9.0-windows</TargetFramework>
-		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
 		<OutputType>WinExe</OutputType>
-		<StartupObject>Console.Program</StartupObject>
+		<StartupObject>Console.Views.App</StartupObject>
 		<GenerateREADME>False</GenerateREADME>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ApplicationDefinition Include="Views\App.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
 		<ProjectReference Include="..\src\AsyncTask.csproj" />
 	</ItemGroup>
 
