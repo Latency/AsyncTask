@@ -5,6 +5,9 @@
 // Date:     04/11/2024
 // ****************************************************************************
 
+using System;
+using System.Collections.Generic;
+
 namespace EventElements.Interfaces;
 
 public interface IEventCustomElement<TSender, TEventArgs> : IEvent

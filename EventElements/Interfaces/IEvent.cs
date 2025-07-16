@@ -5,6 +5,7 @@
 // Date:     04/11/2024
 // ****************************************************************************
 
+using System;
 using System.Reflection;
 
 namespace EventElements.Interfaces;
