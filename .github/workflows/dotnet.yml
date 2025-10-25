@@ -24,12 +24,7 @@ jobs:
         max-parallel: 2
         
     steps:
-
-    - name: Copy NuGet.Config Template
-      shell: bash
-      run: |
-        cp ../NuGet.Config.template ../NuGet.Config
- 
+   
     - uses: actions/checkout@v5.0.0
       with:
         fetch-depth: '0'
