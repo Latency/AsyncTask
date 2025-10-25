@@ -1,5 +1,4 @@
-﻿# GUI
-Asynchronous Task Extension Application
+﻿# Unit Tests
 
 
 ---
@@ -28,7 +27,7 @@ Asynchronous Task Extension Application
 </tr>
 <tr>
 <td>OUTPUT TYPE:</td>
-<td>WinExe [API]</td>
+<td>Exe [API]</td>
 </tr>
 <tr>
 <td>SUPPORTS:</td>
@@ -36,7 +35,7 @@ Asynchronous Task Extension Application
 </tr>
 <tr>
 <td>GFX SUBSYS:</td>
-<td>[WPF]</td>
+<td>[None]</td>
 </tr>
 <tr>
 <td>TAGS:</td>

@@ -1,4 +1,4 @@
-name: .NET Core Desktop Build
+name: .NET Build
 env:
   NUGET_SERVER_URL: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
   NUGET_CONFIG: "../NuGet.config"
@@ -36,14 +36,14 @@ jobs:
         nuget config -Set defaultPushSource="${{ env.NUGET_SERVER_URL }}" -ConfigFile ${{ env.NUGET_CONFIG }}
         dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.NUGET_AUTH_TOKEN }} --protocol-version 3 --configfile ${{ env.NUGET_CONFIG }} --store-password-in-clear-text --name github "${{ env.NUGET_SERVER_URL }}"
        
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v5.0.0
       with:
         fetch-depth: '0'
              
-    - uses: actions/setup-dotnet@v4.0.0
+    - uses: actions/setup-dotnet@v5.0.0
       if: matrix.os != 'self-hosted'
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '10.0.x'
         dotnet-quality: 'signed'
         source-url: ${{ env.NUGET_SERVER_URL }}
       env:

@@ -16,11 +16,11 @@ Asynchronous Task Extension Library
 </tr>
 <tr>
 <td>UPDATED:</td>
-<td>9/24/2024</td>
+<td>10/25/2025</td>
 </tr>
 <tr>
 <td>FRAMEWORK:</td>
-<td>net452, netstandard2.0, netstandard2.1, net9.0</td>
+<td>net452, netstandard2.0, netstandard2.1, net10.0</td>
 </tr>
 <tr>
 <td>LANGUAGE:</td>
@@ -54,7 +54,7 @@ Asynchronous Task Extension Library
 <td>VERSION:</td>
 <td><a href="https://github.com/Latency/AsyncTask/releases"><img src="https://img.shields.io/github/v/release/Latency/AsyncTask?include_prereleases&style=plastic&logo=GitHub&logoColor=black&label=Version&color=blue"></a></td>
 </tr>
-<!-- VERSION: 3.2.0 -->
+<!-- VERSION: 3.2.2 -->
 </table>
 
 

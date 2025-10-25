@@ -1,5 +1,4 @@
 ﻿# Console
-###
 
 
 ---
@@ -16,7 +15,7 @@
 </tr>
 <tr>
 <td>UPDATED:</td>
-<td>4/13/2024</td>
+<td>10/25/2025</td>
 </tr>
 <tr>
 <td>FRAMEWORK:</td>
@@ -36,15 +35,15 @@
 </tr>
 <tr>
 <td>GFX SUBSYS:</td>
-<td>[WinForms]</td>
+<td>[WPF]</td>
 </tr>
 <tr>
 <td>TAGS:</td>
-<td></td>
+<td>[C#], [.NET], [API], [Visual Studio]</td>
 </tr>
 <tr>
 <td>STATUS:</td>
-<td><a  href="https://github.com/Latency/AsyncTask/actions/workflows/dotnet.yml"><img src="https://github.com/Latency/AsyncTask/actions/workflows/dotnet.yml/badge.svg"></a></td>
+<td><a href="https://github.com/Latency/AsyncTask/actions/workflows/dotnet.yml"><img src="https://github.com/Latency/AsyncTask/actions/workflows/dotnet.yml/badge.svg"></a></td>
 </tr>
 <tr>
 <td>LICENSE:</td>
