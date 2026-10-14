@@ -5,7 +5,7 @@
 		<UseWPF>true</UseWPF>
 		<OutputType>WinExe</OutputType>
 		<StartupObject>Console.Views.App</StartupObject>
-		<GenerateREADME>False</GenerateREADME>
+		<GenerateReadmeFile>False</GenerateReadmeFile>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IsPackable>false</IsPackable>
 		<Nullable>enable</Nullable>

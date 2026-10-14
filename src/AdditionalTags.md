@@ -1,0 +1,20 @@
+[Comparison]: <https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java>
+[WPF]: <https://en.wikipedia.org/wiki/Windows_Presentation_Foundation/>
+[WinForms]: <https://en.wikipedia.org/wiki/Windows_Forms/>
+[AOP]: <https://en.wikipedia.org/wiki/Aspect-oriented_programming>
+[Parametric-Polymorphism]: <https://en.wikipedia.org/wiki/Parametric_polymorphism>
+[AsyncTask]: <https://github.com/Latency/AsyncTask/>
+[TAP]: <https://msdn.microsoft.com/en-us/library/hh873175(v=vs.110).aspx>
+[AMI]: <https://en.wikipedia.org/wiki/Asynchronous_method_invocation>
+[TPL]: <https://msdn.microsoft.com/en-us/library/dd460717(v=vs.110).aspx>
+[ORM]: <https://en.wikipedia.org/wiki/Object-relational_mapping>
+[MVC]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>
+[MVA]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
+[CMS]: <https://en.wikipedia.org/wiki/Content_management_system>
+[IoC]: <https://msdn.microsoft.com/en-us/library/ff921087.aspx>
+[DI]: <https://en.wikipedia.org/wiki/Dependency_injection>
+[Generics]: <https://en.wikipedia.org/wiki/Generic_programming>
+[Delegates]: <https://msdn.microsoft.com/en-us/library/ms173171.aspx>
+[EventHandlers]: <https://msdn.microsoft.com/en-us/library/2z7x8ys3(v=vs.90).aspx>
+[NUnit]: <https://en.wikipedia.org/wiki/NUnit>
+[lambda expressions]: <https://msdn.microsoft.com/en-us/library/bb397687.aspx>

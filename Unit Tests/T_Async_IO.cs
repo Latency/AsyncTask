@@ -1,4 +1,4 @@
-// ****************************************************************************
+﻿// ****************************************************************************
 // Project:  Unit Tests
 // File:     T_Async_IO.cs
 // Author:   Latency McLaughlin
@@ -42,7 +42,7 @@ public class Tests(ITestOutputHelper output)
                 do
                 {
                     task.TaskInfo.Token.ThrowIfCancellationRequested();
-                    Task.Delay(250).GetAwaiter().GetResult();
+                    Thread.Sleep(250);
                 }
                 while (args.Duration < TimeSpan.FromSeconds(2));
             })
@@ -79,7 +79,7 @@ public class Tests(ITestOutputHelper output)
                 do
                 {
                     task.TaskInfo.Token.ThrowIfCancellationRequested();
-                    Task.Delay(250).GetAwaiter().GetResult();
+                    Thread.Sleep(250);
                 }
                 while (args.Duration < TimeSpan.FromSeconds(10));
             })
@@ -132,7 +132,7 @@ public class Tests(ITestOutputHelper output)
                 do
                 {
                     task.TaskInfo.Token.ThrowIfCancellationRequested();
-                    Task.Delay(250).GetAwaiter().GetResult();
+                    Thread.Sleep(250);
                 }
                 while (args.Duration < TimeSpan.FromSeconds(10));
             })

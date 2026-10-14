@@ -8,7 +8,7 @@
 		<RootNamespace>ORM_Monitor</RootNamespace>
 		<AssemblyName>AsyncTaskViewer</AssemblyName>
 		<StartupObject>ORM_Monitor.Views.App</StartupObject>
-		<GenerateREADME>False</GenerateREADME>
+		<GenerateReadmeFile>False</GenerateReadmeFile>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IsPackable>false</IsPackable>
 		<Nullable>enable</Nullable>

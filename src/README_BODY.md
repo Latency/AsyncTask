@@ -1,43 +1,34 @@
-## Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/[MVA] [DLL])
+﻿## Screenshots
 
-### Task-based Asynchronous Pattern ([TAP])
-
----
-
-## Screenshots
-
-### WinForms
+### [WinForms]
 ![AsyncTask](Resources/Console.png)
 
-### WPF
+### [WPF]
 ![AsyncTask](Resources/AsyncTask.png)
 
 ---
 
 ## Navigation
+
 * [Background](#background)
 * [Introduction](#introduction)
 * [Overview](#overview)
-* [Installation](#installation)
 * [Output](#output)
 * [Other features](#other-features)
-* [References](#references)
-* [Report An Issue](#report-an-issue)
-* [Donation](#donation)
-* [License](#license)
+* [Usage](#usage)
 
 ---
 
 ## Background
 
-There have been many instances throughout my career where incompetent developers try to release code to the company and its stakeholders which deadlock underlying dependency OSI layers which hinder project performance and scheduling.
-Those tasked to sustain code as dependency will be frustrated debugging these efforts when trying to qualify responsibility of failure.
+There have been many instances throughout my career where incompetent developers try to release code to the company and its stakeholders which deadlock underlying dependency OSI layers, and hinder project performance and scheduling.
+Those tasked to sustain code, will be frustrated debugging these efforts when trying to qualify responsibility of failure.
 
-The goal was to develop an [API] that would be universal and simple to use in helping eliminate any '*concerns*' a.k.a cohesive areas of functionality, by wrapping amateur developers efforts with ease and addressing cross-cutting/horizontal concerns as well.
+The goal was to develop an [API], using Task-based Asynchronous Pattern [TAP], that would be universal and simple to use in helping eliminate any '*concerns*' a.k.a cohesive areas of functionality, by wrapping amateur developers efforts with ease and addressing cross-cutting/horizontal concerns as well.
 The goal was to reduce time & development costs in validating efforts for risk mitigation serving as a universal multi-functional paradigm.
 Any developer can therefore use it to construct new code with the same underlying mechanics and reduce boilerplate code.
 
-Some nice things about the C# language is that it is far superior to Java and can detect within a certain tolerance what the type might be so that the type parameter can be omitted from its calling convention.
+Some nice things about the [C#] language is that it is far superior to Java. It can detect within a certain tolerance what the type might be so that the type parameter can be omitted from its calling convention.
 Note that both languages have Reflection built-in, which technically makes it is possible to drill down many OSI layers and pull out information used for dynamic / RT calling conventions.
 
 Java has limitations and has nothing to offer of greater value which is described here for [Comparison].
@@ -58,12 +49,13 @@ Callback support for the following delegates:
 * OnTick
 * OnTimeout
 
-
 [AsyncTask] is compiled as a library packaged for the [NuGet] marketplace.  The project itself, supplies an application driver, test suite, and the library's source code.
+
+### Model-View-Controller / Adapter Dynamically Linked Library ([MVC]/[MVA] [DLL])
 
 Model-View-Controller ([MVC]) is an architectural pattern that separates application's data model and user interface views into separate components. This is what the definition says. However, to fully understand the [MVC] we have to introduce required terms and point benefits of [MVC].
 
-![AsyncTask](Resources/mvc.png)
+![AsyncTask](Resources/mvc_process.svg)
 
 The view is a user interface element (typically a window) that presents the data to the user and allows the user to change the data. It is a typical situation to have several views active at the same time (for example in the Multiple-Document Interface).
 
@@ -106,15 +98,11 @@ This API has several benefits, such as:
 * **Async / Await support.**\
  Task monitoring and dispatching utilizes [TPL] found in [.NET]'s v4+ async [API] which is fully supported by every task is wrapped and invocated based on its delegate.  Tightly coupled integration of multi-threaded delegates with composite [TPL] mechanics to offer thread-safe immediate and explicit timeout and termination functionality.   
 
-* **Create reusable parametric polymorphic / [lambda expression] / FP methods in code.**\
+* **Create reusable parametric polymorphic / [lambda expressions] / FP methods in code.**\
  When running your tests, it might be that you want to create a sample of functional or regressive tasks.  Interchanging the delegates make it easy.  For example, switching contexts from an administrator area in your [CMS] / web-application.
 
 * **Task Parallel Library ([TPL]) concurrent scheduling.**\
  [AsyncTask] uses a wrapping factory for the delegates supplied as its generic type. It doesn't matter whether your application uses multiple event handlers with specific listeners for each.  This [API] will consolidate those into a universal system regardless of type.   It will reduce the boilerplate code and overhead which will ultimately reduce the overall risk of failure since everything will funnel through the same sub-system.
-
-## Installation
-
-This library can be installed from [NuGet].
 
 ## Output
 
@@ -125,54 +113,50 @@ This library can be installed from [NuGet].
 - Unit Tests:\
   The unit test uses [NUnit] to help qualify the underlying [API].   Included is a sample that can be ran and tested againsted a variety of mock senario conditions.
 - UI Application:\
-  In addition to being able to use the [API] library as standalone, the project consists of a user-interface I developed using [WPF].
+  In addition to being able to use the [API] library as standalone, the project consists of a user-interface developed using [WPF].
 
-## References
+## Usage
 
- [TPL], [.NET], [ORM], [IoC], [DI], [Generics], [Delegates], [EventHandlers], [Parametric Polymorphism]
+Create a `TaskList` to track the running tasks, then create each `AsyncTask` with the work to perform and configure it through `TaskInfo` and the event callbacks.  Call `Start()` to run it.
 
-## Report An Issue
-If you have a patch to contribute, a feature to request, or a bug to report, please post to the [Issue Tracker](https://github.com/Latency/AsyncTask/issues).
+```csharp
+using AsyncTask.Models;
 
-## Donation
-If you want to donate to my efforts on this project, please use the following link,
+var       taskList = new TaskList();
+const int timeout  = 5;
 
-[![Donate via Paypal](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/Latency2?country.x=US&locale.x=en_US)
+var t1 = new AsyncTask.AsyncTask((task, args) =>
+{
+    do
+    {
+        task.TaskInfo.Token.ThrowIfCancellationRequested();
+        Thread.Sleep(250);
+    }
+    while (args.Duration < TimeSpan.FromSeconds(2));
+})
+{
+    TaskInfo = new TaskInfo
+    {
+        Name                   = "t1",
+        Timeout                = TimeSpan.FromSeconds(timeout),
+        TaskList               = taskList,
+        PollInterval           = new(0, 0, 1),
+        SynchronizationContext = SynchronizationContext.Current
+    },
+    OnAdd      = (asyncTask, _)    => Console.WriteLine($"Adding '{asyncTask.TaskInfo.Name}'."),
+    OnRemove   = (asyncTask, _)    => Console.WriteLine($"Removing '{asyncTask.TaskInfo.Name}'."),
+    OnComplete = (asyncTask, _)    => Console.WriteLine($"Completed '{asyncTask.TaskInfo.Name}'."),
+    OnTick     = (asyncTask, args) => Console.WriteLine($"Duration:  {args.Duration:hh\\:mm\\:ss}"),
+    OnTimeout  = (asyncTask, _)    => Console.WriteLine($"Timeout for '{asyncTask.TaskInfo.Name}'."),
+    OnCanceled = (asyncTask, _)    => Console.WriteLine($"Canceled '{asyncTask.TaskInfo.Name}'.")
+};
+t1.Start();
 
-## License
+// Wait
+await Task.WhenAll(taskList.Keys.Cast<Task>());
+```
 
-The source code for the site is licensed under the MIT license, which you can find in
-the [MIT-LICENSE].txt file.
-
-All graphical assets are licensed under the
-[Creative Commons Attribution 3.0 Unported License](https://creativecommons.org/licenses/by/3.0/).
-
-[//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job.)
-
-   [GNU LESSER GENERAL PUBLIC LICENSE]: <http://www.gnu.org/licenses/lgpl-3.0.en.html>
-   [Comparison]: <https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java>
-   [NuGet]: <https://www.nuget.org/packages/AsyncTask/>
-   [.NET]: <https://en.wikipedia.org/wiki/.NET_Framework/>
-   [WPF]: <https://en.wikipedia.org/wiki/Windows_Presentation_Foundation/>
-   [Visual Studio]: <https://en.wikipedia.org/wiki/Microsoft_Visual_Studio/>
-   [Latency McLaughlin]: <https://www.linkedin.com/in/Latency/>
-   [API]: <https://en.wikipedia.org/wiki/Application_programming_interface>
-   [AOP]: <https://en.wikipedia.org/wiki/Aspect-oriented_programming>
-   [Parametric Polymorphism]: <https://en.wikipedia.org/wiki/Parametric_polymorphism>
-   [AsyncTask]: <https://github.com/Latency/AsyncTask/>
-   [TAP]: <https://msdn.microsoft.com/en-us/library/hh873175(v=vs.110).aspx>
-   [AMI]: <https://en.wikipedia.org/wiki/Asynchronous_method_invocation>
-   [TPL]: <https://msdn.microsoft.com/en-us/library/dd460717(v=vs.110).aspx>
-   [ORM]: <https://en.wikipedia.org/wiki/Object-relational_mapping>
-   [C#]: <https://en.wikipedia.org/wiki/C_Sharp_(programming_language)>
-   [DLL]: <https://en.wikipedia.org/wiki/Dynamic-link_library>
-   [MVC]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>
-   [MVA]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
-   [CMS]: <https://en.wikipedia.org/wiki/Content_management_system>
-   [IoC]: <https://msdn.microsoft.com/en-us/library/ff921087.aspx>
-   [DI]: <https://en.wikipedia.org/wiki/Dependency_injection>
-   [Generics]: <https://en.wikipedia.org/wiki/Generic_programming>
-   [Delegates]: <https://msdn.microsoft.com/en-us/library/ms173171.aspx>
-   [EventHandlers]: <https://msdn.microsoft.com/en-us/library/2z7x8ys3(v=vs.90).aspx>
-   [NUnit]: <https://en.wikipedia.org/wiki/NUnit>
-   [lambda expression]: <https://msdn.microsoft.com/en-us/library/bb397687.aspx>
+- **Delegate:**  The work is supplied as a delegate receiving the running task and its arguments (`args.Duration` is the elapsed time).  Call `task.TaskInfo.Token.ThrowIfCancellationRequested()` to honor cancellation.
+- **TaskInfo:**  `Name`, `Timeout`, `PollInterval` (how often `OnTick` fires), `TaskList` and the `SynchronizationContext` the callbacks are posted to.
+- **Callbacks:**  `OnAdd`, `OnRemove`, `OnComplete`, `OnTick`, `OnTimeout` and `OnCanceled`.
+- **Cancellation:**  Call `Cancel()` on the task to interrupt it, which raises `OnCanceled`.  A task running longer than `Timeout` raises `OnTimeout`.
