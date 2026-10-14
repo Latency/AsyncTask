@@ -4,9 +4,9 @@
 // Author:   Latency McLaughlin
 // Date:     04/11/2024
 // ****************************************************************************
+// ReSharper disable InconsistentNaming
 
 using AsyncTask.Models;
-using Assert = Xunit.Assert;
 
 namespace Unit_Tests;
 
@@ -16,14 +16,17 @@ public sealed class TestSynchronizationContext : SynchronizationContext
     public override void Send(SendOrPostCallback d, object? state) => d(state);
 }
 
-// ReSharper disable once InconsistentNaming
-public partial class Tests
+
+public class Tests(ITestOutputHelper output)
 {
+    private void Expr(string name, string msg) => output.WriteLine($"@{name}:  {msg}");
+
+
     /// <summary>
     ///     Test
     /// </summary>
     [Fact]
-    public async Task Monitor_Test()
+    public async Task TTest()
     {
         try
         {
@@ -31,19 +34,18 @@ public partial class Tests
             const int timeout  = 5;
             string[]  test     = ["NORMAL", "CANCELED", "TIMED OUT"];
 
-            void Expr(string name, string msg) => System.Console.WriteLine($"@{name}:  {msg}");
+
 
             // #############################################################
             var t1 = new AsyncTask.AsyncTask((task, args) =>
+            {
+                do
                 {
-                    do
-                    {
-                        task.TaskInfo.Token.ThrowIfCancellationRequested();
-                        Task.Delay(250).GetAwaiter().GetResult();
-                    }
-                    while (args.Duration < TimeSpan.FromSeconds(2));
+                    task.TaskInfo.Token.ThrowIfCancellationRequested();
+                    Task.Delay(250).GetAwaiter().GetResult();
                 }
-            )
+                while (args.Duration < TimeSpan.FromSeconds(2));
+            })
             {
                 TaskInfo = new TaskInfo
                 {
@@ -73,15 +75,14 @@ public partial class Tests
 
             // #############################################################
             var t2 = new AsyncTask.AsyncTask((task, args) =>
+            {
+                do
                 {
-                    do
-                    {
-                        task.TaskInfo.Token.ThrowIfCancellationRequested();
-                        Task.Delay(250).GetAwaiter().GetResult();
-                    }
-                    while (args.Duration < TimeSpan.FromSeconds(10));
+                    task.TaskInfo.Token.ThrowIfCancellationRequested();
+                    Task.Delay(250).GetAwaiter().GetResult();
                 }
-            )
+                while (args.Duration < TimeSpan.FromSeconds(10));
+            })
             {
                 TaskInfo = new TaskInfo
                 {
@@ -117,7 +118,8 @@ public partial class Tests
              {
                  await Task.Delay(TimeSpan.FromSeconds(4.4));
                  t2.Cancel();
-             }
+             },
+            Xunit.TestContext.Current.CancellationToken
             );
             // ------------------------------------
 
@@ -126,15 +128,14 @@ public partial class Tests
 
             // #############################################################
             var t3 = new AsyncTask.AsyncTask((task, args) =>
+            {
+                do
                 {
-                    do
-                    {
-                        task.TaskInfo.Token.ThrowIfCancellationRequested();
-                        Task.Delay(250).GetAwaiter().GetResult();
-                    }
-                    while (args.Duration < TimeSpan.FromSeconds(10));
+                    task.TaskInfo.Token.ThrowIfCancellationRequested();
+                    Task.Delay(250).GetAwaiter().GetResult();
                 }
-            )
+                while (args.Duration < TimeSpan.FromSeconds(10));
+            })
             {
                 TaskInfo = new TaskInfo
                 {
@@ -164,7 +165,7 @@ public partial class Tests
             // Wait for all the tasks to finish.
             try
             {
-                await Task.WhenAll(taskList.Keys.Cast<Task>()).ContinueWith(_ => System.Console.WriteLine("All Tasks Completed."));
+                await Task.WhenAll(taskList.Keys.Cast<Task>()).ContinueWith(_ => System.Console.WriteLine("All Tasks Completed."), Xunit.TestContext.Current.CancellationToken);
             }
             catch
             {

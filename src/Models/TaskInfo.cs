@@ -1,13 +1,10 @@
-﻿// ****************************************************************************
+// ****************************************************************************
 // Project:  AsyncTask
 // File:     TaskInfo.cs
 // Author:   Latency McLaughlin
 // Date:     04/11/2024
 // ****************************************************************************
 
-#if NETNET461_OR_GREATER || NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER
-using System.ComponentModel.DataAnnotations;
-#endif
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AsyncTask.Interfaces;
@@ -20,9 +17,6 @@ public class TaskInfo : ITaskInfo
     /// <summary>
     ///     Name
     /// </summary>
-    #if NET461_OR_GREATER || NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER
-    [Required]
-    #endif
     public string Name { get; set; } = string.Empty;
 
 

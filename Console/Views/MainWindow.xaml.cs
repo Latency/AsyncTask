@@ -23,7 +23,7 @@ namespace Console.Views;
 public partial class MainWindow : Window
 {
     private ILogger?             _logger;
-    private AsyncTask.AsyncTask? _t2;
+    private AsyncTask.AsyncTask? _t1;
 
 
     /// <summary>
@@ -53,7 +53,7 @@ public partial class MainWindow : Window
         var blockTime = NumericUpDownBlockTime.Value!.Value;
         var timeout   = NumericUpDownTimeout.Value!.Value;
 
-        _t2 = new((task, args) =>
+        _t1 = new((task, args) =>
             {
                 do
                 {
@@ -66,7 +66,7 @@ public partial class MainWindow : Window
         {
             TaskInfo = new TaskInfo
             {
-                Name                   = "t2",
+                Name                   = "T1",
                 Timeout                = timeout < 0 ? null : TimeSpan.FromSeconds(timeout),
                 Logger                 = _logger,
                 PollInterval           = new(0, 0, 1),
@@ -75,7 +75,7 @@ public partial class MainWindow : Window
             OnAdd = (asyncTask, _) =>
             {
                 asyncTask.TaskInfo.Logger?.Trace($"Adding task for {asyncTask.TaskInfo.Name}");
-                asyncTask.TaskInfo.Logger?.Warning($"Executing **** t2 **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
+                asyncTask.TaskInfo.Logger?.Warning($"Executing **** {asyncTask.TaskInfo.Name} **** test.  Blocking for {blockTime} seconds.  Timeout {(timeout < 0 ? "is infinate" : $"at {timeout} second{(timeout == 1 ? string.Empty : "s")}")}.");
                 OnButtonChanged(true);
             },
             OnRemove = (asyncTask, _) =>
@@ -89,18 +89,18 @@ public partial class MainWindow : Window
             OnCanceled = (asyncTask, _) => asyncTask.TaskInfo.Logger?.Critical($"Canceling task for '{asyncTask.TaskInfo.Name}'."),
             OnError    = (asyncTask, args) => asyncTask.TaskInfo.Logger?.Error($"Error occured for '{asyncTask.TaskInfo.Name}'.{Environment.NewLine}\t{args.Exception?.Message}")
         };
-        _t2.Start();
+        _t1.Start();
     }
 
 
     private void ButtonDisable_Click(object sender, EventArgs e)
     {
         OnButtonChanged(false);
-        _t2?.Cancel();
+        _t1?.Cancel();
     }
 
 
-    private void ButtonClear_Click(object sender, EventArgs e) => TextBoxMessageLog.Document.Blocks.Clear();
+    private void ButtonClear_Click(object sender, EventArgs e) => TextBoxMessageLog?.Document?.Blocks.Clear();
 
 
     private void Form1_Load(object sender, EventArgs e)

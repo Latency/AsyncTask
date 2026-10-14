@@ -1,4 +1,4 @@
-﻿// ****************************************************************************
+// ****************************************************************************
 // Project:  AsyncTask
 // File:     DefaultLogger.cs
 // Author:   Latency McLaughlin
@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using AsyncTask.Interfaces;
 using Microsoft.Extensions.Logging;
 
-#if !NETCOREAPP1_1_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
+#if !NETCOREAPP1_1_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !NET461_OR_GREATER
 using static System.Diagnostics.Trace;
 #endif
 
@@ -37,7 +37,7 @@ public partial class DefaultLogger
 
         _isEnabled = true;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger = Initialize(LogLevel.Trace);
         #else
         _listeners = Listeners;
@@ -57,7 +57,7 @@ public partial class DefaultLogger
 
         _isEnabled = true;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger = Initialize(LogLevel.Trace);
         #else
         _listeners.AddRange(Listeners);
@@ -72,7 +72,7 @@ public partial class DefaultLogger
 
         _isEnabled = false;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger = Initialize(LogLevel.None);
         #else
         _listeners.Clear();
@@ -85,7 +85,7 @@ public partial class DefaultLogger
         if (!_isEnabled)
             return;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.LogTrace(msg);
         #endif
 
@@ -98,7 +98,7 @@ public partial class DefaultLogger
         if (!_isEnabled)
             return;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.LogDebug(msg);
         #else
         WriteLine(msg);
@@ -113,7 +113,7 @@ public partial class DefaultLogger
         if (!_isEnabled)
             return;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.LogError(ex, msg);
         #else
         if (ex != null)
@@ -130,7 +130,7 @@ public partial class DefaultLogger
         if (!_isEnabled)
             return;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.LogInformation(msg);
         #else
         TraceInformation(msg);
@@ -145,7 +145,7 @@ public partial class DefaultLogger
         if (!_isEnabled)
             return;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.LogWarning(msg);
         #else
         TraceWarning(msg);
@@ -160,7 +160,7 @@ public partial class DefaultLogger
         if (!_isEnabled)
             return;
 
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.LogCritical(msg);
         #endif
 
@@ -241,7 +241,7 @@ public partial class DefaultLogger
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         _logger.Log(logLevel, eventId, state, exception, formatter);
         #else
         throw new NotSupportedException();
@@ -251,7 +251,7 @@ public partial class DefaultLogger
 
     public bool IsEnabled(LogLevel logLevel)
     {
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         return _logger.IsEnabled(logLevel);
         #else
         throw new NotSupportedException();
@@ -259,10 +259,14 @@ public partial class DefaultLogger
     }
 
 
+    #if NET461
+    public IDisposable BeginScope<TState>(TState state)
+    #else
     public IDisposable? BeginScope<TState>(TState state)
         where TState : notnull
+    #endif
     {
-        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
         return _logger.BeginScope(state);
         #else
         throw new NotSupportedException();
@@ -281,7 +285,7 @@ public partial class DefaultLogger
     { }
 
 
-    #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
     private static Microsoft.Extensions.Logging.ILogger Initialize(LogLevel logLevel) => LoggerFactory.Create(builder => builder.SetMinimumLevel(logLevel)).CreateLogger(typeof(object));
     #endif
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

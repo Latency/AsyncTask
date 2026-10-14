@@ -1,4 +1,4 @@
-﻿// ****************************************************************************
+// ****************************************************************************
 // Project:  AsyncTask
 // File:     DefaultLogger.Schema.cs
 // Author:   Latency McLaughlin
@@ -21,7 +21,7 @@ public partial class DefaultLogger : LoggerHandlers, ILogger
     private bool _isEnabled;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    #if NETCOREAPP1_1_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NET461_OR_GREATER
     private Microsoft.Extensions.Logging.ILogger _logger;
     #else
     private readonly TraceListenerCollection _listeners;

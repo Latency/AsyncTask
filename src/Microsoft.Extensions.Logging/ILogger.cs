@@ -28,7 +28,10 @@ public interface ILogger
     //
     // Returns:
     //     A disposable object that ends the logical operation scope on dispose.
-    IDisposable? BeginScope<TState>(TState state) where TState : notnull;
+    IDisposable? BeginScope<TState>(TState state) where TState
+    #if !NET8_0_OR_GREATER
+        : notnull;
+    #endif
 
     //
     // Summary:

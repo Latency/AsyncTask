@@ -1,27 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net452;netstandard2.0;netstandard2.1;net10.0</TargetFrameworks>
+		<TargetFrameworks>net45;net451;net452;net46;net461;net462;net47;net471;net472;net48;net481;netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
 		<Version>3.2.2</Version>
 		<Description>Asynchronous Task Extension Library</Description>
-		<PackageReleaseNotes>Update target framework to .NET 10.0 RC</PackageReleaseNotes>
+		<PackageReleaseNotes>Update target framework to .NET 11.0</PackageReleaseNotes>
 		<PackageTags>API; TAP; TPL; .NET; Core; ORM; IoC; DI; Generics; Delegates; EventHandlers; Parametric-Polymorphism</PackageTags>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<NetCore>$([System.Text.RegularExpressions.Regex]::Match($(TargetFramework),      `^net(8|9|10).0$`).Groups[1].Value)</NetCore>
-		<NetStandard>$([System.Text.RegularExpressions.Regex]::Match($(TargetFramework),  `^netstandard(1.[0-6]|2.[0-1])$`).Groups[1].Value)</NetStandard>
-		<NetFramework>$([System.Text.RegularExpressions.Regex]::Match($(TargetFramework), `^net(452|46|46[0-2]|47|47[1-2]|48|481)$`).Groups[1].Value)</NetFramework>
-	</PropertyGroup>
-
-	<!-- Normalize version numbers for easier comparison -->
-	<PropertyGroup Condition="'$(NetFramework)' != '' And $(NetFramework) &lt; 100">
-		<NetFramework>$(NetFramework)0</NetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-rc.2.25502.107" Condition="'$(NetCore)' != '' Or ('$(NetFramework)' != '' And $(NetFramework) &gt;= 470) Or ('$(NetStandard)' != '' And $(NetStandard) &gt;= 2.0)" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0-rc.1.26425.128" Condition="'$(TargetFramework)' != 'net461' And '$(TargetFramework)' != 'net8.0' And '$(TargetFramework)' != 'net9.0' And ('$(IsNetCore)' != '' Or '$(IsNetStandard)' != '' Or $([System.Text.RegularExpressions.Regex]::IsMatch('$(IsNetFramework)', '^(462|47|471|472|48|481)$')))" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.13" Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net9.0'" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" Condition="'$(TargetFramework)' == 'net461'" />
 	</ItemGroup>
-	
+
 </Project>

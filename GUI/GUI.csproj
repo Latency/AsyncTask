@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net11.0-windows</TargetFramework>
 		<Description>Asynchronous Task Extension Application</Description>
 		<UseWPF>true</UseWPF>
 		<OutputType>WinExe</OutputType>
@@ -35,12 +35,7 @@
 		<Resource Include="Resources\Image-6.bmp" />
 		<Resource Include="Resources\Image-7.bmp" />
 		<Resource Include="Resources\Lamp.bmp" />
-		<Resource Include="Resources\project.ico" />
 		<Resource Include="Resources\Token.bmp" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>

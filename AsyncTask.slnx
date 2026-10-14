@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="DataModel.md" />
+    <File Path="Flow-Chart.png" />
+    <File Path="Output.png" />
+    <File Path="Properties/AsyncTask.png" />
+    <File Path="Properties/mvc.png" />
+  </Folder>
+  <Project Path="Console/Console.csproj" />
+  <Project Path="GUI/GUI.csproj" />
+  <Project Path="src/AsyncTask.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="Unit Tests/Unit Tests.csproj" />
+</Solution>

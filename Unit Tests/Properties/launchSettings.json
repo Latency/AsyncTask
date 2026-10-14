@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Medtronic.MFI.EC.AOI.UnitTests": {
-      "commandName": "Project",
-        "environmentVariables": {
-        }
-    }
-  }
-}
