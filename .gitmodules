@@ -1,0 +1,3 @@
+[submodule "src/Logging"]
+	path = src/Logging
+	url = https://github.com/Latency/HSMS-Logging.git

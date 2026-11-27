@@ -9,9 +9,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0-rc.1.26425.128" Condition="'$(TargetFramework)' != 'net461' And '$(TargetFramework)' != 'net8.0' And '$(TargetFramework)' != 'net9.0' And ('$(IsNetCore)' != '' Or '$(IsNetStandard)' != '' Or $([System.Text.RegularExpressions.Regex]::IsMatch('$(IsNetFramework)', '^(462|47|471|472|48|481)$')))" />
+		<Compile Remove="Logging/**" />
+		<None Remove="Logging/**" />
+		<Compile Remove="Structs/EventId.cs" Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net452' Or '$(TargetFramework)' == 'net46'" />
+		<ProjectReference Include="Logging/HSMS.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0" Condition="'$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'net47' Or '$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net48' Or '$(TargetFramework)' == 'net481' Or '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net10.0' Or '$(TargetFramework)' == 'net11.0'" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.13" Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net9.0'" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" Condition="'$(TargetFramework)' == 'net461'" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="11.0.0" Condition="'$(TargetFramework)' == 'net11.0'" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" Condition="'$(TargetFramework)' == 'net11.0'" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" Condition="'$(TargetFramework)' == 'net11.0'" />
 	</ItemGroup>
 
 </Project>

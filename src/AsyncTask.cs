@@ -120,9 +120,25 @@ public class AsyncTask : Task<bool>, ITask
         ((TaskInfo)TaskInfo).Token = _cts[1].Token;
 
         TaskInfo.TaskList ??= new TaskList();
-        TaskInfo.TaskList.Add(this, TaskInfo);
+        var taskList = TaskInfo.TaskList;
+        taskList.Add(this, TaskInfo);
 
-        Dispatch(nameof(OnAdd), OnAdd);
+        try
+        {
+            Dispatch(nameof(OnAdd), OnAdd);
+        }
+        catch
+        {
+            try
+            {
+                taskList.Remove(this);
+            }
+            finally
+            {
+                FinishLifecycle();
+            }
+            throw;
+        }
 
         #region Monitor
         //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -167,7 +183,7 @@ public class AsyncTask : Task<bool>, ITask
                 _cts[1].Cancel();
                 #endif
             }
-        }, _cts[0].Token);
+        });
 
         //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         #endregion Monitor
@@ -190,41 +206,55 @@ public class AsyncTask : Task<bool>, ITask
                 }
             }, _cts[1].Token);
         }
+        catch (OperationCanceledException) when (_cts[1].IsCancellationRequested)
+        {
+            // Cancellation can occur before the main delegate starts.
+        }
         finally
         {
-            #if NET8_0_OR_GREATER
-            await _cts[0].CancelAsync();
-            #else
-            _cts[0].Cancel();
-            #endif
+            try
+            {
+                #if NET8_0_OR_GREATER
+                await _cts[0].CancelAsync();
+                #else
+                _cts[0].Cancel();
+                #endif
 
-            monitor.Wait();
+                monitor.Wait();
 
-            _cts[0].Dispose();
-            _cts[1].Dispose();
+                switch (Status)
+                {
+                    case TaskStatus.Faulted:
+                        ((TaskEventArgs)_eventArgs).Exception = _exception;
+                        Dispatch(nameof(OnError), OnError);
+                        break;
+                    case TaskStatus.Canceled:
+                    case TaskStatus.Created:
+                    case TaskStatus.WaitingForActivation:
+                    case TaskStatus.WaitingToRun:
+                    case TaskStatus.Running:
+                    case TaskStatus.WaitingForChildrenToComplete:
+                        break;
+                    case TaskStatus.RanToCompletion:
+                        Dispatch(nameof(OnComplete), OnComplete);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            finally
+            {
+                try
+                {
+                    taskList.Remove(this);
+                    Dispatch(nameof(OnRemove), OnRemove);
+                }
+                finally
+                {
+                    FinishLifecycle();
+                }
+            }
         }
-
-        switch (Status)
-        {
-            case TaskStatus.Faulted:
-                ((TaskEventArgs)_eventArgs).Exception = _exception;
-                Dispatch(nameof(OnError), OnError);
-                break;
-            case TaskStatus.Canceled:
-            case TaskStatus.Created:
-            case TaskStatus.WaitingForActivation:
-            case TaskStatus.WaitingToRun:
-            case TaskStatus.Running:
-            case TaskStatus.WaitingForChildrenToComplete:
-                break;
-            case TaskStatus.RanToCompletion:
-                Dispatch(nameof(OnComplete), OnComplete);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        Dispatch(nameof(OnRemove), OnRemove);
 
         //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         #endregion Main Delegate
@@ -237,9 +267,25 @@ public class AsyncTask : Task<bool>, ITask
     /// <param name="throwOnFirstException"></param>
     public void Cancel(bool throwOnFirstException = false)
     {
-        _cts[0].Cancel(throwOnFirstException);
-        _setTaskStatus(TASK_STATE_CANCELED);
-        Dispatch(nameof(OnCanceled), OnCanceled);
+        lock (_lifecycleLock)
+        {
+            if (_lifecycleFinished || _cancelRequested || IsCompleted)
+                return;
+            _cancelRequested = true;
+            _activeSourceUsers++;
+        }
+
+        try
+        {
+            _cts[0].Cancel(throwOnFirstException);
+            if (!IsCompleted)
+                _setTaskStatus(TASK_STATE_CANCELED);
+            Dispatch(nameof(OnCanceled), OnCanceled);
+        }
+        finally
+        {
+            EndCancellationSourceUse();
+        }
     }
 
 
@@ -256,33 +302,96 @@ public class AsyncTask : Task<bool>, ITask
         if (TaskInfo.SynchronizationContext == null)
             throw new NullReferenceException("SynchronizationContext is null.");
 
-        if (TaskInfo.SynchronizationContext == SynchronizationContext.Current)
+        void InvokeCallback()
+        {
             try
             {
                 method?.Invoke(this, _eventArgs);
             }
             catch (Exception ex)
             {
-                _cts[0].Cancel();
-                _setTaskStatus(TASK_STATE_FAULTED);
-                _exception = Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex) as Exception;
+                if (name == nameof(OnError))
+                    throw;
+
+                _exception = ex;
+                ((TaskEventArgs)_eventArgs).Exception = ex;
+                if (name == nameof(OnRemove))
+                {
+                    if (OnError is null)
+                        throw;
+                    Dispatch(nameof(OnError), OnError);
+                    return;
+                }
+
+                if (!IsCompleted && TryBeginCancellationSourceUse())
+                {
+                    try
+                    {
+                        _cts[0].Cancel();
+                        if (!IsCompleted)
+                            _setTaskStatus(TASK_STATE_FAULTED);
+                    }
+                    finally
+                    {
+                        EndCancellationSourceUse();
+                    }
+                }
+                else if (OnError is not null)
+                {
+                    Dispatch(nameof(OnError), OnError);
+                }
+                else
+                {
+                    throw;
+                }
             }
+        }
+
+        if (TaskInfo.SynchronizationContext == SynchronizationContext.Current)
+            InvokeCallback();
         else
-            TaskInfo.SynchronizationContext.Send(_ =>
-            {
-                try
-                {
-                    method?.Invoke(this, _eventArgs);
-                }
-                catch (Exception ex)
-                {
-                    _cts[0].Cancel();
-                    _setTaskStatus(TASK_STATE_FAULTED);
-                    _exception = Activator.CreateInstance(ex.GetType(), $"{name} -> {ex.Message}", ex) as Exception;
-                }
-            }, null);
+            TaskInfo.SynchronizationContext.Send(_ => InvokeCallback(), null);
     }
 
+
+    private bool TryBeginCancellationSourceUse()
+    {
+        lock (_lifecycleLock)
+        {
+            if (_lifecycleFinished)
+                return false;
+            _activeSourceUsers++;
+            return true;
+        }
+    }
+
+    private void EndCancellationSourceUse()
+    {
+        lock (_lifecycleLock)
+        {
+            _activeSourceUsers--;
+            if (_lifecycleFinished && _activeSourceUsers == 0)
+                DisposeCancellationSources();
+        }
+    }
+
+
+    private void FinishLifecycle()
+    {
+        lock (_lifecycleLock)
+        {
+            _lifecycleFinished = true;
+            if (_activeSourceUsers == 0)
+                DisposeCancellationSources();
+        }
+    }
+
+
+    private void DisposeCancellationSources()
+    {
+        _cts[0].Dispose();
+        _cts[1].Dispose();
+    }
 
     /// <summary>
     ///     ToString
@@ -300,6 +409,11 @@ public class AsyncTask : Task<bool>, ITask
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private readonly CancellationTokenSource[] _cts;
+
+    private readonly object _lifecycleLock = new();
+    private int _activeSourceUsers;
+    private bool _lifecycleFinished;
+    private bool _cancelRequested;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private readonly ITaskEventArgs _eventArgs = new TaskEventArgs();

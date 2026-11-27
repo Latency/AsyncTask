@@ -13,5 +13,6 @@
   <Project Path="src/AsyncTask.csproj">
     <Deploy Solution="Debug|*" />
   </Project>
+  <Project Path="src/Logging/HSMS.Logging.csproj" />
   <Project Path="Unit Tests/Unit Tests.csproj" />
 </Solution>

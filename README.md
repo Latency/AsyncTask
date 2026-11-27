@@ -4,18 +4,18 @@ Asynchronous Task Extension Library
  
 | | Description |
 |---|---|
+| ASSEMBLY NAME: | AsyncTask |
 | CREATED BY: | [Latency McLaughlin] |
-| UPDATED: | 10/14/2026 |
+| UPDATED: | 11/26/2026 |
 | FRAMEWORKS: | net45, net451, net452, net46, net461, net462, net47, net471, net472, net48, net481, netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0, net11.0 |
 | LANGUAGE: | [C#] preview |
-| OUTPUT TYPE: | Library [API] |
+| OUTPUT TYPE: | [Library] [API] |
 | SUPPORTS: | [Visual Studio] |
 | GFX SUBSYS: | [None] |
 | TAGS: | [API], [TAP], [TPL], [.NET], [ORM], [IoC], [DI], [Generics], [Delegates], [EventHandlers], [Parametric-Polymorphism] |
 | STATUS: | [![workflow-badge](https://github.com/Latency/AsyncTask/actions/workflows/status.yml/badge.svg)](https://github.com/Latency/AsyncTask/actions/workflows/status.yml) |
-| LICENSE: | [![license-badge](https://img.shields.io/github/license/Latency/AsyncTask?style=plastic&logo=GitHub&logoColor=black&label=License&color=yellowgreen)](https://github.com/Latency/AsyncTask/blob/master/MIT-LICENSE.txt) |
+| LICENSE: | [![license-badge](https://img.shields.io/github/license/Latency/AsyncTask?logo=GitHub&style=plastic&logoColor=black&label=License&color=yellowgreen)](https://github.com/Latency/AsyncTask/blob/master/MIT-LICENSE.txt) |
 | VERSION: | 3.2.3 |
-<!-- VERSION: 3.2.3 -->
  
 ## Screenshots
 
@@ -184,7 +184,8 @@ await Task.WhenAll(taskList.Keys.Cast<Task>());
 - **TaskInfo:**  `Name`, `Timeout`, `PollInterval` (how often `OnTick` fires), `TaskList` and the `SynchronizationContext` the callbacks are posted to.
 - **Callbacks:**  `OnAdd`, `OnRemove`, `OnComplete`, `OnTick`, `OnTimeout` and `OnCanceled`.
 - **Cancellation:**  Call `Cancel()` on the task to interrupt it, which raises `OnCanceled`.  A task running longer than `Timeout` raises `OnTimeout`.
- 
+- **Logging:**  Set `TaskInfo.Logger` to an `AsyncTask.Interfaces.ILogger`. To forward `DefaultLogger` messages to an existing `Microsoft.Extensions.Logging.ILogger`, construct it with `new AsyncTask.Logging.DefaultLogger(synchronizationContext, logger)`. The caller owns the supplied logger and its provider. The original constructor remains available; on net452 it uses `NullLogger` unless a logger is supplied.
+
 ## Installation
 
 This library can be installed from [NuGet].
@@ -199,13 +200,14 @@ If you have a patch to contribute, a feature to request, or a bug to report, ple
 
 ## Donation
 
-Click the button to donate to my efforts:
-[![Donate via Paypal](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/Latency2?country.x=US&locale.x=en_US)
+If this project is useful to you, please consider supporting its continued development through PayPal.
+
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-003087?style=plastic&logo=paypal&logoColor=white)](https://paypal.me/Latency2?country.x=US&locale.x=en_US)
 
 ## License
 
 The source code for the site is licensed under the MIT license, which you can find in the [MIT-LICENSE].txt file.
-  
+
 ---
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job.)
@@ -213,11 +215,14 @@ The source code for the site is licensed under the MIT license, which you can fi
    [NuGet]: <https://github.com/Latency/AsyncTask/pkgs/nuget/AsyncTask/>
    [.NET]: <https://en.wikipedia.org/wiki/.NET_Framework/>
    [Visual Studio]: <https://en.wikipedia.org/wiki/Microsoft_Visual_Studio/>
+   [Library]: <https://en.wikipedia.org/wiki/Software_library/>
    [Latency McLaughlin]: <https://www.linkedin.com/in/Latency/>
    [API]: <https://en.wikipedia.org/wiki/Application_programming_interface>
    [C#]: <https://en.wikipedia.org/wiki/C_Sharp_(programming_language)>
    [DLL]: <https://en.wikipedia.org/wiki/Dynamic-link_library>
    [MIT-License]: <http://choosealicense.com/licenses/mit/>
+   [WPF]: <https://en.wikipedia.org/wiki/Windows_Presentation_Foundation/>
+   [WinForms]: <https://en.wikipedia.org/wiki/Windows_Forms/>
    [Unit Tests]: <https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-xunit>
    [Comparison]: <https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java>
    [WPF]: <https://en.wikipedia.org/wiki/Windows_Presentation_Foundation/>
